@@ -56,15 +56,31 @@ tryAgainBtn.addEventListener('click', () => switchScreen(startScreen));
 // Funciones
 async function autoLoadQuestions() {
     try {
-        const response = await fetch('./data/preguntas_comunes.json');
-        if (!response.ok) throw new Error("No se pudo cargar el archivo local");
+        const urls = [
+            './data/preguntas_comunes.json',
+            './data/preguntas_especificas.json'
+        ];
         
-        const text = await response.text();
-        const data = JSON.parse(text);
+        let allLoadedQuestions = [];
+        let loadedCount = 0;
         
-        allQuestions = data.filter(q => q.respuestaCorrecta && q.respuestaCorrecta !== "");
+        for (const url of urls) {
+            try {
+                const response = await fetch(url);
+                if (response.ok) {
+                    const data = await response.json();
+                    const validQuestions = data.filter(q => q.respuestaCorrecta && q.respuestaCorrecta !== "");
+                    allLoadedQuestions = allLoadedQuestions.concat(validQuestions);
+                    loadedCount++;
+                }
+            } catch (err) {
+                console.error("Error al cargar " + url, err);
+            }
+        }
         
-        fileCountText.textContent = "1";
+        allQuestions = allLoadedQuestions;
+        
+        fileCountText.textContent = loadedCount.toString();
         totalAvailableText.textContent = allQuestions.length;
         
         loadedFilesInfo.classList.remove('hidden');
