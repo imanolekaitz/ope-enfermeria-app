@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test OPE Enfermeria by Ekaitzel</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#121826">
+    <link rel="apple-touch-icon" href="icon.png">
+</head>
+
+<body>
+    <div class="background-effects">
+        <div class="glow-orb orb-1"></div>
+        <div class="glow-orb orb-2"></div>
+    </div>
+
+    <!-- PANTALLA DE INICIO: Carga de JSON -->
+    <main id="startScreen" class="screen active">
+        <div class="glass-panel">
+            <h1 class="gradient-text">Test OPE 2026 Enfermeria</h1>
+            <p class="subtitle">La aplicación cargará automáticamente tu base de datos de preguntas para comenzar el test o el examen.</p>
+
+            <div class="upload-zone" id="loadingZone" style="border: none; background: transparent;">
+                <p id="loadingMessage" style="font-size: 1.2rem; font-weight: 600; color: #6366f1;">Cargando preguntas automáticamente...</p>
+            </div>
+
+            <div id="loadedFilesInfo" class="file-info hidden">
+                <p>Archivos cargados: <span id="fileCount">0</span></p>
+                <p>Total preguntas disponibles: <strong id="totalAvailable">0</strong></p>
+
+                <div class="start-actions" style="display: flex; gap: 1rem; justify-content: center;">
+                    <button id="startTestBtn" class="premium-btn secondary">Comenzar Test</button>
+                    <button id="startExamBtn" class="premium-btn primary">Comenzar Examen</button>
+                </div>
+                <div style="margin-top: 1.5rem;">
+                    <button id="viewHistoryBtn" class="premium-btn secondary" style="width: 100%;">📊 Ver Histórico de Resultados</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- PANTALLA PRINCIPAL: El Test -->
+    <main id="testScreen" class="screen">
+        <header class="test-header">
+            <div style="display: flex; justify-content: flex-end; margin-bottom: 1rem;">
+                <button id="exitTestBtn" class="premium-btn secondary"
+                    style="padding: 0.5rem 1rem; font-size: 0.9rem;">✕ Salir al menú</button>
+            </div>
+            <div class="progress-container">
+                <div class="progress-stats">
+                    <span id="currentQuestionNumber">Pregunta 1 de 40</span>
+                    <span id="scoreTracker">Aciertos: 0</span>
+                </div>
+                <div class="progress-bar">
+                    <div id="testProgressFill" class="progress-fill"></div>
+                </div>
+            </div>
+        </header>
+
+        <div class="glass-panel question-panel">
+            <h2 id="questionText" class="question-text">
+                <!-- La pregunta se inserta aquí -->
+            </h2>
+
+            <div id="optionsContainer" class="options-container">
+                <!-- Opciones A, B, C, D -->
+            </div>
+
+            <div class="actions" style="display: flex; justify-content: space-between;">
+                <button id="prevBtn" class="premium-btn secondary hidden">← Anterior</button>
+                <div>
+                    <button id="nextBtn" class="premium-btn secondary hidden">Siguiente ➔</button>
+                    <button id="submitExamBtn" class="premium-btn primary hidden">Entregar Examen</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- PANTALLA FINAL: Resultados -->
+    <main id="resultScreen" class="screen">
+        <div class="glass-panel text-center">
+            <h1 class="gradient-text">¡Test Completado!</h1>
+
+            <div class="score-display">
+                <div class="score-circle">
+                    <span id="finalScoreText" class="score-number">0</span>
+                    <span class="score-max">/ 40</span>
+                </div>
+            </div>
+
+            <p id="feedbackMessage" class="feedback-msg">Buen intento. ¡Sigue preparándote!</p>
+
+            <button id="tryAgainBtn" class="premium-btn primary mt-4">Realizar otro test</button>
+        </div>
+    </main>
+
+    <!-- PANTALLA HISTÓRICA: Resultados guardados -->
+    <main id="historyScreen" class="screen">
+        <header class="test-header" style="margin-bottom: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h2 class="gradient-text" style="font-size: 2rem; margin: 0;">Histórico de Progreso</h2>
+                <button id="historyToStartBtn" class="premium-btn secondary" style="padding: 0.5rem 1rem; font-size: 0.9rem;">✕ Volver</button>
+            </div>
+        </header>
+
+        <div class="glass-panel" style="padding: 2rem;">
+            <div id="historyStatsGrid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem;">
+                <div class="stat-card" style="background: rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 1rem; text-align: center;">
+                    <h3 style="font-size: 0.9rem; color: var(--text-secondary);">Sesiones (E/T)</h3>
+                    <p id="histTotalSessions" style="font-size: 1.8rem; font-weight: 800; margin-top: 0.5rem;">0</p>
+                </div>
+                <div class="stat-card" style="background: rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 1rem; text-align: center;">
+                    <h3 style="font-size: 0.9rem; color: var(--text-secondary);">Total Respondidas</h3>
+                    <p id="histTotalQuestions" style="font-size: 1.8rem; font-weight: 800; margin-top: 0.5rem;">0</p>
+                </div>
+                <div class="stat-card" style="background: rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 1rem; text-align: center;">
+                    <h3 style="font-size: 0.9rem; color: var(--text-secondary);">Aciertos Globales</h3>
+                    <p id="histWinRate" style="font-size: 1.8rem; font-weight: 800; margin-top: 0.5rem; color: var(--success);">0%</p>
+                </div>
+            </div>
+
+            <div style="background: rgba(0,0,0,0.3); border-radius: 1rem; padding: 1rem; margin-bottom: 2rem;">
+                <canvas id="historyChart" height="100"></canvas>
+            </div>
+
+            <!-- Pregunta más fallada -->
+            <div id="worstQuestionContainer" style="background: rgba(255, 60, 60, 0.1); border: 1px solid rgba(255, 60, 60, 0.3); border-radius: 1rem; padding: 1.5rem; margin-bottom: 2rem; display: none;">
+                <h3 style="color: #ff6b6b; margin-top: 0; margin-bottom: 0.5rem; font-size: 1.2rem;">❌ Pregunta más fallada</h3>
+                <p id="worstQuestionTitle" style="font-weight: 600; margin-bottom: 0.5rem; line-height: 1.4; color: #fff;">[Pregunta]</p>
+                <div style="background: rgba(255, 255, 255, 0.05); padding: 1rem; border-radius: 0.5rem; border-left: 4px solid #51cf66;">
+                    <span style="color: #51cf66; font-weight: bold; display: block; margin-bottom: 0.3rem;">✔ Respuesta correcta: </span>
+                    <span id="worstQuestionAnswer" style="color: #e2e8f0;">[Respuesta]</span>
+                </div>
+            </div>
+
+            <div style="text-align: right;">
+                <button id="clearHistoryBtn" class="premium-btn" style="background: var(--error-bg); color: var(--error); border: 1px solid var(--error);">🗑 Borrar Historial</button>
+            </div>
+        </div>
+    </main>
+
+    <script src="main.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(registration => console.log('SW Registrado correctamente:', registration.scope))
+                    .catch(error => console.log('Error al registrar SW:', error));
+            });
+        }
+    </script>
+</body>
+
+</html>
