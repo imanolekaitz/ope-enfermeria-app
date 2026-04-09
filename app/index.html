@@ -33,9 +33,17 @@
                 <p>Archivos cargados: <span id="fileCount">0</span></p>
                 <p>Total preguntas disponibles: <strong id="totalAvailable">0</strong></p>
 
-                <div class="start-actions" style="display: flex; gap: 1rem; justify-content: center;">
-                    <button id="startTestBtn" class="premium-btn secondary">Comenzar Test</button>
-                    <button id="startExamBtn" class="premium-btn primary">Comenzar Examen</button>
+                <div class="start-actions" style="display: flex; flex-direction: column; gap: 1rem; align-items: center;">
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; align-items: center; background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 1rem; width: 100%;">
+                        <span style="color: var(--text-secondary); font-size: 0.95rem; font-weight: 600; width: 100%;">Configurar Test Normal:</span>
+                        <select id="testLengthSelect" class="premium-btn secondary" style="padding: 0.8rem; border: 1px solid var(--border-color); flex-grow: 1;">
+                            <option value="25">25 pregs.</option>
+                            <option value="50" selected>50 pregs.</option>
+                            <option value="100">100 pregs.</option>
+                        </select>
+                        <button id="startTestBtn" class="premium-btn secondary" style="flex-grow: 2;">Comenzar Test</button>
+                    </div>
+                    <button id="startExamBtn" class="premium-btn primary" style="width: 100%;">Comenzar Examen (100 pregs.)</button>
                 </div>
                 <div style="margin-top: 1.5rem;">
                     <button id="viewHistoryBtn" class="premium-btn secondary" style="width: 100%;">📊 Ver Histórico de Resultados</button>

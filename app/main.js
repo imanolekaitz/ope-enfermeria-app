@@ -33,7 +33,6 @@ let allQuestions = [];
 let testQuestions = [];
 let currentQuestionIndex = 0;
 let correctAnswersCount = 0;
-const TEST_LIMIT = 40;
 
 let testMode = 'normal'; // 'normal' | 'examen'
 let reviewMode = false;
@@ -115,7 +114,16 @@ function startTest(mode) {
     });
     
     testQuestions = [];
-    const limit = Math.min(TEST_LIMIT, pool.length);
+    
+    let maxQuestions = 100;
+    if (mode === 'normal') {
+        const selectEl = document.getElementById('testLengthSelect');
+        if (selectEl) {
+            maxQuestions = parseInt(selectEl.value, 10);
+        }
+    }
+    
+    const limit = Math.min(maxQuestions, pool.length);
     
     for (let i = 0; i < limit; i++) {
         let totalWeight = pool.reduce((sum, item) => sum + item.weight, 0);
