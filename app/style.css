@@ -223,6 +223,8 @@ input[type="file"] {
     font-weight: 600;
     margin-bottom: 2rem;
     line-height: 1.4;
+    text-align: justify;
+    hyphens: auto;
 }
 
 .options-container {
@@ -263,6 +265,14 @@ input[type="file"] {
     align-items: center;
     justify-content: center;
     border-radius: 8px;
+    flex-shrink: 0;
+}
+
+.op-text {
+    flex: 1;
+    text-align: justify;
+    hyphens: auto;
+    line-height: 1.4;
 }
 
 /* Respuestas Modificadores */
