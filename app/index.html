@@ -23,30 +23,39 @@
     <main id="startScreen" class="screen active">
         <div class="glass-panel">
             <h1 class="gradient-text">Test OPE 2026 Enfermeria</h1>
-            <p class="subtitle">La aplicación cargará automáticamente tu base de datos de preguntas para comenzar el test o el examen.</p>
+            <p class="subtitle">by Ekaitzel</p>
 
             <div class="upload-zone" id="loadingZone" style="border: none; background: transparent;">
-                <p id="loadingMessage" style="font-size: 1.2rem; font-weight: 600; color: #6366f1;">Cargando preguntas automáticamente...</p>
+                <p id="loadingMessage" style="font-size: 1.2rem; font-weight: 600; color: #6366f1;">Cargando preguntas
+                    automáticamente...</p>
             </div>
 
             <div id="loadedFilesInfo" class="file-info hidden">
                 <p>Archivos cargados: <span id="fileCount">0</span></p>
                 <p>Total preguntas disponibles: <strong id="totalAvailable">0</strong></p>
 
-                <div class="start-actions" style="display: flex; flex-direction: column; gap: 1rem; align-items: center;">
-                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; align-items: center; background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 1rem; width: 100%;">
-                        <span style="color: var(--text-secondary); font-size: 0.95rem; font-weight: 600; width: 100%;">Configurar Test Normal:</span>
-                        <select id="testLengthSelect" class="premium-btn secondary" style="padding: 0.8rem; border: 1px solid var(--border-color); flex-grow: 1;">
+                <div class="start-actions"
+                    style="display: flex; flex-direction: column; gap: 1rem; align-items: center;">
+                    <div
+                        style="display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; align-items: center; background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 1rem; width: 100%;">
+                        <span
+                            style="color: var(--text-secondary); font-size: 0.95rem; font-weight: 600; width: 100%;">Configurar
+                            Test Normal:</span>
+                        <select id="testLengthSelect" class="premium-btn secondary"
+                            style="padding: 0.8rem; border: 1px solid var(--border-color); flex-grow: 1;">
                             <option value="25">25 pregs.</option>
                             <option value="50" selected>50 pregs.</option>
                             <option value="100">100 pregs.</option>
                         </select>
-                        <button id="startTestBtn" class="premium-btn secondary" style="flex-grow: 2;">Comenzar Test</button>
+                        <button id="startTestBtn" class="premium-btn secondary" style="flex-grow: 2;">Comenzar
+                            Test</button>
                     </div>
-                    <button id="startExamBtn" class="premium-btn primary" style="width: 100%;">Comenzar Examen (100 pregs.)</button>
+                    <button id="startExamBtn" class="premium-btn primary" style="width: 100%;">Comenzar Examen (100
+                        pregs.)</button>
                 </div>
                 <div style="margin-top: 1.5rem;">
-                    <button id="viewHistoryBtn" class="premium-btn secondary" style="width: 100%;">📊 Ver Histórico de Resultados</button>
+                    <button id="viewHistoryBtn" class="premium-btn secondary" style="width: 100%;">📊 Ver Histórico de
+                        Resultados</button>
                 </div>
             </div>
         </div>
@@ -112,23 +121,28 @@
         <header class="test-header" style="margin-bottom: 2rem;">
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <h2 class="gradient-text" style="font-size: 2rem; margin: 0;">Histórico de Progreso</h2>
-                <button id="historyToStartBtn" class="premium-btn secondary" style="padding: 0.5rem 1rem; font-size: 0.9rem;">✕ Volver</button>
+                <button id="historyToStartBtn" class="premium-btn secondary"
+                    style="padding: 0.5rem 1rem; font-size: 0.9rem;">✕ Volver</button>
             </div>
         </header>
 
         <div class="glass-panel" style="padding: 2rem;">
-            <div id="historyStatsGrid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem;">
-                <div class="stat-card" style="background: rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 1rem; text-align: center;">
+            <div id="historyStatsGrid" class="history-grid">
+                <div class="stat-card"
+                    style="background: rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 1rem; text-align: center;">
                     <h3 style="font-size: 0.9rem; color: var(--text-secondary);">Sesiones (E/T)</h3>
                     <p id="histTotalSessions" style="font-size: 1.8rem; font-weight: 800; margin-top: 0.5rem;">0</p>
                 </div>
-                <div class="stat-card" style="background: rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 1rem; text-align: center;">
+                <div class="stat-card"
+                    style="background: rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 1rem; text-align: center;">
                     <h3 style="font-size: 0.9rem; color: var(--text-secondary);">Total Respondidas</h3>
                     <p id="histTotalQuestions" style="font-size: 1.8rem; font-weight: 800; margin-top: 0.5rem;">0</p>
                 </div>
-                <div class="stat-card" style="background: rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 1rem; text-align: center;">
+                <div class="stat-card"
+                    style="background: rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 1rem; text-align: center;">
                     <h3 style="font-size: 0.9rem; color: var(--text-secondary);">Aciertos Globales</h3>
-                    <p id="histWinRate" style="font-size: 1.8rem; font-weight: 800; margin-top: 0.5rem; color: var(--success);">0%</p>
+                    <p id="histWinRate"
+                        style="font-size: 1.8rem; font-weight: 800; margin-top: 0.5rem; color: var(--success);">0%</p>
                 </div>
             </div>
 
@@ -137,17 +151,24 @@
             </div>
 
             <!-- Pregunta más fallada -->
-            <div id="worstQuestionContainer" style="background: rgba(255, 60, 60, 0.1); border: 1px solid rgba(255, 60, 60, 0.3); border-radius: 1rem; padding: 1.5rem; margin-bottom: 2rem; display: none;">
-                <h3 style="color: #ff6b6b; margin-top: 0; margin-bottom: 0.5rem; font-size: 1.2rem;">❌ Pregunta más fallada</h3>
-                <p id="worstQuestionTitle" style="font-weight: 600; margin-bottom: 0.5rem; line-height: 1.4; color: #fff;">[Pregunta]</p>
-                <div style="background: rgba(255, 255, 255, 0.05); padding: 1rem; border-radius: 0.5rem; border-left: 4px solid #51cf66;">
-                    <span style="color: #51cf66; font-weight: bold; display: block; margin-bottom: 0.3rem;">✔ Respuesta correcta: </span>
+            <div id="worstQuestionContainer"
+                style="background: rgba(255, 60, 60, 0.1); border: 1px solid rgba(255, 60, 60, 0.3); border-radius: 1rem; padding: 1.5rem; margin-bottom: 2rem; display: none;">
+                <h3 style="color: #ff6b6b; margin-top: 0; margin-bottom: 0.5rem; font-size: 1.2rem;">❌ Pregunta más
+                    fallada</h3>
+                <p id="worstQuestionTitle"
+                    style="font-weight: 600; margin-bottom: 0.5rem; line-height: 1.4; color: #fff;">[Pregunta]</p>
+                <div
+                    style="background: rgba(255, 255, 255, 0.05); padding: 1rem; border-radius: 0.5rem; border-left: 4px solid #51cf66;">
+                    <span style="color: #51cf66; font-weight: bold; display: block; margin-bottom: 0.3rem;">✔ Respuesta
+                        correcta: </span>
                     <span id="worstQuestionAnswer" style="color: #e2e8f0;">[Respuesta]</span>
                 </div>
             </div>
 
             <div style="text-align: right;">
-                <button id="clearHistoryBtn" class="premium-btn" style="background: var(--error-bg); color: var(--error); border: 1px solid var(--error);">🗑 Borrar Historial</button>
+                <button id="clearHistoryBtn" class="premium-btn"
+                    style="background: var(--error-bg); color: var(--error); border: 1px solid var(--error);">🗑 Borrar
+                    Historial</button>
             </div>
         </div>
     </main>
