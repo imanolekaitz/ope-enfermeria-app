@@ -53,9 +53,9 @@
                     <button id="startExamBtn" class="premium-btn primary" style="width: 100%;">Comenzar Examen (100
                         pregs.)</button>
                 </div>
-                <div style="margin-top: 1.5rem;">
-                    <button id="viewHistoryBtn" class="premium-btn secondary" style="width: 100%;">📊 Ver Histórico de
-                        Resultados</button>
+                <div style="margin-top: 1.5rem; display: flex; flex-direction: column; gap: 0.5rem;">
+                    <button id="viewHistoryBtn" class="premium-btn secondary" style="width: 100%;">📊 Ver Histórico de Resultados</button>
+                    <button id="howItWorksBtn" class="premium-btn secondary" style="width: 100%;">❓ ¿Cómo funciona la app?</button>
                 </div>
             </div>
         </div>
@@ -174,6 +174,34 @@
                     style="background: var(--error-bg); color: var(--error); border: 1px solid var(--error);">🗑 Borrar
                     Historial</button>
             </div>
+        </div>
+    </main>
+
+    <!-- PANTALLA CÓMO FUNCIONA -->
+    <main id="infoScreen" class="screen">
+        <header class="test-header" style="margin-bottom: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h2 class="gradient-text" style="font-size: 2rem; margin: 0;">Cómo funciona el simulador</h2>
+                <button id="infoToStartBtn" class="premium-btn secondary"
+                    style="padding: 0.5rem 1rem; font-size: 0.9rem;">✕ Volver</button>
+            </div>
+        </header>
+
+        <div class="glass-panel" style="padding: 2rem; text-align: left; color: var(--text-primary); font-size: 1.05rem; line-height: 1.6;">
+            <ul style="list-style-type: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 1.5rem;">
+                <li>
+                    <span style="font-size: 1.3rem; margin-bottom: 0.5rem; display: block;">📝 <strong>Dos modos de estudio</strong></span>
+                    Puedes elegir el <strong>Test Normal</strong> (de 25, 50 o 100 preguntas) para estudiar de forma dinámica con confirmación inmediata de si has acertado o fallado, o el <strong>Modo Examen</strong> (100 preguntas temporizadas a 1 hora) para ponerte a prueba a ciegas hasta el final.
+                </li>
+                <li>
+                    <span style="font-size: 1.3rem; margin-bottom: 0.5rem; display: block;">🎯 <strong>Insistencia en tus fallos</strong></span>
+                    El sistema detecta automáticamente qué respuestas fallas más a menudo y les otorga más peso matemático. Significa que, conforme más utilices la app, más insistirá de forma inteligente en tus puntos flacos.
+                </li>
+                <li>
+                    <span style="font-size: 1.3rem; margin-bottom: 0.5rem; display: block;">⚖️ <strong>Ninguna pregunta se queda atrás</strong></span>
+                    A diferencia del simple "azar", si hay preguntas que nunca te han tocado, el algoritmo aumenta su prioridad garantizando que antes o después abarcarás y memorizarás el 100% del abanico de preguntas proporcionadas en el temario. 
+                </li>
+            </ul>
         </div>
     </main>
 

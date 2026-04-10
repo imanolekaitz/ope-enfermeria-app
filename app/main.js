@@ -1,8 +1,8 @@
-// Elementos DOM
 const startScreen = document.getElementById('startScreen');
 const testScreen = document.getElementById('testScreen');
 const resultScreen = document.getElementById('resultScreen');
 const historyScreen = document.getElementById('historyScreen');
+const infoScreen = document.getElementById('infoScreen');
 
 const loadedFilesInfo = document.getElementById('loadedFilesInfo');
 const fileCountText = document.getElementById('fileCount');
@@ -10,7 +10,9 @@ const totalAvailableText = document.getElementById('totalAvailable');
 const startTestBtn = document.getElementById('startTestBtn');
 const startExamBtn = document.getElementById('startExamBtn');
 const viewHistoryBtn = document.getElementById('viewHistoryBtn');
+const howItWorksBtn = document.getElementById('howItWorksBtn');
 const historyToStartBtn = document.getElementById('historyToStartBtn');
+const infoToStartBtn = document.getElementById('infoToStartBtn');
 const clearHistoryBtn = document.getElementById('clearHistoryBtn');
 
 const examTimerContainer = document.getElementById('examTimerContainer');
@@ -56,7 +58,9 @@ nextBtn.addEventListener('click', proceedToNext);
 prevBtn.addEventListener('click', proceedToPrev);
 exitTestBtn.addEventListener('click', exitTest);
 viewHistoryBtn.addEventListener('click', showHistory);
+howItWorksBtn.addEventListener('click', () => switchScreen(infoScreen));
 historyToStartBtn.addEventListener('click', () => switchScreen(startScreen));
+infoToStartBtn.addEventListener('click', () => switchScreen(startScreen));
 clearHistoryBtn.addEventListener('click', clearHistory);
 tryAgainBtn.addEventListener('click', () => switchScreen(startScreen));
 
@@ -428,7 +432,7 @@ function finishTest() {
 }
 
 function switchScreen(screenElement) {
-    [startScreen, testScreen, resultScreen, historyScreen].forEach(el => {
+    [startScreen, testScreen, resultScreen, historyScreen, infoScreen].forEach(el => {
         if(el) el.classList.remove('active');
     });
     screenElement.classList.add('active');
