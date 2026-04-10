@@ -64,9 +64,12 @@
     <!-- PANTALLA PRINCIPAL: El Test -->
     <main id="testScreen" class="screen">
         <header class="test-header">
-            <div style="display: flex; justify-content: flex-end; margin-bottom: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <div id="examTimerContainer" class="hidden" style="background: rgba(255,255,255,0.1); padding: 0.5rem 1rem; border-radius: 2rem; font-weight: 600; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="font-size: 1.2rem;">⏱</span> <span id="examTimerText">60:00</span>
+                </div>
                 <button id="exitTestBtn" class="premium-btn secondary"
-                    style="padding: 0.5rem 1rem; font-size: 0.9rem;">✕ Salir al menú</button>
+                    style="padding: 0.5rem 1rem; font-size: 0.9rem; margin-left: auto;">✕ Salir al menú</button>
             </div>
             <div class="progress-container">
                 <div class="progress-stats">
@@ -111,6 +114,7 @@
             </div>
 
             <p id="feedbackMessage" class="feedback-msg">Buen intento. ¡Sigue preparándote!</p>
+            <p id="remainingTimeFeedback" style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 1.5rem;" class="hidden"></p>
 
             <button id="tryAgainBtn" class="premium-btn primary mt-4">Realizar otro test</button>
         </div>

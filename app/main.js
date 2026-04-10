@@ -13,6 +13,10 @@ const viewHistoryBtn = document.getElementById('viewHistoryBtn');
 const historyToStartBtn = document.getElementById('historyToStartBtn');
 const clearHistoryBtn = document.getElementById('clearHistoryBtn');
 
+const examTimerContainer = document.getElementById('examTimerContainer');
+const examTimerText = document.getElementById('examTimerText');
+const remainingTimeFeedback = document.getElementById('remainingTimeFeedback');
+
 const currentQuestionNumberText = document.getElementById('currentQuestionNumber');
 const scoreTrackerText = document.getElementById('scoreTracker');
 const testProgressFill = document.getElementById('testProgressFill');
@@ -40,6 +44,10 @@ let userAnswers = [];
 let chartInstance = null;
 let isResultSaved = false;
 let isConfirmDialogActive = false;
+
+let examTimerInterval = null;
+let timeRemaining = 3600;
+let finalTimeRemainingText = '';
 
 document.addEventListener('DOMContentLoaded', autoLoadQuestions);
 startTestBtn.addEventListener('click', () => startTest('normal'));
@@ -105,6 +113,17 @@ async function autoLoadQuestions() {
 function startTest(mode) {
     testMode = mode;
     reviewMode = false;
+    
+    if (examTimerInterval) clearInterval(examTimerInterval);
+    if (mode === 'examen') {
+        timeRemaining = 3600;
+        finalTimeRemainingText = '';
+        examTimerContainer.classList.remove('hidden');
+        updateTimerDisplay();
+        examTimerInterval = setInterval(timerTick, 1000);
+    } else {
+        examTimerContainer.classList.add('hidden');
+    }
     
     let failuresMap = JSON.parse(localStorage.getItem('antigravity_failures') || '{}');
     let lastSeenMap = JSON.parse(localStorage.getItem('antigravity_last_seen_test') || '{}');
@@ -314,12 +333,45 @@ function proceedToPrev() {
     }
 }
 
-function submitExamHandler() {
-    if (isConfirmDialogActive) return;
-    isConfirmDialogActive = true;
-    const res = confirm("¿Seguro que quieres entregar el examen?");
-    setTimeout(() => { isConfirmDialogActive = false; }, 300);
-    if (!res) return;
+function updateTimerDisplay() {
+    const minutes = Math.floor(timeRemaining / 60);
+    const seconds = timeRemaining % 60;
+    examTimerText.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+}
+
+function timerTick() {
+    if (timeRemaining > 0) {
+        timeRemaining--;
+        updateTimerDisplay();
+    } else {
+        clearInterval(examTimerInterval);
+        alert("¡Se acabó el tiempo!");
+        if (testMode === 'examen' && !reviewMode) {
+             submitExamHandler(true);
+        }
+    }
+}
+
+function submitExamHandler(isForceCall) {
+    if (isForceCall !== true) {
+        if (isConfirmDialogActive) return;
+        isConfirmDialogActive = true;
+        const res = confirm("¿Seguro que quieres entregar el examen?");
+        setTimeout(() => { isConfirmDialogActive = false; }, 300);
+        if (!res) return;
+    }
+    
+    if (examTimerInterval) {
+        clearInterval(examTimerInterval);
+        if (timeRemaining > 0) {
+            const min = Math.floor(timeRemaining / 60);
+            const sec = timeRemaining % 60;
+            finalTimeRemainingText = `Te han sobrado ${min} minutos y ${sec} segundos.`;
+        } else {
+            finalTimeRemainingText = "Agotaste todo el tiempo disponible.";
+        }
+    }
+    examTimerContainer.classList.add('hidden');
     
     correctAnswersCount = 0;
     for (let i = 0; i < testQuestions.length; i++) {
@@ -363,6 +415,13 @@ function finishTest() {
         feedbackMessage.textContent = "Aprobado. Hay margen de mejora con algo de repaso.";
     } else {
         feedbackMessage.textContent = "Debes seguir estudiando. ¡No te rindas!";
+    }
+
+    if (testMode === 'examen') {
+        remainingTimeFeedback.textContent = finalTimeRemainingText;
+        remainingTimeFeedback.classList.remove('hidden');
+    } else {
+        remainingTimeFeedback.classList.add('hidden');
     }
 
     switchScreen(resultScreen);
