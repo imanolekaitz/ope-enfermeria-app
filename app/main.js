@@ -107,10 +107,22 @@ function startTest(mode) {
     reviewMode = false;
     
     let failuresMap = JSON.parse(localStorage.getItem('antigravity_failures') || '{}');
+    let lastSeenMap = JSON.parse(localStorage.getItem('antigravity_last_seen_test') || '{}');
+    let currentTestCounter = parseInt(localStorage.getItem('antigravity_test_counter') || '0', 10);
     
     let pool = [...allQuestions].map(q => {
         let failures = failuresMap[q.pregunta] || 0;
-        return { q, weight: 1 + failures }; // A mayor número de fallos, mayor peso
+        let lastSeenTest = lastSeenMap[q.pregunta];
+        
+        let testsUnseen = 0;
+        if (lastSeenTest === undefined) {
+             testsUnseen = currentTestCounter + 5; // Bonus para garantizar que entren las nunca vistas
+        } else {
+             testsUnseen = currentTestCounter - lastSeenTest;
+        }
+        
+        let weight = 1 + (failures * 3) + testsUnseen;
+        return { q, weight };
     });
     
     testQuestions = [];
@@ -381,6 +393,10 @@ function exitTest() {
 function saveResult() {
     const historyData = JSON.parse(localStorage.getItem('antigravity_history') || '[]');
     let failuresMap = JSON.parse(localStorage.getItem('antigravity_failures') || '{}');
+    let lastSeenMap = JSON.parse(localStorage.getItem('antigravity_last_seen_test') || '{}');
+    let currentTestCounter = parseInt(localStorage.getItem('antigravity_test_counter') || '0', 10) + 1;
+    
+    localStorage.setItem('antigravity_test_counter', currentTestCounter.toString());
     
     let respondidas = 0;
     
@@ -391,6 +407,9 @@ function saveResult() {
         if (ua !== null) {
             respondidas++;
             const hash = q.pregunta;
+            
+            lastSeenMap[hash] = currentTestCounter;
+            
             if (ua === q.respuestaCorrecta) {
                 if (failuresMap[hash]) {
                     failuresMap[hash] = Math.max(0, failuresMap[hash] - 1); // Disminuye el peso si se acierta
@@ -402,6 +421,7 @@ function saveResult() {
     }
     
     localStorage.setItem('antigravity_failures', JSON.stringify(failuresMap));
+    localStorage.setItem('antigravity_last_seen_test', JSON.stringify(lastSeenMap));
     
     const record = {
         date: new Date().toISOString(),
@@ -527,6 +547,8 @@ function clearHistory() {
     if (res) {
         localStorage.removeItem('antigravity_history');
         localStorage.removeItem('antigravity_failures');
+        localStorage.removeItem('antigravity_test_counter');
+        localStorage.removeItem('antigravity_last_seen_test');
         renderHistory();
     }
 }
