@@ -1,4 +1,5 @@
-const CACHE_NAME = 'ope-enfermeria-cache-v1';
+// Cambiar CACHE_NAME para forzar una actualización profunda inmediata
+const CACHE_NAME = 'ope-enfermeria-cache-v2';
 const urlsToCache = [
     './',
     './index.html',
@@ -17,15 +18,20 @@ self.addEventListener('install', event => {
     );
 });
 
-// Interceptar peticiones para servir desde caché local
+// Interceptar peticiones para servir desde RED primero, fallback a CACHE si no hay internet (Network First)
 self.addEventListener('fetch', event => {
     event.respondWith(
-        caches.match(event.request)
-            .then(response => {
-                if (response) {
-                    return response; // En cache local offline
-                }
-                return fetch(event.request);
+        fetch(event.request)
+            .then(networkResponse => {
+                // Guardamos una copia temporal de lo nuevo que llega de internet
+                return caches.open(CACHE_NAME).then(cache => {
+                    cache.put(event.request, networkResponse.clone());
+                    return networkResponse;
+                });
+            })
+            .catch(() => {
+                // Si falla (estamos offline), usamos la memoria caché
+                return caches.match(event.request);
             })
     );
 });
