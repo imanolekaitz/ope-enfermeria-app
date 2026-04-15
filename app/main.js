@@ -3,6 +3,7 @@ const testScreen = document.getElementById('testScreen');
 const resultScreen = document.getElementById('resultScreen');
 const historyScreen = document.getElementById('historyScreen');
 const infoScreen = document.getElementById('infoScreen');
+const flashcardScreen = document.getElementById('flashcardScreen');
 
 const loadedFilesInfo = document.getElementById('loadedFilesInfo');
 const fileCountText = document.getElementById('fileCount');
@@ -14,6 +15,8 @@ const howItWorksBtn = document.getElementById('howItWorksBtn');
 const historyToStartBtn = document.getElementById('historyToStartBtn');
 const infoToStartBtn = document.getElementById('infoToStartBtn');
 const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+const startFlashcardsBtn = document.getElementById('startFlashcardsBtn');
+const exitFlashcardsBtn = document.getElementById('exitFlashcardsBtn');
 
 const examTimerContainer = document.getElementById('examTimerContainer');
 const examTimerText = document.getElementById('examTimerText');
@@ -24,6 +27,15 @@ const scoreTrackerText = document.getElementById('scoreTracker');
 const testProgressFill = document.getElementById('testProgressFill');
 const questionText = document.getElementById('questionText');
 const optionsContainer = document.getElementById('optionsContainer');
+
+const flashcardElement = document.getElementById('flashcardElement');
+const fcQuestionText = document.getElementById('fcQuestionText');
+const fcAnswerText = document.getElementById('fcAnswerText');
+const flashcardNumberText = document.getElementById('flashcardNumber');
+const flashcardProgressFill = document.getElementById('flashcardProgressFill');
+const fcNextBtn = document.getElementById('fcNextBtn');
+const fcPrevBtn = document.getElementById('fcPrevBtn');
+const fcFinishBtn = document.getElementById('fcFinishBtn');
 
 const nextBtn = document.getElementById('nextBtn');
 const prevBtn = document.getElementById('prevBtn');
@@ -39,6 +51,9 @@ let allQuestions = [];
 let testQuestions = [];
 let currentQuestionIndex = 0;
 let correctAnswersCount = 0;
+
+let dailyFlashcards = [];
+let currentFlashcardIndex = 0;
 
 let testMode = 'normal'; // 'normal' | 'examen'
 let reviewMode = false;
@@ -63,6 +78,16 @@ historyToStartBtn.addEventListener('click', () => switchScreen(startScreen));
 infoToStartBtn.addEventListener('click', () => switchScreen(startScreen));
 clearHistoryBtn.addEventListener('click', clearHistory);
 tryAgainBtn.addEventListener('click', () => switchScreen(startScreen));
+
+// Listeners Flashcards
+startFlashcardsBtn.addEventListener('click', startFlashcards);
+exitFlashcardsBtn.addEventListener('click', () => switchScreen(startScreen));
+flashcardElement.addEventListener('click', () => {
+    flashcardElement.classList.toggle('is-flipped');
+});
+fcNextBtn.addEventListener('click', proceedToNextFlashcard);
+fcPrevBtn.addEventListener('click', proceedToPrevFlashcard);
+fcFinishBtn.addEventListener('click', finishFlashcards);
 
 // Funciones
 async function autoLoadQuestions() {
@@ -101,10 +126,12 @@ async function autoLoadQuestions() {
         if (allQuestions.length === 0) {
             startTestBtn.disabled = true;
             startExamBtn.disabled = true;
+            startFlashcardsBtn.disabled = true;
             startTestBtn.textContent = 'Sin preguntas';
         } else {
             startTestBtn.disabled = false;
             startExamBtn.disabled = false;
+            startFlashcardsBtn.disabled = false;
             startTestBtn.textContent = 'Comenzar Test';
         }
     } catch (e) {
@@ -432,7 +459,7 @@ function finishTest() {
 }
 
 function switchScreen(screenElement) {
-    [startScreen, testScreen, resultScreen, historyScreen, infoScreen].forEach(el => {
+    [startScreen, testScreen, resultScreen, historyScreen, infoScreen, flashcardScreen].forEach(el => {
         if(el) el.classList.remove('active');
     });
     screenElement.classList.add('active');
@@ -612,6 +639,113 @@ function clearHistory() {
         localStorage.removeItem('antigravity_failures');
         localStorage.removeItem('antigravity_test_counter');
         localStorage.removeItem('antigravity_last_seen_test');
+        localStorage.removeItem('antigravity_daily_flashcards');
         renderHistory();
     }
 }
+
+// --- LÓGICA DE FLASHCARDS ---
+
+function getDailyFlashcards() {
+    const todayStr = new Date().toDateString();
+    const stored = JSON.parse(localStorage.getItem('antigravity_daily_flashcards') || '{}');
+    
+    // Si ya existen para hoy y son válidas
+    if (stored.date === todayStr && stored.questions && stored.questions.length > 0) {
+        return stored.questions;
+    }
+
+    // Generar nuevas flashcards
+    let failuresMap = JSON.parse(localStorage.getItem('antigravity_failures') || '{}');
+    let pool = [...allQuestions].map(q => {
+        let failures = failuresMap[q.pregunta] || 0;
+        let weight = 1 + (failures * 3);
+        return { q, weight };
+    });
+    
+    let fcs = [];
+    const limit = Math.min(10, pool.length);
+    for (let i = 0; i < limit; i++) {
+        let totalWeight = pool.reduce((sum, item) => sum + item.weight, 0);
+        let randomNum = Math.random() * totalWeight;
+        let cumulativeWeight = 0;
+        for (let j = 0; j < pool.length; j++) {
+            cumulativeWeight += pool[j].weight;
+            if (randomNum <= cumulativeWeight) {
+                fcs.push(pool[j].q);
+                pool.splice(j, 1);
+                break;
+            }
+        }
+    }
+    
+    localStorage.setItem('antigravity_daily_flashcards', JSON.stringify({
+        date: todayStr,
+        questions: fcs
+    }));
+    
+    return fcs;
+}
+
+function startFlashcards() {
+    dailyFlashcards = getDailyFlashcards();
+    if(dailyFlashcards.length === 0) return;
+    
+    currentFlashcardIndex = 0;
+    switchScreen(flashcardScreen);
+    renderFlashcard();
+}
+
+function renderFlashcard() {
+    const q = dailyFlashcards[currentFlashcardIndex];
+    flashcardNumberText.textContent = `Flashcard ${currentFlashcardIndex + 1}/${dailyFlashcards.length}`;
+    
+    const progress = ((currentFlashcardIndex + 1) / dailyFlashcards.length) * 100;
+    flashcardProgressFill.style.width = `${progress}%`;
+    
+    // Reiniciar estado volteado
+    flashcardElement.classList.remove('is-flipped');
+    
+    fcQuestionText.textContent = q.pregunta;
+    
+    const correctLetter = q.respuestaCorrecta;
+    const correctText = q.opciones[correctLetter];
+    fcAnswerText.innerHTML = `<span style="display:block; margin-bottom: 0.5rem;">Opción ${correctLetter}</span><span style="font-weight: 300;">${correctText}</span>`;
+    
+    manageFlashcardsButtons();
+}
+
+function manageFlashcardsButtons() {
+    fcPrevBtn.classList.add('hidden');
+    fcNextBtn.classList.add('hidden');
+    fcFinishBtn.classList.add('hidden');
+    
+    if (currentFlashcardIndex > 0) {
+        fcPrevBtn.classList.remove('hidden');
+    }
+    
+    if (currentFlashcardIndex < dailyFlashcards.length - 1) {
+        fcNextBtn.classList.remove('hidden');
+    } else {
+        fcFinishBtn.classList.remove('hidden');
+    }
+}
+
+function proceedToNextFlashcard() {
+    if (currentFlashcardIndex < dailyFlashcards.length - 1) {
+        currentFlashcardIndex++;
+        renderFlashcard();
+    }
+}
+
+function proceedToPrevFlashcard() {
+    if (currentFlashcardIndex > 0) {
+        currentFlashcardIndex--;
+        renderFlashcard();
+    }
+}
+
+function finishFlashcards() {
+    switchScreen(startScreen);
+}
+

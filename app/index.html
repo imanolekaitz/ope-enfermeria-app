@@ -54,6 +54,7 @@
                         pregs.)</button>
                 </div>
                 <div style="margin-top: 1.5rem; display: flex; flex-direction: column; gap: 0.5rem;">
+                    <button id="startFlashcardsBtn" class="premium-btn primary" style="width: 100%; box-shadow: 0 0 15px rgba(168,85,247,0.4); background: linear-gradient(135deg, #a855f7, #6366f1);" disabled>🎴 Flashcards Diarias</button>
                     <button id="viewHistoryBtn" class="premium-btn secondary" style="width: 100%;">📊 Ver Histórico de Resultados</button>
                     <button id="howItWorksBtn" class="premium-btn secondary" style="width: 100%;">❓ ¿Cómo funciona la app?</button>
                 </div>
@@ -177,6 +178,47 @@
         </div>
     </main>
 
+    <!-- PANTALLA FLASHCARDS -->
+    <main id="flashcardScreen" class="screen">
+        <header class="test-header" style="margin-bottom: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div class="progress-stats" style="margin: 0; width: 100%;">
+                    <span id="flashcardNumber" style="font-size: 1.2rem; font-weight: 800; background: linear-gradient(135deg, #a855f7, #6366f1); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">Flashcard 1/10</span>
+                </div>
+                <button id="exitFlashcardsBtn" class="premium-btn secondary"
+                    style="padding: 0.5rem 1rem; font-size: 0.9rem; margin-left: auto; flex-shrink: 0;">✕ Salir al menú</button>
+            </div>
+            <div class="progress-bar" style="margin-top: 1rem;">
+                <div id="flashcardProgressFill" class="progress-fill" style="background: linear-gradient(90deg, #a855f7, #6366f1);"></div>
+            </div>
+        </header>
+
+        <div class="scene scene--card">
+            <div class="card" id="flashcardElement">
+                <div class="card__face card__face--front glass-panel" style="padding: 2rem; display: flex; flex-direction: column;">
+                    <h3 style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 1rem; text-align: center;">Toca para voltear 🔄</h3>
+                    <h2 id="fcQuestionText" class="question-text" style="font-size: 1.4rem; text-align: center; display: flex; align-items: center; justify-content: center; height: 100%; margin: 0;">
+                        <!-- Pregunta aquí -->
+                    </h2>
+                </div>
+                <div class="card__face card__face--back glass-panel" style="padding: 2rem; display: flex; flex-direction: column;">
+                    <h3 style="color: var(--success); margin-bottom: 1rem; font-size: 1rem; text-align: center;">Respuesta Correcta ✔</h3>
+                    <div id="fcAnswerText" style="font-size: 1.3rem; font-weight: 600; text-align: center; display: flex; align-items: center; justify-content: center; height: 100%; color: var(--text-primary);">
+                        <!-- Respuesta correcta aquí -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="actions" style="display: flex; justify-content: space-between; margin-top: 3rem;">
+            <button id="fcPrevBtn" class="premium-btn secondary hidden">← Anterior</button>
+            <div style="margin-left: auto;">
+                <button id="fcNextBtn" class="premium-btn secondary">Siguiente ➔</button>
+                <button id="fcFinishBtn" class="premium-btn primary hidden" style="background: linear-gradient(135deg, #a855f7, #6366f1);">Terminar</button>
+            </div>
+        </div>
+    </main>
+
     <!-- PANTALLA CÓMO FUNCIONA -->
     <main id="infoScreen" class="screen">
         <header class="test-header" style="margin-bottom: 2rem;">
@@ -192,6 +234,10 @@
                 <li>
                     <span style="font-size: 1.3rem; margin-bottom: 0.5rem; display: block;">📝 <strong>Dos modos de estudio</strong></span>
                     Puedes elegir el <strong>Test Normal</strong> (de 25, 50 o 100 preguntas) para estudiar de forma dinámica con confirmación inmediata de si has acertado o fallado, o el <strong>Modo Examen</strong> (100 preguntas temporizadas a 1 hora) para ponerte a prueba a ciegas hasta el final.
+                </li>
+                <li>
+                    <span style="font-size: 1.3rem; margin-bottom: 0.5rem; display: block;">🎴 <strong>Flashcards Diarias</strong></span>
+                    Inicia tu día con 10 flashcards diferentes cada jornada. Esta función te muestra una pregunta en el frente y su respuesta en el reverso de la carta. ¡Voltéala con un simple toque para entrenar tu memoria a largo plazo mediante la repetición y memorización activa!
                 </li>
                 <li>
                     <span style="font-size: 1.3rem; margin-bottom: 0.5rem; display: block;">🎯 <strong>Insistencia en tus fallos</strong></span>
