@@ -50,7 +50,7 @@
                             <input type="number" id="rangeStart" class="premium-btn secondary" style="padding: 0.5rem; width: 100%; border: 1px solid var(--border-color);" placeholder="Todas" min="1">
                         </div>
                         <div style="flex-grow: 1;">
-                            <label style="color: var(--text-primary); font-size: 0.85rem;">Hasta preg. nº:</label>
+                            <label style="color: var(--text-primary); font-size: 0.85rem;">Hasta preg. nº <span id="maxRangeInfo"></span>:</label>
                             <input type="number" id="rangeEnd" class="premium-btn secondary" style="padding: 0.5rem; width: 100%; border: 1px solid var(--border-color);" placeholder="Todas" min="1">
                         </div>
                     </div>
@@ -68,6 +68,7 @@
                             <option value="25">25 pregs.</option>
                             <option value="50" selected>50 pregs.</option>
                             <option value="100">100 pregs.</option>
+                            <option value="all">Todas las seleccionadas</option>
                         </select>
                         <button id="startTestBtn" class="premium-btn secondary" style="flex-grow: 2;">Comenzar
                             Test</button>
@@ -283,8 +284,6 @@
         </div>
     </main>
 
-    <script src="main.js"></script>
-    
     <!-- MODAL REPORTAR ERROR -->
     <div id="errorModal" style="position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 1rem;">
         <div class="glass-panel" style="max-width: 400px; width: 100%; text-align: left; position: relative; background: #1a202c; border: 1px solid rgba(255,255,255,0.1);">
@@ -330,6 +329,7 @@
             });
         }
     </script>
+    <script src="main.js"></script>
 </body>
 
 </html>

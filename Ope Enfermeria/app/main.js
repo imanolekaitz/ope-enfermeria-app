@@ -157,12 +157,28 @@ async function autoLoadQuestions() {
             startFlashcardsBtn.disabled = false;
             startTestBtn.textContent = 'Comenzar Test';
         }
+        updateMaxRangeInfo();
     } catch (e) {
         console.error("Error cargando las preguntas:", e);
         const loadingMessage = document.getElementById('loadingMessage');
         if (loadingMessage) loadingMessage.textContent = "Error al cargar las preguntas automáticamente. Por favor, asegúrate de estar en un servidor local o GitHub Pages.";
     }
 }
+
+function updateMaxRangeInfo() {
+    let repoSelect = document.getElementById('repoSelect');
+    let maxRangeInfo = document.getElementById('maxRangeInfo');
+    if(repoSelect && maxRangeInfo && allQuestions.length > 0) {
+        let maxVal = 0;
+        allQuestions.forEach(q => {
+            if(repoSelect.value === 'ambos' || q.sourceType === repoSelect.value) {
+                if(q.originalIndex > maxVal) maxVal = q.originalIndex;
+            }
+        });
+        maxRangeInfo.textContent = `(Máx: ${maxVal})`;
+    }
+}
+document.getElementById('repoSelect').addEventListener('change', updateMaxRangeInfo);
 
 function startTest(mode) {
     testMode = mode;
@@ -227,7 +243,11 @@ function startTest(mode) {
     if (mode === 'normal') {
         const selectEl = document.getElementById('testLengthSelect');
         if (selectEl) {
-            maxQuestions = parseInt(selectEl.value, 10);
+            if (selectEl.value === 'all') {
+                maxQuestions = pool.length;
+            } else {
+                maxQuestions = parseInt(selectEl.value, 10);
+            }
         }
     }
     
@@ -767,7 +787,8 @@ function startFlashcards() {
 }
 
 function renderFlashcard() {
-    const q = dailyFlashcards[currentFlashcardIndex];
+    const rawQ = dailyFlashcards[currentFlashcardIndex];
+    const q = allQuestions.find(x => x.pregunta === rawQ.pregunta) || rawQ;
     flashcardNumberText.textContent = `Flashcard ${currentFlashcardIndex + 1}/${dailyFlashcards.length} | (Nº ${q.originalIndex || '?'} - ${q.sourceName || 'General'})`;
     
     const progress = ((currentFlashcardIndex + 1) / dailyFlashcards.length) * 100;
