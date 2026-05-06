@@ -46,6 +46,16 @@ const finalScoreText = document.getElementById('finalScoreText');
 const feedbackMessage = document.getElementById('feedbackMessage');
 const tryAgainBtn = document.getElementById('tryAgainBtn');
 
+const errorModal = document.getElementById('errorModal');
+const reportErrorBtn = document.getElementById('reportErrorBtn');
+const fcReportErrorBtn = document.getElementById('fcReportErrorBtn');
+const closeErrorModalBtn = document.getElementById('closeErrorModalBtn');
+const errorQuestionInfo = document.getElementById('errorQuestionInfo');
+const errorCurrentAnswer = document.getElementById('errorCurrentAnswer');
+const errorUserSuggestion = document.getElementById('errorUserSuggestion');
+const errorUserComment = document.getElementById('errorUserComment');
+const sendErrorEmailBtn = document.getElementById('sendErrorEmailBtn');
+
 // Estado
 let allQuestions = [];
 let testQuestions = [];
@@ -61,6 +71,8 @@ let userAnswers = [];
 let chartInstance = null;
 let isResultSaved = false;
 let isConfirmDialogActive = false;
+
+let currentErrorQuestion = null;
 
 let examTimerInterval = null;
 let timeRemaining = 3600;
@@ -89,28 +101,39 @@ fcNextBtn.addEventListener('click', proceedToNextFlashcard);
 fcPrevBtn.addEventListener('click', proceedToPrevFlashcard);
 fcFinishBtn.addEventListener('click', finishFlashcards);
 
+// Listeners Modal Error
+reportErrorBtn.addEventListener('click', () => openErrorModal(testQuestions[currentQuestionIndex]));
+fcReportErrorBtn.addEventListener('click', () => openErrorModal(dailyFlashcards[currentFlashcardIndex]));
+closeErrorModalBtn.addEventListener('click', () => errorModal.style.display = 'none');
+sendErrorEmailBtn.addEventListener('click', sendErrorEmail);
+
 // Funciones
 async function autoLoadQuestions() {
     try {
-        const urls = [
-            './data/preguntas_comunes.json',
-            './data/preguntas_especificas.json'
+        const sources = [
+            { url: './data/preguntas_comunes.json', type: 'comun', name: 'Común' },
+            { url: './data/preguntas_especificas.json', type: 'especifico', name: 'Específico' }
         ];
         
         let allLoadedQuestions = [];
         let loadedCount = 0;
         
-        for (const url of urls) {
+        for (const source of sources) {
             try {
-                const response = await fetch(url);
+                const response = await fetch(source.url);
                 if (response.ok) {
                     const data = await response.json();
-                    const validQuestions = data.filter(q => q.respuestaCorrecta && q.respuestaCorrecta !== "");
+                    const validQuestions = data.filter(q => q.respuestaCorrecta && q.respuestaCorrecta !== "").map((q, idx) => ({
+                        ...q,
+                        originalIndex: idx + 1,
+                        sourceType: source.type,
+                        sourceName: source.name
+                    }));
                     allLoadedQuestions = allLoadedQuestions.concat(validQuestions);
                     loadedCount++;
                 }
             } catch (err) {
-                console.error("Error al cargar " + url, err);
+                console.error("Error al cargar " + source.url, err);
             }
         }
         
@@ -160,7 +183,30 @@ function startTest(mode) {
     let lastSeenMap = JSON.parse(localStorage.getItem('antigravity_last_seen_test') || '{}');
     let currentTestCounter = parseInt(localStorage.getItem('antigravity_test_counter') || '0', 10);
     
-    let pool = [...allQuestions].map(q => {
+    let repoSelect = document.getElementById('repoSelect');
+    let rangeStart = document.getElementById('rangeStart');
+    let rangeEnd = document.getElementById('rangeEnd');
+    
+    let filteredQuestions = [...allQuestions];
+    
+    if (repoSelect && repoSelect.value !== 'ambos') {
+        filteredQuestions = filteredQuestions.filter(q => q.sourceType === repoSelect.value);
+    }
+    if (rangeStart && rangeStart.value) {
+        let minVal = parseInt(rangeStart.value, 10);
+        filteredQuestions = filteredQuestions.filter(q => q.originalIndex >= minVal);
+    }
+    if (rangeEnd && rangeEnd.value) {
+        let maxVal = parseInt(rangeEnd.value, 10);
+        filteredQuestions = filteredQuestions.filter(q => q.originalIndex <= maxVal);
+    }
+    
+    if (filteredQuestions.length === 0) {
+        alert("No hay preguntas disponibles con la configuración actual (Revisa el repositorio y el rango).");
+        return;
+    }
+    
+    let pool = filteredQuestions.map(q => {
         let failures = failuresMap[q.pregunta] || 0;
         let lastSeenTest = lastSeenMap[q.pregunta];
         
@@ -214,7 +260,7 @@ function startTest(mode) {
 function renderQuestion() {
     const q = testQuestions[currentQuestionIndex];
     
-    currentQuestionNumberText.textContent = `Pregunta ${currentQuestionIndex + 1} de ${testQuestions.length}`;
+    currentQuestionNumberText.textContent = `Pregunta ${currentQuestionIndex + 1} de ${testQuestions.length} | (Nº ${q.originalIndex || '?'} - ${q.sourceName || 'General'})`;
     
     if (testMode === 'normal' || reviewMode) {
         scoreTrackerText.textContent = `Aciertos: ${correctAnswersCount}`;
@@ -657,7 +703,31 @@ function getDailyFlashcards() {
 
     // Generar nuevas flashcards
     let failuresMap = JSON.parse(localStorage.getItem('antigravity_failures') || '{}');
-    let pool = [...allQuestions].map(q => {
+
+    let repoSelect = document.getElementById('repoSelect');
+    let rangeStart = document.getElementById('rangeStart');
+    let rangeEnd = document.getElementById('rangeEnd');
+    
+    let filteredQuestions = [...allQuestions];
+    
+    if (repoSelect && repoSelect.value !== 'ambos') {
+        filteredQuestions = filteredQuestions.filter(q => q.sourceType === repoSelect.value);
+    }
+    if (rangeStart && rangeStart.value) {
+        let minVal = parseInt(rangeStart.value, 10);
+        filteredQuestions = filteredQuestions.filter(q => q.originalIndex >= minVal);
+    }
+    if (rangeEnd && rangeEnd.value) {
+        let maxVal = parseInt(rangeEnd.value, 10);
+        filteredQuestions = filteredQuestions.filter(q => q.originalIndex <= maxVal);
+    }
+    
+    if (filteredQuestions.length === 0) {
+        alert("No hay preguntas disponibles para Flashcards con el filtro actual.");
+        return [];
+    }
+
+    let pool = filteredQuestions.map(q => {
         let failures = failuresMap[q.pregunta] || 0;
         let weight = 1 + (failures * 3);
         return { q, weight };
@@ -698,7 +768,7 @@ function startFlashcards() {
 
 function renderFlashcard() {
     const q = dailyFlashcards[currentFlashcardIndex];
-    flashcardNumberText.textContent = `Flashcard ${currentFlashcardIndex + 1}/${dailyFlashcards.length}`;
+    flashcardNumberText.textContent = `Flashcard ${currentFlashcardIndex + 1}/${dailyFlashcards.length} | (Nº ${q.originalIndex || '?'} - ${q.sourceName || 'General'})`;
     
     const progress = ((currentFlashcardIndex + 1) / dailyFlashcards.length) * 100;
     flashcardProgressFill.style.width = `${progress}%`;
@@ -747,5 +817,35 @@ function proceedToPrevFlashcard() {
 
 function finishFlashcards() {
     switchScreen(startScreen);
+}
+
+// --- LOGICA REPORTE DE ERRORES ---
+function openErrorModal(questionObj) {
+    if(!questionObj) return;
+    currentErrorQuestion = questionObj;
+    errorQuestionInfo.textContent = `Nº ${questionObj.originalIndex || '?'} - ${questionObj.sourceName || 'General'}`;
+    const correcta = questionObj.respuestaCorrecta;
+    errorCurrentAnswer.textContent = `Opción ${correcta}: ${questionObj.opciones[correcta]}`;
+    errorUserSuggestion.value = 'A';
+    errorUserComment.value = '';
+    errorModal.style.display = 'flex';
+}
+
+function sendErrorEmail() {
+    if(!currentErrorQuestion) return;
+    const subject = encodeURIComponent("Error en Pregunta Simulador OPE");
+    const suggestion = errorUserSuggestion.value;
+    const comment = errorUserComment.value;
+    
+    let bodyText = `Hola, he encontrado un posible error en una pregunta del simulador.\n\n`;
+    bodyText += `[ PREGUNTA ]\nOrigen: ${errorQuestionInfo.textContent}\nTexto: ${currentErrorQuestion.pregunta}\n\n`;
+    bodyText += `[ RESPUESTA ACTUAL ]\nMarcada en el temario: ${errorCurrentAnswer.textContent}\n\n`;
+    bodyText += `[ MI SUGERENCIA ]\nConsidero que la correcta es: ${suggestion}\n\n`;
+    if(comment.trim() !== '') {
+        bodyText += `[ COMENTARIO ]\n${comment}\n`;
+    }
+    
+    window.location.href = `mailto:imanoleka@gmail.com?subject=${subject}&body=${encodeURIComponent(bodyText)}`;
+    errorModal.style.display = 'none';
 }
 
