@@ -169,13 +169,13 @@ function updateMaxRangeInfo() {
     let repoSelect = document.getElementById('repoSelect');
     let maxRangeInfo = document.getElementById('maxRangeInfo');
     if(repoSelect && maxRangeInfo && allQuestions.length > 0) {
-        let maxVal = 0;
-        allQuestions.forEach(q => {
-            if(repoSelect.value === 'ambos' || q.sourceType === repoSelect.value) {
-                if(q.originalIndex > maxVal) maxVal = q.originalIndex;
-            }
-        });
-        maxRangeInfo.textContent = `(Máx: ${maxVal})`;
+        let count = 0;
+        if (repoSelect.value === 'ambos') {
+            count = allQuestions.length;
+        } else {
+            count = allQuestions.filter(q => q.sourceType === repoSelect.value).length;
+        }
+        maxRangeInfo.textContent = `(Máx: ${count})`;
     }
 }
 document.getElementById('repoSelect').addEventListener('change', updateMaxRangeInfo);
@@ -208,14 +208,15 @@ function startTest(mode) {
     if (repoSelect && repoSelect.value !== 'ambos') {
         filteredQuestions = filteredQuestions.filter(q => q.sourceType === repoSelect.value);
     }
+    let minVal = 1;
+    let maxVal = filteredQuestions.length;
     if (rangeStart && rangeStart.value) {
-        let minVal = parseInt(rangeStart.value, 10);
-        filteredQuestions = filteredQuestions.filter(q => q.originalIndex >= minVal);
+        minVal = parseInt(rangeStart.value, 10);
     }
     if (rangeEnd && rangeEnd.value) {
-        let maxVal = parseInt(rangeEnd.value, 10);
-        filteredQuestions = filteredQuestions.filter(q => q.originalIndex <= maxVal);
+        maxVal = parseInt(rangeEnd.value, 10);
     }
+    filteredQuestions = filteredQuestions.slice(minVal - 1, maxVal);
     
     if (filteredQuestions.length === 0) {
         alert("No hay preguntas disponibles con la configuración actual (Revisa el repositorio y el rango).");
@@ -733,14 +734,15 @@ function getDailyFlashcards() {
     if (repoSelect && repoSelect.value !== 'ambos') {
         filteredQuestions = filteredQuestions.filter(q => q.sourceType === repoSelect.value);
     }
+    let minVal = 1;
+    let maxVal = filteredQuestions.length;
     if (rangeStart && rangeStart.value) {
-        let minVal = parseInt(rangeStart.value, 10);
-        filteredQuestions = filteredQuestions.filter(q => q.originalIndex >= minVal);
+        minVal = parseInt(rangeStart.value, 10);
     }
     if (rangeEnd && rangeEnd.value) {
-        let maxVal = parseInt(rangeEnd.value, 10);
-        filteredQuestions = filteredQuestions.filter(q => q.originalIndex <= maxVal);
+        maxVal = parseInt(rangeEnd.value, 10);
     }
+    filteredQuestions = filteredQuestions.slice(minVal - 1, maxVal);
     
     if (filteredQuestions.length === 0) {
         alert("No hay preguntas disponibles para Flashcards con el filtro actual.");
