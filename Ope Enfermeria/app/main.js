@@ -1096,15 +1096,22 @@ function openSearchScreen() {
 }
 
 function performSearch() {
-    const query = searchInput.value.trim().toLowerCase();
-    if (!query) {
+    const rawQuery = searchInput.value.trim();
+    if (!rawQuery) {
         openSearchScreen();
         return;
     }
     
+    const normalizeStr = (str) => {
+        if (!str) return "";
+        return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    };
+
+    const query = normalizeStr(rawQuery);
+    
     const results = allQuestions.filter(q => {
-        return q.pregunta.toLowerCase().includes(query) || 
-               Object.values(q.opciones).some(opt => opt.toLowerCase().includes(query));
+        if (normalizeStr(q.pregunta).includes(query)) return true;
+        return Object.values(q.opciones).some(opt => normalizeStr(opt).includes(query));
     });
     
     renderSearchResults(results);
