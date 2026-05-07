@@ -366,7 +366,7 @@ function renderQuestion() {
     
     currentQuestionNumberText.textContent = `Pregunta ${currentQuestionIndex + 1} de ${testQuestions.length} | (Nº ${q.originalIndex || '?'} - ${q.sourceName || 'General'})`;
     
-    if (testMode === 'normal' || reviewMode) {
+    if (testMode !== 'examen' || reviewMode) {
         scoreTrackerText.textContent = `Aciertos: ${correctAnswersCount}`;
     } else {
         const respondidas = userAnswers.filter(a => a !== null).length;
@@ -433,7 +433,7 @@ function renderQuestion() {
             } else if (userA === opt.letter && userA !== q.respuestaCorrecta) {
                 btn.classList.add('incorrect');
             }
-        } else if (testMode === 'normal') {
+        } else if (testMode !== 'examen') {
             if (userA) {
                 // Ya respondido
                 btn.disabled = true;
@@ -457,7 +457,7 @@ function renderQuestion() {
 function handleAnswerSelected(selectedBtn, selectedLetter, correctLetter) {
     userAnswers[currentQuestionIndex] = selectedLetter;
 
-    if (testMode === 'normal') {
+    if (testMode !== 'examen') {
         const allBtns = optionsContainer.querySelectorAll('.option-btn');
         allBtns.forEach(b => {
             b.disabled = true;
