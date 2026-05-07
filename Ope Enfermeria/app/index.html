@@ -289,9 +289,21 @@
         </header>
 
         <div class="glass-panel" style="padding: 2rem; text-align: left;">
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Buscar por texto:</p>
             <div style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem;">
                 <input type="text" id="searchInput" class="premium-btn secondary" style="flex-grow: 1; padding: 0.8rem; border: 1px solid var(--border-color); font-size: 1rem; text-align: left;" placeholder="Busca una palabra clave... (ej. Ley 8/1997, RCP)">
                 <button id="doSearchBtn" class="premium-btn primary">Buscar</button>
+            </div>
+            
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Buscar por número de pregunta:</p>
+            <div style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+                <input type="number" id="searchIdInput" class="premium-btn secondary" style="flex-grow: 1; padding: 0.8rem; border: 1px solid var(--border-color); font-size: 1rem; text-align: left;" placeholder="Nº Pregunta..." min="1">
+                <select id="searchRepoSelect" class="premium-btn secondary" style="padding: 0.8rem; border: 1px solid var(--border-color);">
+                    <option value="ambos">Ambos repositorios</option>
+                    <option value="comun">Común</option>
+                    <option value="especifico">Específico</option>
+                </select>
+                <button id="doSearchIdBtn" class="premium-btn primary">Buscar</button>
             </div>
             
             <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.9rem;">Resultados encontrados: <span id="searchResultCount" style="font-weight: bold; color: var(--text-primary);">0</span></p>
@@ -320,20 +332,20 @@
                     Puedes elegir el <strong>Test Normal</strong> (de 25, 50 o 100 preguntas) para estudiar de forma dinámica con confirmación inmediata de si has acertado o fallado, o el <strong>Modo Examen</strong> (100 preguntas temporizadas a 1 hora) para ponerte a prueba a ciegas hasta el final.
                 </li>
                 <li>
-                    <span style="font-size: 1.3rem; margin-bottom: 0.5rem; display: block;">🎴 <strong>Flashcards Diarias</strong></span>
-                    Inicia tu día con 10 flashcards diferentes cada jornada. Esta función te muestra una pregunta en el frente y su respuesta en el reverso de la carta. ¡Voltéala con un simple toque para entrenar tu memoria a largo plazo mediante la repetición y memorización activa!
+                    <span style="font-size: 1.3rem; margin-bottom: 0.5rem; display: block;">⭐ <strong>Favoritas, Falladas y Buscador</strong></span>
+                    Puedes marcar cualquier pregunta con la ⭐ para añadirla a tus favoritas. Luego, desde el menú principal, podrás generar un <strong>Test de Favoritas</strong> o un <strong>Test de Falladas</strong>. Además, dispones de un <strong>Buscador</strong> para consultar rápidamente cualquier concepto por texto o por número de pregunta.
                 </li>
                 <li>
-                    <span style="font-size: 1.3rem; margin-bottom: 0.5rem; display: block;">🎯 <strong>Insistencia en tus fallos</strong></span>
-                    El sistema detecta automáticamente qué respuestas fallas más a menudo y les otorga más peso matemático. Significa que, conforme más utilices la app, más insistirá de forma inteligente en tus puntos flacos.
+                    <span style="font-size: 1.3rem; margin-bottom: 0.5rem; display: block;">🎴 <strong>Flashcards y Rachas</strong></span>
+                    Inicia tu día con 10 flashcards diferentes cada jornada. Para mantener la constancia, el sistema cuenta tu <strong>Racha de Estudio</strong> diaria (🔥). ¡Intenta no perder tu racha!
                 </li>
                 <li>
-                    <span style="font-size: 1.3rem; margin-bottom: 0.5rem; display: block;">⚙️ <strong>Filtros por Temario y Rango</strong></span>
-                    Puedes personalizar tu sesión eligiendo si abarcar todo el contenido, o centrarte <strong>solo en el temario Común o en el Específico</strong>. Además, puedes establecer un rango numérico exacto (p. ej., de la 1 a la 50) para enfocar tu estudio en bloques concretos.
+                    <span style="font-size: 1.3rem; margin-bottom: 0.5rem; display: block;">⏸️ <strong>Pausar Test y Mis Notas</strong></span>
+                    Si tienes que irte en mitad de un test, pulsa el botón <strong>⏸️ Pausar</strong>. Podrás retomarlo exactamente donde lo dejaste la próxima vez que entres. También puedes usar el botón 📝 en cualquier pregunta para añadir una <strong>Regla Mnemotécnica o Nota</strong> que te aparecerá cada vez que esa pregunta vuelva a salir.
                 </li>
                 <li>
-                    <span style="font-size: 1.3rem; margin-bottom: 0.5rem; display: block;">⚖️ <strong>Ninguna pregunta se queda atrás</strong></span>
-                    A diferencia del simple "azar", si hay preguntas que nunca te han tocado, el algoritmo aumenta su prioridad garantizando que abarcarás y memorizarás el 100% de las preguntas. 
+                    <span style="font-size: 1.3rem; margin-bottom: 0.5rem; display: block;">🎯 <strong>Insistencia inteligente</strong></span>
+                    El algoritmo detecta qué respuestas fallas más a menudo y les otorga más peso. Conforme más utilices la app, más insistirá en tus puntos flacos garantizando que abarcarás el 100% de las preguntas.
                 </li>
             </ul>
         </div>

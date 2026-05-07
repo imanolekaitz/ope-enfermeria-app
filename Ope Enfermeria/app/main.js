@@ -18,6 +18,9 @@ const userNoteDisplay = document.getElementById('userNoteDisplay');
 const searchToStartBtn = document.getElementById('searchToStartBtn');
 const searchInput = document.getElementById('searchInput');
 const doSearchBtn = document.getElementById('doSearchBtn');
+const searchIdInput = document.getElementById('searchIdInput');
+const searchRepoSelect = document.getElementById('searchRepoSelect');
+const doSearchIdBtn = document.getElementById('doSearchIdBtn');
 const searchResultCount = document.getElementById('searchResultCount');
 const searchResultsContainer = document.getElementById('searchResultsContainer');
 
@@ -120,7 +123,9 @@ infoToStartBtn.addEventListener('click', () => switchScreen(startScreen));
 searchToStartBtn.addEventListener('click', () => switchScreen(startScreen));
 openSearchBtn.addEventListener('click', openSearchScreen);
 doSearchBtn.addEventListener('click', performSearch);
+doSearchIdBtn.addEventListener('click', performSearchById);
 searchInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') performSearch(); });
+searchIdInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') performSearchById(); });
 
 toggleFavoriteBtn.addEventListener('click', toggleFavorite);
 openNoteBtn.addEventListener('click', openNoteModal);
@@ -607,7 +612,7 @@ function finishTest() {
 }
 
 function switchScreen(screenElement) {
-    [startScreen, testScreen, resultScreen, historyScreen, infoScreen, flashcardScreen].forEach(el => {
+    [startScreen, testScreen, resultScreen, historyScreen, infoScreen, flashcardScreen, searchScreen].forEach(el => {
         if(el) el.classList.remove('active');
     });
     screenElement.classList.add('active');
@@ -1032,6 +1037,27 @@ function performSearch() {
                Object.values(q.opciones).some(opt => opt.toLowerCase().includes(query));
     });
     
+    renderSearchResults(results);
+}
+
+function performSearchById() {
+    const numStr = searchIdInput.value.trim();
+    if (!numStr) {
+        openSearchScreen();
+        return;
+    }
+    const num = parseInt(numStr, 10);
+    const repo = searchRepoSelect.value;
+    
+    const results = allQuestions.filter(q => {
+        let matchRepo = (repo === 'ambos') ? true : (q.sourceType === repo);
+        return matchRepo && q.originalIndex === num;
+    });
+    
+    renderSearchResults(results);
+}
+
+function renderSearchResults(results) {
     searchResultCount.textContent = results.length;
     searchResultsContainer.innerHTML = '';
     
@@ -1050,7 +1076,8 @@ function performSearch() {
         div.style.borderRadius = '0.5rem';
         div.style.marginBottom = '0.5rem';
         
-        let html = `<p style="font-weight: 600; font-size: 0.95rem; margin-bottom: 0.5rem; color: var(--text-primary);">${q.pregunta}</p>`;
+        let html = `<p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.3rem;">Nº ${q.originalIndex || '?'} - ${q.sourceName || 'General'}</p>`;
+        html += `<p style="font-weight: 600; font-size: 0.95rem; margin-bottom: 0.5rem; color: var(--text-primary);">${q.pregunta}</p>`;
         html += `<div style="background: rgba(74, 222, 128, 0.1); border-left: 3px solid #4ade80; padding: 0.5rem; font-size: 0.9rem; color: #4ade80;">`;
         html += `<strong>Correcta (${correctLetter}):</strong> ${correctText}</div>`;
         
