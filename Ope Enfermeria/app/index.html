@@ -367,6 +367,43 @@
         </div>
     </div>
 
+    <!-- MODAL ESTADÍSTICAS DE PREGUNTA -->
+    <div id="statsModal" style="position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 1rem;">
+        <div class="glass-panel" style="max-width: 500px; width: 100%; text-align: left; position: relative; background: #1a202c; border: 1px solid rgba(255,255,255,0.1); max-height: 90vh; overflow-y: auto;">
+            <button id="closeStatsModalBtn" style="position: absolute; top: 1rem; right: 1rem; background: transparent; border: none; color: white; font-size: 1.2rem; cursor: pointer;">✕</button>
+            <h3 style="color: #4ade80; margin-top: 0; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">📊 Detalles de la Pregunta</h3>
+            
+            <p id="statsQuestionTitle" style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.3rem;"></p>
+            <p id="statsQuestionText" style="font-weight: 600; color: #fff; margin-bottom: 1rem;"></p>
+            
+            <div style="background: rgba(74, 222, 128, 0.1); border-left: 3px solid #4ade80; padding: 0.8rem; border-radius: 0 0.5rem 0.5rem 0; margin-bottom: 1.5rem;">
+                <span style="color: #4ade80; font-weight: bold; display: block; margin-bottom: 0.3rem;">✔ Respuesta correcta:</span>
+                <span id="statsCorrectAnswer" style="color: #e2e8f0; font-size: 0.95rem;"></span>
+            </div>
+
+            <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+                <div style="flex: 1; background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 0.5rem; text-align: center;">
+                    <span style="font-size: 1.5rem; font-weight: bold; color: var(--text-primary);" id="statsSeen">0</span>
+                    <span style="display: block; font-size: 0.8rem; color: var(--text-secondary);">Veces vista</span>
+                </div>
+                <div style="flex: 1; background: rgba(74, 222, 128, 0.05); padding: 1rem; border-radius: 0.5rem; text-align: center; border: 1px solid rgba(74, 222, 128, 0.2);">
+                    <span style="font-size: 1.5rem; font-weight: bold; color: #4ade80;" id="statsCorrect">0</span>
+                    <span style="display: block; font-size: 0.8rem; color: var(--text-secondary);">Aciertos</span>
+                </div>
+                <div style="flex: 1; background: rgba(248, 113, 113, 0.05); padding: 1rem; border-radius: 0.5rem; text-align: center; border: 1px solid rgba(248, 113, 113, 0.2);">
+                    <span style="font-size: 1.5rem; font-weight: bold; color: #f87171;" id="statsWrong">0</span>
+                    <span style="display: block; font-size: 0.8rem; color: var(--text-secondary);">Fallos</span>
+                </div>
+            </div>
+            
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <button id="statsToggleFavBtn" class="premium-btn secondary" style="flex: 1; border-color: #facc15; color: #facc15;">⭐ Favorita</button>
+                <button id="statsOpenNoteBtn" class="premium-btn secondary" style="flex: 1; border-color: #6366f1; color: #6366f1;">📝 Mis Notas</button>
+                <button id="statsReportBtn" class="premium-btn secondary" style="flex: 1; border-color: #f87171; color: #f87171;">⚠️ Reportar</button>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL REPORTAR ERROR -->
     <div id="errorModal" style="position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 1rem;">
         <div class="glass-panel" style="max-width: 400px; width: 100%; text-align: left; position: relative; background: #1a202c; border: 1px solid rgba(255,255,255,0.1);">

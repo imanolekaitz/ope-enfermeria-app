@@ -30,6 +30,20 @@ const noteTextarea = document.getElementById('noteTextarea');
 const deleteNoteBtn = document.getElementById('deleteNoteBtn');
 const saveNoteBtn = document.getElementById('saveNoteBtn');
 
+const statsModal = document.getElementById('statsModal');
+const closeStatsModalBtn = document.getElementById('closeStatsModalBtn');
+const statsQuestionTitle = document.getElementById('statsQuestionTitle');
+const statsQuestionText = document.getElementById('statsQuestionText');
+const statsCorrectAnswer = document.getElementById('statsCorrectAnswer');
+const statsSeen = document.getElementById('statsSeen');
+const statsCorrect = document.getElementById('statsCorrect');
+const statsWrong = document.getElementById('statsWrong');
+const statsToggleFavBtn = document.getElementById('statsToggleFavBtn');
+const statsOpenNoteBtn = document.getElementById('statsOpenNoteBtn');
+const statsReportBtn = document.getElementById('statsReportBtn');
+
+let currentActiveQuestion = null;
+
 const streakContainer = document.getElementById('streakContainer');
 const streakCountText = document.getElementById('streakCount');
 
@@ -132,6 +146,11 @@ openNoteBtn.addEventListener('click', openNoteModal);
 closeNoteModalBtn.addEventListener('click', () => noteModal.style.display = 'none');
 saveNoteBtn.addEventListener('click', saveNote);
 deleteNoteBtn.addEventListener('click', deleteNote);
+
+closeStatsModalBtn.addEventListener('click', () => statsModal.style.display = 'none');
+statsToggleFavBtn.addEventListener('click', () => toggleFavoriteAction(currentActiveQuestion, statsToggleFavBtn));
+statsOpenNoteBtn.addEventListener('click', () => openNoteModalAction(currentActiveQuestion, statsOpenNoteBtn));
+statsReportBtn.addEventListener('click', () => openErrorModal(currentActiveQuestion));
 
 clearHistoryBtn.addEventListener('click', clearHistory);
 tryAgainBtn.addEventListener('click', () => switchScreen(startScreen));
@@ -637,6 +656,7 @@ function saveResult() {
     const historyData = JSON.parse(localStorage.getItem('antigravity_history') || '[]');
     let failuresMap = JSON.parse(localStorage.getItem('antigravity_failures') || '{}');
     let lastSeenMap = JSON.parse(localStorage.getItem('antigravity_last_seen_test') || '{}');
+    let statsMap = JSON.parse(localStorage.getItem('appOpeQuestionStats') || '{}');
     let currentTestCounter = parseInt(localStorage.getItem('antigravity_test_counter') || '0', 10) + 1;
     
     localStorage.setItem('antigravity_test_counter', currentTestCounter.toString());
@@ -652,12 +672,18 @@ function saveResult() {
             const hash = q.pregunta;
             
             lastSeenMap[hash] = currentTestCounter;
+            if (!statsMap[hash]) {
+                statsMap[hash] = { seen: 0, correct: 0, wrong: 0 };
+            }
+            statsMap[hash].seen++;
             
             if (ua === q.respuestaCorrecta) {
+                statsMap[hash].correct++;
                 if (failuresMap[hash]) {
                     failuresMap[hash] = Math.max(0, failuresMap[hash] - 1); // Disminuye el peso si se acierta
                 }
             } else {
+                statsMap[hash].wrong++;
                 failuresMap[hash] = (failuresMap[hash] || 0) + 1; // Aumenta el peso si se falla
             }
         }
@@ -665,6 +691,7 @@ function saveResult() {
     
     localStorage.setItem('antigravity_failures', JSON.stringify(failuresMap));
     localStorage.setItem('antigravity_last_seen_test', JSON.stringify(lastSeenMap));
+    localStorage.setItem('appOpeQuestionStats', JSON.stringify(statsMap));
     
     const record = {
         date: new Date().toISOString(),
@@ -959,26 +986,45 @@ function sendErrorEmail() {
 }
 
 // --- LOGICA FAVORITAS Y NOTAS ---
-function toggleFavorite() {
-    if (!testQuestions || testQuestions.length === 0) return;
-    const q = testQuestions[currentQuestionIndex];
+function toggleFavoriteAction(q, btnElement) {
+    if (!q) return;
     let favs = JSON.parse(localStorage.getItem('appOpeFavorites') || '[]');
     
     if (favs.includes(q.pregunta)) {
         favs = favs.filter(f => f !== q.pregunta);
-        toggleFavoriteBtn.style.color = 'var(--text-secondary)';
-        toggleFavoriteBtn.innerHTML = '☆';
+        if (btnElement) {
+            btnElement.style.color = 'var(--text-secondary)';
+            btnElement.innerHTML = btnElement.id === 'statsToggleFavBtn' ? '☆ Favorita' : '☆';
+        }
     } else {
         favs.push(q.pregunta);
-        toggleFavoriteBtn.style.color = '#facc15';
-        toggleFavoriteBtn.innerHTML = '⭐';
+        if (btnElement) {
+            btnElement.style.color = '#facc15';
+            btnElement.innerHTML = btnElement.id === 'statsToggleFavBtn' ? '⭐ Favorita' : '⭐';
+        }
     }
     localStorage.setItem('appOpeFavorites', JSON.stringify(favs));
+    
+    // Si estamos en la pantalla de test, sincronizamos visualmente si es la misma pregunta
+    if (testScreen.classList.contains('active') && testQuestions[currentQuestionIndex]?.pregunta === q.pregunta) {
+        if (favs.includes(q.pregunta)) {
+            toggleFavoriteBtn.style.color = '#facc15';
+            toggleFavoriteBtn.innerHTML = '⭐';
+        } else {
+            toggleFavoriteBtn.style.color = 'var(--text-secondary)';
+            toggleFavoriteBtn.innerHTML = '☆';
+        }
+    }
 }
 
-function openNoteModal() {
+function toggleFavorite() {
     if (!testQuestions || testQuestions.length === 0) return;
-    const q = testQuestions[currentQuestionIndex];
+    toggleFavoriteAction(testQuestions[currentQuestionIndex], toggleFavoriteBtn);
+}
+
+function openNoteModalAction(q) {
+    if (!q) return;
+    currentActiveQuestion = q;
     const notes = JSON.parse(localStorage.getItem('appOpeNotes') || '{}');
     
     if (notes[q.pregunta]) {
@@ -990,11 +1036,19 @@ function openNoteModal() {
     noteModal.style.display = 'flex';
 }
 
-function saveNote() {
+function openNoteModal() {
     if (!testQuestions || testQuestions.length === 0) return;
-    const q = testQuestions[currentQuestionIndex];
-    const notes = JSON.parse(localStorage.getItem('appOpeNotes') || '{}');
+    openNoteModalAction(testQuestions[currentQuestionIndex]);
+}
+
+function saveNote() {
+    let q = currentActiveQuestion;
+    if (!q && testQuestions && testQuestions.length > 0) {
+        q = testQuestions[currentQuestionIndex];
+    }
+    if (!q) return;
     
+    const notes = JSON.parse(localStorage.getItem('appOpeNotes') || '{}');
     const val = noteTextarea.value.trim();
     if (val) {
         notes[q.pregunta] = val;
@@ -1004,17 +1058,33 @@ function saveNote() {
     
     localStorage.setItem('appOpeNotes', JSON.stringify(notes));
     noteModal.style.display = 'none';
-    renderQuestion(); // Para que se actualice el UI
+    
+    if (testScreen.classList.contains('active') && testQuestions[currentQuestionIndex]?.pregunta === q.pregunta) {
+        renderQuestion();
+    }
+    if (statsModal.style.display === 'flex') {
+        openStatsModal(q);
+    }
 }
 
 function deleteNote() {
-    if (!testQuestions || testQuestions.length === 0) return;
-    const q = testQuestions[currentQuestionIndex];
+    let q = currentActiveQuestion;
+    if (!q && testQuestions && testQuestions.length > 0) {
+        q = testQuestions[currentQuestionIndex];
+    }
+    if (!q) return;
+    
     const notes = JSON.parse(localStorage.getItem('appOpeNotes') || '{}');
     delete notes[q.pregunta];
     localStorage.setItem('appOpeNotes', JSON.stringify(notes));
     noteModal.style.display = 'none';
-    renderQuestion();
+    
+    if (testScreen.classList.contains('active') && testQuestions[currentQuestionIndex]?.pregunta === q.pregunta) {
+        renderQuestion();
+    }
+    if (statsModal.style.display === 'flex') {
+        openStatsModal(q);
+    }
 }
 
 // --- LOGICA BUSCADOR / GLOSARIO ---
@@ -1074,6 +1144,12 @@ function renderSearchResults(results) {
         div.style.padding = '1rem';
         div.style.borderRadius = '0.5rem';
         div.style.marginBottom = '0.5rem';
+        div.style.cursor = 'pointer';
+        div.style.transition = 'background 0.2s';
+        
+        div.addEventListener('mouseover', () => div.style.background = 'rgba(255,255,255,0.1)');
+        div.addEventListener('mouseout', () => div.style.background = 'rgba(255,255,255,0.05)');
+        div.addEventListener('click', () => openStatsModal(q));
         
         let html = `<p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.3rem;">Nº ${q.originalIndex || '?'} - ${q.sourceName || 'General'}</p>`;
         html += `<p style="font-weight: 600; font-size: 0.95rem; margin-bottom: 0.5rem; color: var(--text-primary);">${q.pregunta}</p>`;
@@ -1083,6 +1159,46 @@ function renderSearchResults(results) {
         div.innerHTML = html;
         searchResultsContainer.appendChild(div);
     });
+}
+
+function openStatsModal(q) {
+    currentActiveQuestion = q;
+    statsQuestionTitle.textContent = `Nº ${q.originalIndex || '?'} - ${q.sourceName || 'General'}`;
+    statsQuestionText.textContent = q.pregunta;
+    
+    const correctLetter = q.respuestaCorrecta;
+    statsCorrectAnswer.textContent = `Opción ${correctLetter}: ${q.opciones[correctLetter]}`;
+    
+    let statsMap = JSON.parse(localStorage.getItem('appOpeQuestionStats') || '{}');
+    const hash = q.pregunta;
+    const stats = statsMap[hash] || { seen: 0, correct: 0, wrong: 0 };
+    
+    let failuresMap = JSON.parse(localStorage.getItem('antigravity_failures') || '{}');
+    let historicalWrong = failuresMap[hash] || 0;
+    
+    statsSeen.textContent = Math.max(stats.seen, historicalWrong);
+    statsCorrect.textContent = stats.correct;
+    statsWrong.textContent = Math.max(stats.wrong, historicalWrong);
+    
+    let favs = JSON.parse(localStorage.getItem('appOpeFavorites') || '[]');
+    if (favs.includes(q.pregunta)) {
+        statsToggleFavBtn.style.color = '#facc15';
+        statsToggleFavBtn.innerHTML = '⭐ Favorita';
+    } else {
+        statsToggleFavBtn.style.color = 'var(--text-secondary)';
+        statsToggleFavBtn.innerHTML = '☆ Favorita';
+    }
+    
+    let notes = JSON.parse(localStorage.getItem('appOpeNotes') || '{}');
+    if (notes[q.pregunta]) {
+        statsOpenNoteBtn.style.color = '#6366f1';
+        statsOpenNoteBtn.innerHTML = '📝 Ver Mis Notas';
+    } else {
+        statsOpenNoteBtn.style.color = 'var(--text-secondary)';
+        statsOpenNoteBtn.innerHTML = '📝 Añadir Nota';
+    }
+    
+    statsModal.style.display = 'flex';
 }
 
 // --- LOGICA PAUSA / REANUDAR TEST ---
