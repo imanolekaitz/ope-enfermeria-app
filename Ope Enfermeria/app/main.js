@@ -474,6 +474,36 @@ function handleAnswerSelected(selectedBtn, selectedLetter, correctLetter) {
             selectedBtn.classList.add('incorrect');
         }
         scoreTrackerText.textContent = `Aciertos: ${correctAnswersCount}`;
+
+        // Guardar estadísticas de esta pregunta inmediatamente
+        let failuresMap = JSON.parse(localStorage.getItem('antigravity_failures') || '{}');
+        let lastSeenMap = JSON.parse(localStorage.getItem('antigravity_last_seen_test') || '{}');
+        let statsMap = JSON.parse(localStorage.getItem('appOpeQuestionStats') || '{}');
+        let currentTestCounter = parseInt(localStorage.getItem('antigravity_test_counter') || '0', 10);
+        
+        const q = testQuestions[currentQuestionIndex];
+        const hash = q.pregunta;
+        
+        lastSeenMap[hash] = currentTestCounter + 1;
+        if (!statsMap[hash]) {
+            statsMap[hash] = { seen: 0, correct: 0, wrong: 0 };
+        }
+        statsMap[hash].seen++;
+        
+        if (selectedLetter === correctLetter) {
+            statsMap[hash].correct++;
+            if (failuresMap[hash]) {
+                failuresMap[hash] = Math.max(0, failuresMap[hash] - 1);
+            }
+        } else {
+            statsMap[hash].wrong++;
+            failuresMap[hash] = (failuresMap[hash] || 0) + 1;
+        }
+        
+        localStorage.setItem('antigravity_failures', JSON.stringify(failuresMap));
+        localStorage.setItem('antigravity_last_seen_test', JSON.stringify(lastSeenMap));
+        localStorage.setItem('appOpeQuestionStats', JSON.stringify(statsMap));
+
     } else {
         const allBtns = optionsContainer.querySelectorAll('.option-btn');
         allBtns.forEach(b => b.classList.remove('selected'));
@@ -669,29 +699,34 @@ function saveResult() {
         
         if (ua !== null) {
             respondidas++;
-            const hash = q.pregunta;
             
-            lastSeenMap[hash] = currentTestCounter;
-            if (!statsMap[hash]) {
-                statsMap[hash] = { seen: 0, correct: 0, wrong: 0 };
-            }
-            statsMap[hash].seen++;
-            
-            if (ua === q.respuestaCorrecta) {
-                statsMap[hash].correct++;
-                if (failuresMap[hash]) {
-                    failuresMap[hash] = Math.max(0, failuresMap[hash] - 1); // Disminuye el peso si se acierta
+            if (testMode === 'examen') {
+                const hash = q.pregunta;
+                
+                lastSeenMap[hash] = currentTestCounter;
+                if (!statsMap[hash]) {
+                    statsMap[hash] = { seen: 0, correct: 0, wrong: 0 };
                 }
-            } else {
-                statsMap[hash].wrong++;
-                failuresMap[hash] = (failuresMap[hash] || 0) + 1; // Aumenta el peso si se falla
+                statsMap[hash].seen++;
+                
+                if (ua === q.respuestaCorrecta) {
+                    statsMap[hash].correct++;
+                    if (failuresMap[hash]) {
+                        failuresMap[hash] = Math.max(0, failuresMap[hash] - 1);
+                    }
+                } else {
+                    statsMap[hash].wrong++;
+                    failuresMap[hash] = (failuresMap[hash] || 0) + 1;
+                }
             }
         }
     }
     
-    localStorage.setItem('antigravity_failures', JSON.stringify(failuresMap));
-    localStorage.setItem('antigravity_last_seen_test', JSON.stringify(lastSeenMap));
-    localStorage.setItem('appOpeQuestionStats', JSON.stringify(statsMap));
+    if (testMode === 'examen') {
+        localStorage.setItem('antigravity_failures', JSON.stringify(failuresMap));
+        localStorage.setItem('antigravity_last_seen_test', JSON.stringify(lastSeenMap));
+        localStorage.setItem('appOpeQuestionStats', JSON.stringify(statsMap));
+    }
     
     const record = {
         date: new Date().toISOString(),
