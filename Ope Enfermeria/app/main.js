@@ -1043,7 +1043,6 @@ function performSearch() {
 function performSearchById() {
     const numStr = searchIdInput.value.trim();
     if (!numStr) {
-        openSearchScreen();
         return;
     }
     const num = parseInt(numStr, 10);
@@ -1051,7 +1050,7 @@ function performSearchById() {
     
     const results = allQuestions.filter(q => {
         let matchRepo = (repo === 'ambos') ? true : (q.sourceType === repo);
-        return matchRepo && q.originalIndex === num;
+        return matchRepo && (q.id == num || q.originalIndex == num);
     });
     
     renderSearchResults(results);
