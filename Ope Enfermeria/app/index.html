@@ -24,8 +24,9 @@
         <div class="glass-panel">
             <h1 class="gradient-text">Test OPE 2026 Enfermeria</h1>
             <p class="subtitle">by Ekaitzel</p>
-            
-            <div id="streakContainer" class="hidden" style="margin-bottom: 1rem; display: inline-block; background: rgba(255,165,0,0.1); border: 1px solid rgba(255,165,0,0.3); padding: 0.5rem 1rem; border-radius: 2rem; color: #ffa500; font-weight: bold; font-size: 0.9rem;">
+
+            <div id="streakContainer" class="hidden"
+                style="margin-bottom: 1rem; display: inline-block; background: rgba(255,165,0,0.1); border: 1px solid rgba(255,165,0,0.3); padding: 0.5rem 1rem; border-radius: 2rem; color: #ffa500; font-weight: bold; font-size: 0.9rem;">
                 🔥 Racha de estudio: <span id="streakCount">0</span> días
             </div>
 
@@ -38,11 +39,14 @@
                 <p>Archivos cargados: <span id="fileCount">0</span></p>
                 <p>Total preguntas disponibles: <strong id="totalAvailable">0</strong></p>
 
-                <div id="globalSettings" style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 1rem; margin-bottom: 1rem; display: flex; flex-direction: column; gap: 0.8rem; text-align: left;">
-                    <span style="color: var(--text-secondary); font-size: 0.95rem; font-weight: 600;">Opciones de Temario:</span>
+                <div id="globalSettings"
+                    style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 1rem; margin-bottom: 1rem; display: flex; flex-direction: column; gap: 0.8rem; text-align: left;">
+                    <span style="color: var(--text-secondary); font-size: 0.95rem; font-weight: 600;">Opciones de
+                        Temario:</span>
                     <div style="display: flex; flex-direction: column; gap: 0.3rem;">
                         <label style="color: var(--text-primary); font-size: 0.85rem;">Repositorio a utilizar:</label>
-                        <select id="repoSelect" class="premium-btn secondary" style="padding: 0.5rem; border: 1px solid var(--border-color); font-size: 0.9rem; text-align: left;">
+                        <select id="repoSelect" class="premium-btn secondary"
+                            style="padding: 0.5rem; border: 1px solid var(--border-color); font-size: 0.9rem; text-align: left;">
                             <option value="ambos" selected>Ambos (Común y Específico)</option>
                             <option value="comun">Solo Común</option>
                             <option value="especifico">Solo Específico</option>
@@ -51,20 +55,27 @@
                     <div style="display: flex; gap: 0.5rem;">
                         <div style="flex-grow: 1;">
                             <label style="color: var(--text-primary); font-size: 0.85rem;">Desde preg. nº:</label>
-                            <input type="number" id="rangeStart" class="premium-btn secondary" style="padding: 0.5rem; width: 100%; border: 1px solid var(--border-color);" placeholder="Todas" min="1">
+                            <input type="number" id="rangeStart" class="premium-btn secondary"
+                                style="padding: 0.5rem; width: 100%; border: 1px solid var(--border-color);"
+                                placeholder="Todas" min="1">
                         </div>
                         <div style="flex-grow: 1;">
-                            <label style="color: var(--text-primary); font-size: 0.85rem;">Hasta preg. nº <span id="maxRangeInfo"></span>:</label>
-                            <input type="number" id="rangeEnd" class="premium-btn secondary" style="padding: 0.5rem; width: 100%; border: 1px solid var(--border-color);" placeholder="Todas" min="1">
+                            <label style="color: var(--text-primary); font-size: 0.85rem;">Hasta preg. nº <span
+                                    id="maxRangeInfo"></span>:</label>
+                            <input type="number" id="rangeEnd" class="premium-btn secondary"
+                                style="padding: 0.5rem; width: 100%; border: 1px solid var(--border-color);"
+                                placeholder="Todas" min="1">
                         </div>
                     </div>
                 </div>
 
                 <div class="start-actions"
                     style="display: flex; flex-direction: column; gap: 1rem; align-items: center;">
-                    
-                    <button id="resumeTestBtn" class="premium-btn primary hidden" style="width: 100%; background: linear-gradient(135deg, #4ade80, #16a34a); box-shadow: 0 0 15px rgba(74, 222, 128, 0.4);">▶️ Reanudar Test Pausado</button>
-                    
+
+                    <button id="resumeTestBtn" class="premium-btn primary hidden"
+                        style="width: 100%; background: linear-gradient(135deg, #4ade80, #16a34a); box-shadow: 0 0 15px rgba(74, 222, 128, 0.4);">▶️
+                        Reanudar Test Pausado</button>
+
                     <div
                         style="display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; align-items: center; background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 1rem; width: 100%;">
                         <span
@@ -80,20 +91,27 @@
                         <button id="startTestBtn" class="premium-btn secondary" style="flex-grow: 2;">Comenzar
                             Test</button>
                     </div>
-                    
+
                     <div style="display: flex; gap: 0.5rem; width: 100%;">
-                        <button id="startFavoritesBtn" class="premium-btn secondary" style="flex-grow: 1; border-color: #facc15; color: #facc15;">⭐ Test Favoritas</button>
-                        <button id="startFailedBtn" class="premium-btn secondary" style="flex-grow: 1; border-color: #f87171; color: #f87171;">❌ Test Falladas</button>
+                        <button id="startFavoritesBtn" class="premium-btn secondary"
+                            style="flex-grow: 1; border-color: #facc15; color: #facc15;">⭐ Test Favoritas</button>
+                        <button id="startFailedBtn" class="premium-btn secondary"
+                            style="flex-grow: 1; border-color: #f87171; color: #f87171;">❌ Test Falladas</button>
                     </div>
 
                     <button id="startExamBtn" class="premium-btn primary" style="width: 100%;">Comenzar Examen (100
                         pregs.)</button>
                 </div>
                 <div style="margin-top: 1.5rem; display: flex; flex-direction: column; gap: 0.5rem;">
-                    <button id="startFlashcardsBtn" class="premium-btn primary" style="width: 100%; box-shadow: 0 0 15px rgba(168,85,247,0.4); background: linear-gradient(135deg, #a855f7, #6366f1);" disabled>🎴 Flashcards Diarias</button>
-                    <button id="openSearchBtn" class="premium-btn secondary" style="width: 100%;">🔍 Buscador / Glosario</button>
-                    <button id="viewHistoryBtn" class="premium-btn secondary" style="width: 100%;">📊 Ver Histórico de Resultados</button>
-                    <button id="howItWorksBtn" class="premium-btn secondary" style="width: 100%;">❓ ¿Cómo funciona la app?</button>
+                    <button id="startFlashcardsBtn" class="premium-btn primary"
+                        style="width: 100%; box-shadow: 0 0 15px rgba(168,85,247,0.4); background: linear-gradient(135deg, #a855f7, #6366f1);"
+                        disabled>🎴 Flashcards Diarias</button>
+                    <button id="openSearchBtn" class="premium-btn secondary" style="width: 100%;">🔍 Buscador /
+                        Glosario</button>
+                    <button id="viewHistoryBtn" class="premium-btn secondary" style="width: 100%;">📊 Ver Histórico de
+                        Resultados</button>
+                    <button id="howItWorksBtn" class="premium-btn secondary" style="width: 100%;">❓ ¿Cómo funciona la
+                        app?</button>
                 </div>
             </div>
         </div>
@@ -103,11 +121,13 @@
     <main id="testScreen" class="screen">
         <header class="test-header">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                <div id="examTimerContainer" class="hidden" style="background: rgba(255,255,255,0.1); padding: 0.5rem 1rem; border-radius: 2rem; font-weight: 600; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
+                <div id="examTimerContainer" class="hidden"
+                    style="background: rgba(255,255,255,0.1); padding: 0.5rem 1rem; border-radius: 2rem; font-weight: 600; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem;">
                     <span style="font-size: 1.2rem;">⏱</span> <span id="examTimerText">60:00</span>
                 </div>
                 <div style="display: flex; gap: 0.5rem; margin-left: auto;">
-                    <button id="pauseTestBtn" class="premium-btn secondary" style="padding: 0.5rem 1rem; font-size: 0.9rem;">⏸️ Pausar</button>
+                    <button id="pauseTestBtn" class="premium-btn secondary"
+                        style="padding: 0.5rem 1rem; font-size: 0.9rem;">⏸️ Pausar</button>
                     <button id="exitTestBtn" class="premium-btn secondary"
                         style="padding: 0.5rem 1rem; font-size: 0.9rem;">✕ Salir</button>
                 </div>
@@ -124,31 +144,40 @@
         </header>
 
         <div class="glass-panel question-panel">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 1rem;">
+            <div
+                style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 1rem;">
                 <h2 id="questionText" class="question-text" style="margin: 0; flex-grow: 1;">
                     <!-- La pregunta se inserta aquí -->
                 </h2>
                 <div style="display: flex; flex-direction: column; gap: 0.5rem; flex-shrink: 0;">
-                    <button id="toggleFavoriteBtn" style="background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); font-size: 1.2rem; padding: 0.5rem; border-radius: 0.5rem; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center;" title="Añadir a Favoritas">
+                    <button id="toggleFavoriteBtn"
+                        style="background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); font-size: 1.2rem; padding: 0.5rem; border-radius: 0.5rem; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center;"
+                        title="Añadir a Favoritas">
                         ⭐
                     </button>
-                    <button id="openNoteBtn" style="background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); font-size: 1.2rem; padding: 0.5rem; border-radius: 0.5rem; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center;" title="Añadir Nota/Regla Mnemotécnica">
+                    <button id="openNoteBtn"
+                        style="background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); font-size: 1.2rem; padding: 0.5rem; border-radius: 0.5rem; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center;"
+                        title="Añadir Nota/Regla Mnemotécnica">
                         📝
                     </button>
                 </div>
             </div>
-            
-            <div id="userNoteDisplay" class="hidden" style="background: rgba(255,255,255,0.05); border-left: 3px solid #6366f1; padding: 0.8rem; margin-bottom: 1.5rem; border-radius: 0 0.5rem 0.5rem 0; font-size: 0.9rem; color: var(--text-secondary); white-space: pre-wrap;">
+
+            <div id="userNoteDisplay" class="hidden"
+                style="background: rgba(255,255,255,0.05); border-left: 3px solid #6366f1; padding: 0.8rem; margin-bottom: 1.5rem; border-radius: 0 0.5rem 0.5rem 0; font-size: 0.9rem; color: var(--text-secondary); white-space: pre-wrap;">
             </div>
 
             <div id="optionsContainer" class="options-container">
                 <!-- Opciones A, B, C, D -->
             </div>
 
-            <div class="actions" style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+            <div class="actions"
+                style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
                 <div style="display: flex; gap: 0.5rem; align-items: center;">
                     <button id="prevBtn" class="premium-btn secondary hidden">← Anterior</button>
-                    <button id="reportErrorBtn" style="background: transparent; border: 1px solid rgba(255,107,107,0.5); color: #ff6b6b; padding: 0.5rem 0.8rem; border-radius: 0.5rem; cursor: pointer; font-size: 0.85rem;">⚠️ Reportar Error</button>
+                    <button id="reportErrorBtn"
+                        style="background: transparent; border: 1px solid rgba(255,107,107,0.5); color: #ff6b6b; padding: 0.5rem 0.8rem; border-radius: 0.5rem; cursor: pointer; font-size: 0.85rem;">⚠️
+                        Reportar Error</button>
                 </div>
                 <div>
                     <button id="nextBtn" class="premium-btn secondary hidden">Siguiente ➔</button>
@@ -171,7 +200,8 @@
             </div>
 
             <p id="feedbackMessage" class="feedback-msg">Buen intento. ¡Sigue preparándote!</p>
-            <p id="remainingTimeFeedback" style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 1.5rem;" class="hidden"></p>
+            <p id="remainingTimeFeedback"
+                style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 1.5rem;" class="hidden"></p>
 
             <button id="tryAgainBtn" class="premium-btn primary mt-4">Realizar otro test</button>
         </div>
@@ -239,41 +269,55 @@
         <header class="test-header" style="margin-bottom: 2rem;">
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <div class="progress-stats" style="margin: 0; width: 100%;">
-                    <span id="flashcardNumber" style="font-size: 1.2rem; font-weight: 800; background: linear-gradient(135deg, #a855f7, #6366f1); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">Flashcard 1/10</span>
+                    <span id="flashcardNumber"
+                        style="font-size: 1.2rem; font-weight: 800; background: linear-gradient(135deg, #a855f7, #6366f1); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">Flashcard
+                        1/10</span>
                 </div>
                 <button id="exitFlashcardsBtn" class="premium-btn secondary"
-                    style="padding: 0.5rem 1rem; font-size: 0.9rem; margin-left: auto; flex-shrink: 0;">✕ Salir al menú</button>
+                    style="padding: 0.5rem 1rem; font-size: 0.9rem; margin-left: auto; flex-shrink: 0;">✕ Salir al
+                    menú</button>
             </div>
             <div class="progress-bar" style="margin-top: 1rem;">
-                <div id="flashcardProgressFill" class="progress-fill" style="background: linear-gradient(90deg, #a855f7, #6366f1);"></div>
+                <div id="flashcardProgressFill" class="progress-fill"
+                    style="background: linear-gradient(90deg, #a855f7, #6366f1);"></div>
             </div>
         </header>
 
         <div class="scene scene--card">
             <div class="card" id="flashcardElement">
-                <div class="card__face card__face--front glass-panel" style="padding: 2rem; display: flex; flex-direction: column;">
-                    <h3 style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 1rem; text-align: center;">Toca para voltear 🔄</h3>
-                    <h2 id="fcQuestionText" class="question-text" style="font-size: 1.4rem; text-align: center; display: flex; align-items: center; justify-content: center; height: 100%; margin: 0;">
+                <div class="card__face card__face--front glass-panel"
+                    style="padding: 2rem; display: flex; flex-direction: column;">
+                    <h3 style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 1rem; text-align: center;">
+                        Toca para voltear 🔄</h3>
+                    <h2 id="fcQuestionText" class="question-text"
+                        style="font-size: 1.4rem; text-align: center; display: flex; align-items: center; justify-content: center; height: 100%; margin: 0;">
                         <!-- Pregunta aquí -->
                     </h2>
                 </div>
-                <div class="card__face card__face--back glass-panel" style="padding: 2rem; display: flex; flex-direction: column;">
-                    <h3 style="color: var(--success); margin-bottom: 1rem; font-size: 1rem; text-align: center;">Respuesta Correcta ✔</h3>
-                    <div id="fcAnswerText" style="font-size: 1.3rem; font-weight: 600; text-align: center; display: flex; align-items: center; justify-content: center; height: 100%; color: var(--text-primary);">
+                <div class="card__face card__face--back glass-panel"
+                    style="padding: 2rem; display: flex; flex-direction: column;">
+                    <h3 style="color: var(--success); margin-bottom: 1rem; font-size: 1rem; text-align: center;">
+                        Respuesta Correcta ✔</h3>
+                    <div id="fcAnswerText"
+                        style="font-size: 1.3rem; font-weight: 600; text-align: center; display: flex; align-items: center; justify-content: center; height: 100%; color: var(--text-primary);">
                         <!-- Respuesta correcta aquí -->
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="actions" style="display: flex; justify-content: space-between; align-items: center; margin-top: 3rem;">
+        <div class="actions"
+            style="display: flex; justify-content: space-between; align-items: center; margin-top: 3rem;">
             <div style="display: flex; gap: 0.5rem; align-items: center;">
                 <button id="fcPrevBtn" class="premium-btn secondary hidden">← Anterior</button>
-                <button id="fcReportErrorBtn" style="background: transparent; border: 1px solid rgba(255,107,107,0.5); color: #ff6b6b; padding: 0.5rem 0.8rem; border-radius: 0.5rem; cursor: pointer; font-size: 0.85rem;">⚠️ Reportar Error</button>
+                <button id="fcReportErrorBtn"
+                    style="background: transparent; border: 1px solid rgba(255,107,107,0.5); color: #ff6b6b; padding: 0.5rem 0.8rem; border-radius: 0.5rem; cursor: pointer; font-size: 0.85rem;">⚠️
+                    Reportar Error</button>
             </div>
             <div style="margin-left: auto;">
                 <button id="fcNextBtn" class="premium-btn secondary">Siguiente ➔</button>
-                <button id="fcFinishBtn" class="premium-btn primary hidden" style="background: linear-gradient(135deg, #a855f7, #6366f1);">Terminar</button>
+                <button id="fcFinishBtn" class="premium-btn primary hidden"
+                    style="background: linear-gradient(135deg, #a855f7, #6366f1);">Terminar</button>
             </div>
         </div>
     </main>
@@ -291,26 +335,36 @@
         <div class="glass-panel" style="padding: 2rem; text-align: left;">
             <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Buscar por texto:</p>
             <div style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem;">
-                <input type="text" id="searchInput" class="premium-btn secondary" style="flex-grow: 1; padding: 0.8rem; border: 1px solid var(--border-color); font-size: 1rem; text-align: left;" placeholder="Busca una palabra clave... (ej. Ley 8/1997, RCP)">
+                <input type="text" id="searchInput" class="premium-btn secondary"
+                    style="flex-grow: 1; padding: 0.8rem; border: 1px solid var(--border-color); font-size: 1rem; text-align: left;"
+                    placeholder="Busca una palabra clave... (ej. Ley 8/1997, RCP)">
                 <button id="doSearchBtn" class="premium-btn primary">Buscar</button>
             </div>
-            
-            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Buscar por número de pregunta:</p>
+
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Buscar por número de
+                pregunta:</p>
             <div style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
-                <input type="number" id="searchIdInput" class="premium-btn secondary" style="flex-grow: 1; padding: 0.8rem; border: 1px solid var(--border-color); font-size: 1rem; text-align: left;" placeholder="Nº Pregunta..." min="1">
-                <select id="searchRepoSelect" class="premium-btn secondary" style="padding: 0.8rem; border: 1px solid var(--border-color);">
+                <input type="number" id="searchIdInput" class="premium-btn secondary"
+                    style="flex-grow: 1; padding: 0.8rem; border: 1px solid var(--border-color); font-size: 1rem; text-align: left;"
+                    placeholder="Nº Pregunta..." min="1">
+                <select id="searchRepoSelect" class="premium-btn secondary"
+                    style="padding: 0.8rem; border: 1px solid var(--border-color);">
                     <option value="ambos">Ambos repositorios</option>
                     <option value="comun">Común</option>
                     <option value="especifico">Específico</option>
                 </select>
                 <button id="doSearchIdBtn" class="premium-btn primary">Buscar</button>
             </div>
-            
-            <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.9rem;">Resultados encontrados: <span id="searchResultCount" style="font-weight: bold; color: var(--text-primary);">0</span></p>
 
-            <div id="searchResultsContainer" style="display: flex; flex-direction: column; gap: 1rem; max-height: 60vh; overflow-y: auto; padding-right: 0.5rem;">
+            <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.9rem;">Resultados encontrados:
+                <span id="searchResultCount" style="font-weight: bold; color: var(--text-primary);">0</span>
+            </p>
+
+            <div id="searchResultsContainer"
+                style="display: flex; flex-direction: column; gap: 1rem; max-height: 60vh; overflow-y: auto; padding-right: 0.5rem;">
                 <!-- Resultados de búsqueda -->
-                <p style="text-align: center; color: var(--text-secondary); margin-top: 2rem;">Escribe algo arriba para buscar entre todas las preguntas.</p>
+                <p style="text-align: center; color: var(--text-secondary); margin-top: 2rem;">Escribe algo arriba para
+                    buscar entre todas las preguntas.</p>
             </div>
         </div>
     </main>
@@ -325,113 +379,169 @@
             </div>
         </header>
 
-        <div class="glass-panel" style="padding: 2rem; text-align: left; color: var(--text-primary); font-size: 1.05rem; line-height: 1.6;">
-            <ul style="list-style-type: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 1.5rem;">
+        <div class="glass-panel"
+            style="padding: 2rem; text-align: left; color: var(--text-primary); font-size: 1.05rem; line-height: 1.6;">
+            <ul
+                style="list-style-type: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 1.5rem;">
                 <li>
-                    <span style="font-size: 1.3rem; margin-bottom: 0.5rem; display: block;">📝 <strong>Dos modos de estudio</strong></span>
-                    Puedes elegir el <strong>Test Normal</strong> (de 25, 50 o 100 preguntas) para estudiar de forma dinámica con confirmación inmediata de si has acertado o fallado, o el <strong>Modo Examen</strong> (100 preguntas temporizadas a 1 hora) para ponerte a prueba a ciegas hasta el final.
+                    <span style="font-size: 1.3rem; margin-bottom: 0.5rem; display: block;">📝 <strong>Dos modos de
+                            estudio</strong></span>
+                    Puedes elegir el <strong>Test Normal</strong> (de 25, 50 o 100 preguntas) para estudiar de forma
+                    dinámica con confirmación inmediata de si has acertado o fallado, o el <strong>Modo Examen</strong>
+                    (100 preguntas temporizadas a 1 hora) para ponerte a prueba a ciegas hasta el final.
                 </li>
                 <li>
-                    <span style="font-size: 1.3rem; margin-bottom: 0.5rem; display: block;">⭐ <strong>Favoritas, Falladas y Buscador</strong></span>
-                    Puedes marcar cualquier pregunta con la ⭐ para añadirla a tus favoritas. Luego, desde el menú principal, podrás generar un <strong>Test de Favoritas</strong> o un <strong>Test de Falladas</strong>. Además, dispones de un <strong>Buscador</strong> para consultar rápidamente cualquier concepto por texto o por número de pregunta.
+                    <span style="font-size: 1.3rem; margin-bottom: 0.5rem; display: block;">⭐ <strong>Favoritas,
+                            Falladas y Buscador</strong></span>
+                    Puedes marcar cualquier pregunta con la ⭐ para añadirla a tus favoritas. Luego, desde el menú
+                    principal, podrás generar un <strong>Test de Favoritas</strong> o un <strong>Test de
+                        Falladas</strong>. Además, dispones de un <strong>Buscador</strong> para consultar rápidamente
+                    cualquier concepto por texto o por número de pregunta.
                 </li>
                 <li>
-                    <span style="font-size: 1.3rem; margin-bottom: 0.5rem; display: block;">🎴 <strong>Flashcards y Rachas</strong></span>
-                    Inicia tu día con 10 flashcards diferentes cada jornada. Para mantener la constancia, el sistema cuenta tu <strong>Racha de Estudio</strong> diaria (🔥). ¡Intenta no perder tu racha!
+                    <span style="font-size: 1.3rem; margin-bottom: 0.5rem; display: block;">🎴 <strong>Flashcards y
+                            Rachas</strong></span>
+                    Inicia tu día con 10 flashcards diferentes cada jornada. Para mantener la constancia, el sistema
+                    cuenta tu <strong>Racha de Estudio</strong> diaria (🔥). ¡Intenta no perder tu racha!
                 </li>
                 <li>
-                    <span style="font-size: 1.3rem; margin-bottom: 0.5rem; display: block;">⏸️ <strong>Pausar Test y Mis Notas</strong></span>
-                    Si tienes que irte en mitad de un test, pulsa el botón <strong>⏸️ Pausar</strong>. Podrás retomarlo exactamente donde lo dejaste la próxima vez que entres. También puedes usar el botón 📝 en cualquier pregunta para añadir una <strong>Regla Mnemotécnica o Nota</strong> que te aparecerá cada vez que esa pregunta vuelva a salir.
+                    <span style="font-size: 1.3rem; margin-bottom: 0.5rem; display: block;">⏸️ <strong>Pausar Test y Mis
+                            Notas</strong></span>
+                    Si tienes que irte en mitad de un test, pulsa el botón <strong>⏸️ Pausar</strong>. Podrás retomarlo
+                    exactamente donde lo dejaste la próxima vez que entres. También puedes usar el botón 📝 en cualquier
+                    pregunta para añadir una <strong>Regla Mnemotécnica o Nota</strong> que te aparecerá cada vez que
+                    esa pregunta vuelva a salir.
                 </li>
                 <li>
-                    <span style="font-size: 1.3rem; margin-bottom: 0.5rem; display: block;">🎯 <strong>Insistencia inteligente</strong></span>
-                    El algoritmo detecta qué respuestas fallas más a menudo y les otorga más peso. Conforme más utilices la app, más insistirá en tus puntos flacos garantizando que abarcarás el 100% de las preguntas.
+                    <span style="font-size: 1.3rem; margin-bottom: 0.5rem; display: block;">🎯 <strong>Insistencia
+                            inteligente</strong></span>
+                    El algoritmo detecta qué respuestas fallas más a menudo y les otorga más peso. Conforme más utilices
+                    la app, más insistirá en tus puntos flacos garantizando que abarcarás el 100% de las preguntas.
                 </li>
                 <li>
-                    <span style="font-size: 1.3rem; margin-bottom: 0.5rem; display: block;">📊 <strong>Histórico y Estadísticas</strong></span>
-                    Consulta tu evolución global desde "Ver Histórico". Además, al pulsar sobre cualquier pregunta (desde el buscador o en test), podrás ver en detalle cuántas veces la has visto, acertado y fallado.
+                    <span style="font-size: 1.3rem; margin-bottom: 0.5rem; display: block;">📊 <strong>Histórico y
+                            Estadísticas</strong></span>
+                    Consulta tu evolución global desde "Ver Histórico". Además, al pulsar sobre cualquier pregunta
+                    (desde el buscador), podrás ver en detalle cuántas veces la has visto, acertado y fallado.
                 </li>
                 <li>
-                    <span style="font-size: 1.3rem; margin-bottom: 0.5rem; display: block;">⚠️ <strong>Reportar Errores</strong></span>
-                    Si encuentras una pregunta con una respuesta incorrecta o que deba ser anulada, usa el botón <strong>⚠️ Reportar Error</strong> para enviarnos un aviso por email con tu sugerencia de corrección.
+                    <span style="font-size: 1.3rem; margin-bottom: 0.5rem; display: block;">⚠️ <strong>Reportar
+                            Errores</strong></span>
+                    Si encuentras una pregunta con una respuesta incorrecta o que deba ser anulada, usa el botón
+                    <strong>⚠️ Reportar Error</strong> para enviar un aviso por email con tu sugerencia de
+                    corrección.
                 </li>
             </ul>
         </div>
     </main>
 
     <!-- MODAL NOTAS -->
-    <div id="noteModal" style="position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1010; padding: 1rem;">
-        <div class="glass-panel" style="max-width: 400px; width: 100%; text-align: left; position: relative; background: #1a202c; border: 1px solid rgba(255,255,255,0.1);">
-            <button id="closeNoteModalBtn" style="position: absolute; top: 1rem; right: 1rem; background: transparent; border: none; color: white; font-size: 1.2rem; cursor: pointer;">✕</button>
-            <h3 style="color: #6366f1; margin-top: 0; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">📝 Mis Notas / Regla Mnemotécnica</h3>
-            <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1rem;">Guarda aquí una explicación o regla que te ayude a recordar la respuesta correcta.</p>
-            
-            <textarea id="noteTextarea" class="premium-btn secondary" style="width: 100%; padding: 0.8rem; border: 1px solid var(--border-color); text-align: left; resize: vertical; min-height: 120px; font-size: 0.95rem;" placeholder="Escribe tu nota aquí..."></textarea>
-            
+    <div id="noteModal"
+        style="position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1010; padding: 1rem;">
+        <div class="glass-panel"
+            style="max-width: 400px; width: 100%; text-align: left; position: relative; background: #1a202c; border: 1px solid rgba(255,255,255,0.1);">
+            <button id="closeNoteModalBtn"
+                style="position: absolute; top: 1rem; right: 1rem; background: transparent; border: none; color: white; font-size: 1.2rem; cursor: pointer;">✕</button>
+            <h3
+                style="color: #6366f1; margin-top: 0; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                📝 Mis Notas / Regla Mnemotécnica</h3>
+            <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1rem;">Guarda aquí una explicación
+                o regla que te ayude a recordar la respuesta correcta.</p>
+
+            <textarea id="noteTextarea" class="premium-btn secondary"
+                style="width: 100%; padding: 0.8rem; border: 1px solid var(--border-color); text-align: left; resize: vertical; min-height: 120px; font-size: 0.95rem;"
+                placeholder="Escribe tu nota aquí..."></textarea>
+
             <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
-                <button id="deleteNoteBtn" class="premium-btn secondary" style="flex-grow: 1; border-color: #f87171; color: #f87171;">Borrar</button>
+                <button id="deleteNoteBtn" class="premium-btn secondary"
+                    style="flex-grow: 1; border-color: #f87171; color: #f87171;">Borrar</button>
                 <button id="saveNoteBtn" class="premium-btn primary" style="flex-grow: 2;">Guardar Nota</button>
             </div>
         </div>
     </div>
 
     <!-- MODAL ESTADÍSTICAS DE PREGUNTA -->
-    <div id="statsModal" style="position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 1rem;">
-        <div class="glass-panel" style="max-width: 500px; width: 100%; text-align: left; position: relative; background: #1a202c; border: 1px solid rgba(255,255,255,0.1); max-height: 90vh; overflow-y: auto;">
-            <button id="closeStatsModalBtn" style="position: absolute; top: 1rem; right: 1rem; background: transparent; border: none; color: white; font-size: 1.2rem; cursor: pointer;">✕</button>
-            <h3 style="color: #4ade80; margin-top: 0; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">📊 Detalles de la Pregunta</h3>
-            
-            <p id="statsQuestionTitle" style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.3rem;"></p>
+    <div id="statsModal"
+        style="position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 1rem;">
+        <div class="glass-panel"
+            style="max-width: 500px; width: 100%; text-align: left; position: relative; background: #1a202c; border: 1px solid rgba(255,255,255,0.1); max-height: 90vh; overflow-y: auto;">
+            <button id="closeStatsModalBtn"
+                style="position: absolute; top: 1rem; right: 1rem; background: transparent; border: none; color: white; font-size: 1.2rem; cursor: pointer;">✕</button>
+            <h3
+                style="color: #4ade80; margin-top: 0; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                📊 Detalles de la Pregunta</h3>
+
+            <p id="statsQuestionTitle" style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.3rem;">
+            </p>
             <p id="statsQuestionText" style="font-weight: 600; color: #fff; margin-bottom: 1rem;"></p>
-            
-            <div style="background: rgba(74, 222, 128, 0.1); border-left: 3px solid #4ade80; padding: 0.8rem; border-radius: 0 0.5rem 0.5rem 0; margin-bottom: 1.5rem;">
-                <span style="color: #4ade80; font-weight: bold; display: block; margin-bottom: 0.3rem;">✔ Respuesta correcta:</span>
+
+            <div
+                style="background: rgba(74, 222, 128, 0.1); border-left: 3px solid #4ade80; padding: 0.8rem; border-radius: 0 0.5rem 0.5rem 0; margin-bottom: 1.5rem;">
+                <span style="color: #4ade80; font-weight: bold; display: block; margin-bottom: 0.3rem;">✔ Respuesta
+                    correcta:</span>
                 <span id="statsCorrectAnswer" style="color: #e2e8f0; font-size: 0.95rem;"></span>
             </div>
 
             <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
-                <div style="flex: 1; background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 0.5rem; text-align: center;">
-                    <span style="font-size: 1.5rem; font-weight: bold; color: var(--text-primary);" id="statsSeen">0</span>
+                <div
+                    style="flex: 1; background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 0.5rem; text-align: center;">
+                    <span style="font-size: 1.5rem; font-weight: bold; color: var(--text-primary);"
+                        id="statsSeen">0</span>
                     <span style="display: block; font-size: 0.8rem; color: var(--text-secondary);">Veces vista</span>
                 </div>
-                <div style="flex: 1; background: rgba(74, 222, 128, 0.05); padding: 1rem; border-radius: 0.5rem; text-align: center; border: 1px solid rgba(74, 222, 128, 0.2);">
+                <div
+                    style="flex: 1; background: rgba(74, 222, 128, 0.05); padding: 1rem; border-radius: 0.5rem; text-align: center; border: 1px solid rgba(74, 222, 128, 0.2);">
                     <span style="font-size: 1.5rem; font-weight: bold; color: #4ade80;" id="statsCorrect">0</span>
                     <span style="display: block; font-size: 0.8rem; color: var(--text-secondary);">Aciertos</span>
                 </div>
-                <div style="flex: 1; background: rgba(248, 113, 113, 0.05); padding: 1rem; border-radius: 0.5rem; text-align: center; border: 1px solid rgba(248, 113, 113, 0.2);">
+                <div
+                    style="flex: 1; background: rgba(248, 113, 113, 0.05); padding: 1rem; border-radius: 0.5rem; text-align: center; border: 1px solid rgba(248, 113, 113, 0.2);">
                     <span style="font-size: 1.5rem; font-weight: bold; color: #f87171;" id="statsWrong">0</span>
                     <span style="display: block; font-size: 0.8rem; color: var(--text-secondary);">Fallos</span>
                 </div>
             </div>
-            
+
             <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                <button id="statsToggleFavBtn" class="premium-btn secondary" style="flex: 1; border-color: #facc15; color: #facc15;">⭐ Favorita</button>
-                <button id="statsOpenNoteBtn" class="premium-btn secondary" style="flex: 1; border-color: #6366f1; color: #6366f1;">📝 Mis Notas</button>
-                <button id="statsReportBtn" class="premium-btn secondary" style="flex: 1; border-color: #f87171; color: #f87171;">⚠️ Reportar</button>
+                <button id="statsToggleFavBtn" class="premium-btn secondary"
+                    style="flex: 1; border-color: #facc15; color: #facc15;">⭐ Favorita</button>
+                <button id="statsOpenNoteBtn" class="premium-btn secondary"
+                    style="flex: 1; border-color: #6366f1; color: #6366f1;">📝 Mis Notas</button>
+                <button id="statsReportBtn" class="premium-btn secondary"
+                    style="flex: 1; border-color: #f87171; color: #f87171;">⚠️ Reportar</button>
             </div>
         </div>
     </div>
 
     <!-- MODAL REPORTAR ERROR -->
-    <div id="errorModal" style="position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1020; padding: 1rem;">
-        <div class="glass-panel" style="max-width: 400px; width: 100%; text-align: left; position: relative; background: #1a202c; border: 1px solid rgba(255,255,255,0.1);">
-            <button id="closeErrorModalBtn" style="position: absolute; top: 1rem; right: 1rem; background: transparent; border: none; color: white; font-size: 1.2rem; cursor: pointer;">✕</button>
+    <div id="errorModal"
+        style="position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1020; padding: 1rem;">
+        <div class="glass-panel"
+            style="max-width: 400px; width: 100%; text-align: left; position: relative; background: #1a202c; border: 1px solid rgba(255,255,255,0.1);">
+            <button id="closeErrorModalBtn"
+                style="position: absolute; top: 1rem; right: 1rem; background: transparent; border: none; color: white; font-size: 1.2rem; cursor: pointer;">✕</button>
             <h3 style="color: #ff6b6b; margin-top: 0; margin-bottom: 1rem;">⚠️ Reportar Error</h3>
-            <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1.5rem;">Si crees que la respuesta correcta es otra, notifícalo para revisarla en el repositorio.</p>
-            
+            <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1.5rem;">Si crees que la respuesta
+                correcta es otra, notifícalo para revisarla en el repositorio.</p>
+
             <div style="margin-bottom: 1rem;">
                 <label style="font-size: 0.85rem; color: var(--text-secondary);">Pregunta:</label>
-                <div id="errorQuestionInfo" style="font-weight: 600; color: #fff; background: rgba(255,255,255,0.05); padding: 0.5rem; border-radius: 0.5rem; margin-top: 0.2rem; font-size: 0.9rem;"></div>
+                <div id="errorQuestionInfo"
+                    style="font-weight: 600; color: #fff; background: rgba(255,255,255,0.05); padding: 0.5rem; border-radius: 0.5rem; margin-top: 0.2rem; font-size: 0.9rem;">
+                </div>
             </div>
-            
+
             <div style="margin-bottom: 1rem;">
                 <label style="font-size: 0.85rem; color: var(--text-secondary);">Marcada como correcta:</label>
-                <div id="errorCurrentAnswer" style="font-weight: 600; color: #fff; background: rgba(255,255,255,0.05); padding: 0.5rem; border-radius: 0.5rem; margin-top: 0.2rem; font-size: 0.9rem;"></div>
+                <div id="errorCurrentAnswer"
+                    style="font-weight: 600; color: #fff; background: rgba(255,255,255,0.05); padding: 0.5rem; border-radius: 0.5rem; margin-top: 0.2rem; font-size: 0.9rem;">
+                </div>
             </div>
-            
+
             <div style="margin-bottom: 1rem;">
-                <label style="font-size: 0.85rem; color: var(--text-secondary);">Tu sugerencia de respuesta correcta:</label>
-                <select id="errorUserSuggestion" class="premium-btn secondary" style="width: 100%; padding: 0.5rem; margin-top: 0.2rem; border: 1px solid var(--border-color); text-align: left;">
+                <label style="font-size: 0.85rem; color: var(--text-secondary);">Tu sugerencia de respuesta
+                    correcta:</label>
+                <select id="errorUserSuggestion" class="premium-btn secondary"
+                    style="width: 100%; padding: 0.5rem; margin-top: 0.2rem; border: 1px solid var(--border-color); text-align: left;">
                     <option value="A">Opción A</option>
                     <option value="B">Opción B</option>
                     <option value="C">Opción C</option>
@@ -439,13 +549,17 @@
                     <option value="Anulada">La pregunta debería anularse</option>
                 </select>
             </div>
-            
+
             <div style="margin-bottom: 1.5rem;">
                 <label style="font-size: 0.85rem; color: var(--text-secondary);">Comentario (opcional):</label>
-                <textarea id="errorUserComment" class="premium-btn secondary" style="width: 100%; padding: 0.5rem; margin-top: 0.2rem; border: 1px solid var(--border-color); text-align: left; resize: vertical; min-height: 60px;" placeholder="Explica brevemente el motivo..."></textarea>
+                <textarea id="errorUserComment" class="premium-btn secondary"
+                    style="width: 100%; padding: 0.5rem; margin-top: 0.2rem; border: 1px solid var(--border-color); text-align: left; resize: vertical; min-height: 60px;"
+                    placeholder="Explica brevemente el motivo..."></textarea>
             </div>
 
-            <button id="sendErrorEmailBtn" class="premium-btn primary" style="width: 100%; background: #ff6b6b; color: white; border: none; box-shadow: 0 0 15px rgba(255,107,107,0.3);">Enviar por Email</button>
+            <button id="sendErrorEmailBtn" class="premium-btn primary"
+                style="width: 100%; background: #ff6b6b; color: white; border: none; box-shadow: 0 0 15px rgba(255,107,107,0.3);">Enviar
+                por Email</button>
         </div>
     </div>
     <script>
