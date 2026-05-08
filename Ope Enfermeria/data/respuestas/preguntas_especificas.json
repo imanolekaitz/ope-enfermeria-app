@@ -52,7 +52,7 @@
       "C": "El autocuidado son las actividades que las personas realizan para mantener su salud y bienestar, pero cuando estas actividades exceden la capacidad de la persona, surge un \"déficit de cuidado\" y el personal sanitario debe intervenir para suplir esa falta mediante educación y apoyo, basándose en la teoría del Modelo de insuficiencia de Autocuidado.",
       "D": "La enfermería pertenece a la familia de los servicios sanitarios y sociales que se organizan para prestar asistencia directa a personas con necesidades legítimas de diferentes formas de atención directa por sus estados de salud o por la naturaleza de sus necesidades de asistencia sanitaria."
     },
-    "respuestaCorrecta": "D"
+    "respuestaCorrecta": "B"
   },
   {
     "id": 6,
@@ -162,7 +162,7 @@
       "C": "Salud deficiente de la comunidad.",
       "D": "Disposición para mejorar el patrón del sueño."
     },
-    "respuestaCorrecta": "A"
+    "respuestaCorrecta": "D"
   },
   {
     "id": 16,
@@ -195,7 +195,7 @@
       "C": "Distinguir los datos relevantes de los irrelevantes.",
       "D": "Puede ayudar a los profesionales sanitarios a desarrollar el currículo de formación de enfermería."
     },
-    "respuestaCorrecta": "D"
+    "respuestaCorrecta": "A"
   },
   {
     "id": 19,
@@ -206,7 +206,7 @@
       "C": "13 Dominios, 47 clases y 277 diagnósticos.",
       "D": "13 Dominios, 48 clases y 277 diagnósticos."
     },
-    "respuestaCorrecta": "A"
+    "respuestaCorrecta": "D"
   },
   {
     "id": 20,
@@ -338,7 +338,7 @@
       "C": "El profesional abandona una actitud rígida, muestra empatía hacia el paciente y facilita que este hable de lo que le ocurre, comprometiéndose a ayudarle.",
       "D": "El profesional se compromete totalmente, comunica de forma empática y anima al paciente a una revelación profunda de su yo auténtico."
     },
-    "respuestaCorrecta": "D"
+    "respuestaCorrecta": "C"
   },
   {
     "id": 32,
@@ -470,7 +470,7 @@
       "C": "En hospitalización a domicilio, la valoración del riesgo debe realizarse en las primeras 72h tras el ingreso.",
       "D": "Es obligatorio valorar el riesgo de lesión por presion a las mujeres que ingresan en obstetricia para parto o cesárea."
     },
-    "respuestaCorrecta": "B"
+    "respuestaCorrecta": "C"
   },
   {
     "id": 44,
@@ -547,7 +547,7 @@
       "C": "Utilice ácidos grasos hiperoxigenados (AGHO) hasta su absorción para hidratar a la persona en riesgo.",
       "D": "Los apósitos recomendados para el alivio de presión son los apósitos de espuma de poliuretano."
     },
-    "respuestaCorrecta": "B"
+    "respuestaCorrecta": "D"
   },
   {
     "id": 51,
@@ -569,7 +569,7 @@
       "C": "El apósito primario se encuentra mojado y hay traspaso de exudado; se requiere una frecuencia de cambio del apósito mayor de la habitual para este tipo de apósito; la piel perilesional puede encontrarse macerada.",
       "D": "Hay pequeñas cantidades de líquido visibles cuando se retira el apósito; el apósito primario puede estar ligeramente manchado; la frecuencia de cambio del apósito resulta adecuada para el tipo de apósito."
     },
-    "respuestaCorrecta": "C"
+    "respuestaCorrecta": "A"
   },
   {
     "id": 53,
@@ -624,7 +624,7 @@
       "C": "Dieta dirigida a disminuir la irritación mecánica intestinal mediante la supresión de alimentos integrales, semillas y vegetales crudos.",
       "D": "Dieta orientada a reducir el contenido intestinal endoluminal no absorbido presente en heces tras la digestión."
     },
-    "respuestaCorrecta": "B"
+    "respuestaCorrecta": "D"
   },
   {
     "id": 58,
@@ -767,7 +767,7 @@
       "C": "La espirometría de incentivo debe realizarse 10 respiraciones consecutivas cada hora durante las horas de vigilia; entre intentos se aconsejan varias respiraciones normales para evitar la fatiga.",
       "D": "En el espirómetro incentivo de flujo, la esfera o pesa se eleva en función de la intensidad del aire inspirado."
     },
-    "respuestaCorrecta": "D"
+    "respuestaCorrecta": "B"
   },
   {
     "id": 71,
@@ -822,7 +822,7 @@
       "C": "La TB afecta principalmente al sistema nervioso central y raramente compromete el parénquima pulmonar.",
       "D": "La TB no se relaciona con factores socioeconómicos."
     },
-    "respuestaCorrecta": "A"
+    "respuestaCorrecta": "B"
   },
   {
     "id": 76,
@@ -921,7 +921,7 @@
       "C": "Se recomienda una dieta rica en proteínas, vitaminas D y K, hierro y cinc, para promover la cicatrización.",
       "D": "Si el dolor limita la actividad del paciente, pueden prescribirse analgésicos para mejorar la tolerancia funcional."
     },
-    "respuestaCorrecta": "A"
+    "respuestaCorrecta": "C"
   },
   {
     "id": 85,
@@ -1713,7 +1713,7 @@
       "C": "El fondo uterino alcanza la apófisis xifoides; las mamas están hinchadas y sensibles. Puede reaparecer la polaquiuria. Pueden hincharse los tobillos y aparecer problemas para dormir. Puede producirse disnea.",
       "D": "El fondo uterino se sitúa por encima del ombligo. Puede producirse lumbalgia y calambres en las piernas. La piel puede sufrir cambios, como estrías gravídicas, cloasma, línea negra, acné, eritema palmar y plantar. Pueden producirse hemorragias nasales. El crecimiento del útero puede provocar prurito abdominal; seguirá hasta el término de la gestación."
     },
-    "respuestaCorrecta": "B"
+    "respuestaCorrecta": "D"
   },
   {
     "id": 157,
@@ -1999,7 +1999,7 @@
       "C": "Evitar el consumo de cafeína y bebidas carbonatadas por su efecto diurético.",
       "D": "Advertir sobre el consumo de alimentos ricos en glutamato monosódico, por su posible relación con el empeoramiento de los síntomas."
     },
-    "respuestaCorrecta": "B"
+    "respuestaCorrecta": "A"
   },
   {
     "id": 183,
@@ -2010,7 +2010,7 @@
       "C": "Observar el punto de inserción al menos una vez al día y realizar cura inmediata si el apósito está sucio, mojado o despegado.",
       "D": "Si se exterioriza parcialmente el catéter periférico corto, puede reintroducirse con técnica aséptica si la salida es inferior a 0,5 cm."
     },
-    "respuestaCorrecta": "C"
+    "respuestaCorrecta": "A"
   },
   {
     "id": 184,
@@ -2021,7 +2021,7 @@
       "C": "Administración de sustancias no vesicantes ni irritantes con pH entre 5 y 9.",
       "D": "Administración de soluciones con osmolaridad inferior a 600 mOsm/L."
     },
-    "respuestaCorrecta": "B"
+    "respuestaCorrecta": "D"
   },
   {
     "id": 185,
@@ -2054,7 +2054,7 @@
       "C": "Cortar el hilo de sutura por encima del punto, alejado del nudo.",
       "D": "Cortar el hilo de sutura por encima del punto y lo más próximo posible al nudo."
     },
-    "respuestaCorrecta": "A"
+    "respuestaCorrecta": "B"
   },
   {
     "id": 188,
@@ -2098,7 +2098,7 @@
       "C": "Las pérdidas a través de la piel son inferiores a 200 ml diarios en condiciones normales.",
       "D": "La eliminación hídrica por vía fecal constituye la principal fuente de pérdida de líquidos, superando los 600 ml diarios."
     },
-    "respuestaCorrecta": "D"
+    "respuestaCorrecta": "B"
   },
   {
     "id": 192,
@@ -2285,7 +2285,7 @@
       "C": "Doble guante de nitrilo.",
       "D": "Doble guante de poliisopreno."
     },
-    "respuestaCorrecta": "A"
+    "respuestaCorrecta": "C"
   },
   {
     "id": 209,
@@ -2318,7 +2318,7 @@
       "C": "Se debe establecer una declaración o pregunta cerrada (“¿Piensa usted en la muerte?”).",
       "D": "Se debe evitar el contacto visual, favoreciendo el contacto físico y comenzar con una declaración que reconozca los temores del paciente."
     },
-    "respuestaCorrecta": "D"
+    "respuestaCorrecta": "B"
   },
   {
     "id": 212,
@@ -2560,7 +2560,7 @@
       "C": "El estado permanente de limitación física, psíquica o intelectual por el que una persona necesita ayuda importante o asistencia de terceros para realizar las tareas elementales de autocuidado.",
       "D": "Es la capacidad de la persona de decidir por sí mismo su conducta, la orientación de sus actos y la realización de diversas actividades."
     },
-    "respuestaCorrecta": "D"
+    "respuestaCorrecta": "B"
   },
   {
     "id": 234,
@@ -2571,7 +2571,7 @@
       "C": "Gran dependencia, la persona precisa ayuda para realizar varias actividades básicas de la vida diaria varias veces al día, y necesita la presencia indispensable y continua de otra persona.",
       "D": "Gran discapacidad, la persona eta ante una situación de incapacidad permanente absoluta que requiere la asistencia de otra persona para las necesidades básicas de la vida diaria."
     },
-    "respuestaCorrecta": "B"
+    "respuestaCorrecta": "C"
   },
   {
     "id": 235,
@@ -2615,7 +2615,7 @@
       "C": "Repetir auscultación y reevaluar pasadas 12 horas y al alta.",
       "D": "Registrar el hallazgo y mantener vigilancia clínica, sin remisión inmediata, si el recién nacido no presenta cianosis ni signos de dificultad respiratoria."
     },
-    "respuestaCorrecta": "D"
+    "respuestaCorrecta": "B"
   },
   {
     "id": 239,
@@ -2901,7 +2901,7 @@
       "C": "Entre los 6 y 10 años, dado que en esa edad se observa un riesgo elevado.",
       "D": "A los 12 años, aprovechando la visita de vacunación para evaluar el IMC y orientar medidas preventivas frente al aumento ponderal puberal."
     },
-    "respuestaCorrecta": "B"
+    "respuestaCorrecta": "C"
   },
   {
     "id": 265,
@@ -2912,7 +2912,7 @@
       "C": "En niños menores de 2 años el cepillado deben realizarlo los padres, con una pasta de dientes con 1200 ppm de flúor.",
       "D": "No se considera necesario el cepillado dental hasta la erupción de todas las piezas dentarias temporales."
     },
-    "respuestaCorrecta": "C"
+    "respuestaCorrecta": "B"
   },
   {
     "id": 266,
@@ -3044,7 +3044,7 @@
       "C": "Consumo perjudicial: >40 g/día en mujeres y >60 g/día en hombres, con consecuencias para la salud física y mental.",
       "D": "Binge drinking: ≥4 bebidas en mujeres y ≥5 en hombres en un corto periodo (≈2 horas)."
     },
-    "respuestaCorrecta": "A"
+    "respuestaCorrecta": "B"
   },
   {
     "id": 278,
@@ -3275,7 +3275,7 @@
       "C": "48,2 litros por habitante y año.",
       "D": "62,8 litros por habitante y año."
     },
-    "respuestaCorrecta": "A"
+    "respuestaCorrecta": "B"
   },
   {
     "id": 299,
@@ -3330,7 +3330,7 @@
       "C": "En la población joven se observa una tendencia ascendente en el uso de cigarrillos electrónicos, con alrededor del 15 % del alumnado que ha fumado o utilizado alguno al menos una vez.",
       "D": "La edad de inicio en el consumo de tabaco, se mantiene más o menos estable alrededor de los 15 años."
     },
-    "respuestaCorrecta": "B"
+    "respuestaCorrecta": "A"
   },
   {
     "id": 304,
@@ -3649,7 +3649,7 @@
       "C": "Mantener el campo estéril permanentemente dentro del campo visual.",
       "D": "Mantener una distancia de al menos 15 cm respecto al campo estéril."
     },
-    "respuestaCorrecta": "B"
+    "respuestaCorrecta": "D"
   },
   {
     "id": 333,
@@ -3990,7 +3990,7 @@
       "C": "Se contabilizan todas las dosis recibidas y que hayan respetado los intervalos mínimos.",
       "D": "Conocer los intervalos entre vacunas, las pautas según edad y pautas aceleradas de algunas vacunas nos facilitará diseñar el calendario vacunal."
     },
-    "respuestaCorrecta": "C"
+    "respuestaCorrecta": "D"
   },
   {
     "id": 364,
@@ -4034,7 +4034,7 @@
       "C": "Deben mezclarse vacunas distintas en la misma jeringa.",
       "D": "Es segura y recomendable."
     },
-    "respuestaCorrecta": "B"
+    "respuestaCorrecta": "D"
   },
   {
     "id": 368,
@@ -4089,7 +4089,7 @@
       "C": "Es la aparición de otras enfermedades en una persona que ya tiene una enfermedad que consideramos secundaria.",
       "D": "Es la ocurrencia simultanea de múltiples problemas de salud en la misma persona, sin tener en cuenta ni el orden jerárquico entre ellos ni su gravedad."
     },
-    "respuestaCorrecta": "A"
+    "respuestaCorrecta": "B"
   },
   {
     "id": 373,
@@ -4133,7 +4133,7 @@
       "C": "Cardiopatía isquemica.",
       "D": "Desnutrición."
     },
-    "respuestaCorrecta": "D"
+    "respuestaCorrecta": "C"
   },
   {
     "id": 377,
@@ -4210,7 +4210,7 @@
       "C": "Una RAM rara es aquella que aparece en ≥1/10.000 y <1/1.000.",
       "D": "Una RAM muy rara es aquella que aparece en ≥1/10.000 y <1/1.000."
     },
-    "respuestaCorrecta": "B"
+    "respuestaCorrecta": "C"
   },
   {
     "id": 384,
@@ -4254,7 +4254,7 @@
       "C": "Los fármacos pueden sufrir metabolismo presistémico.",
       "D": "El mecanismo de absorción suele ser, mayoritariamente, por difusión pasiva para los fármacos hidrososolubles."
     },
-    "respuestaCorrecta": "C"
+    "respuestaCorrecta": "D"
   },
   {
     "id": 388,
@@ -4496,7 +4496,7 @@
       "C": "Quince años desde el fallecimiento.",
       "D": "La documentación clínica no puede destruirse tras el fallecimiento."
     },
-    "respuestaCorrecta": "A"
+    "respuestaCorrecta": "B"
   },
   {
     "id": 410,
@@ -4507,7 +4507,7 @@
       "C": "Los riesgos relacionados con las circunstancias personales o profesionales de la persona paciente.",
       "D": "Los riesgos probables en condiciones normales, conforme a la experiencia del profesional que realizará el procedimiento."
     },
-    "respuestaCorrecta": "C"
+    "respuestaCorrecta": "D"
   },
   {
     "id": 411,
@@ -4595,7 +4595,7 @@
       "C": "Contención mecánica.",
       "D": "Restricción física."
     },
-    "respuestaCorrecta": "B"
+    "respuestaCorrecta": "C"
   },
   {
     "id": 419,
@@ -4749,7 +4749,7 @@
       "C": "Monitorización del uso del conocimiento.",
       "D": "Adaptación al contexto local."
     },
-    "respuestaCorrecta": "A"
+    "respuestaCorrecta": "D"
   },
   {
     "id": 433,
@@ -4848,7 +4848,7 @@
       "C": "El enfoque cuantitativo asume la existencia de una realidad objetiva, externa al investigador, que puede conocerse y medirse.",
       "D": "El enfoque cualitativo pretende generalizar los resultados a grandes poblaciones mediante el análisis estadístico inferencial."
     },
-    "respuestaCorrecta": "C"
+    "respuestaCorrecta": "B"
   },
   {
     "id": 442,
@@ -5222,7 +5222,7 @@
       "C": "Coeficiente de variación.",
       "D": "Rango intercuartílico."
     },
-    "respuestaCorrecta": "C"
+    "respuestaCorrecta": "D"
   },
   {
     "id": 476,
@@ -5332,7 +5332,7 @@
       "C": "Individualizadas y multifactoriales.",
       "D": "Farmacológicas."
     },
-    "respuestaCorrecta": "C"
+    "respuestaCorrecta": "D"
   },
   {
     "id": 486,
@@ -5343,7 +5343,7 @@
       "C": "Reposo absoluto.",
       "D": "Barandillas sistemáticas."
     },
-    "respuestaCorrecta": "B"
+    "respuestaCorrecta": "A"
   },
   {
     "id": 487,
@@ -5420,7 +5420,7 @@
       "C": "≤ 10 días.",
       "D": "≤ 15 días."
     },
-    "respuestaCorrecta": "A"
+    "respuestaCorrecta": "B"
   },
   {
     "id": 494,
@@ -5453,7 +5453,7 @@
       "C": "Región anal, vagina, cérvix, vulva.",
       "D": "Vulva, región anal, vagina, cérvix."
     },
-    "respuestaCorrecta": "A"
+    "respuestaCorrecta": "B"
   },
   {
     "id": 497,
