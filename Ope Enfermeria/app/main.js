@@ -21,6 +21,7 @@ const doSearchBtn = document.getElementById('doSearchBtn');
 const searchIdInput = document.getElementById('searchIdInput');
 const searchRepoSelect = document.getElementById('searchRepoSelect');
 const doSearchIdBtn = document.getElementById('doSearchIdBtn');
+const searchFavoritesBtn = document.getElementById('searchFavoritesBtn');
 const searchResultCount = document.getElementById('searchResultCount');
 const searchResultsContainer = document.getElementById('searchResultsContainer');
 
@@ -138,6 +139,7 @@ searchToStartBtn.addEventListener('click', () => switchScreen(startScreen));
 openSearchBtn.addEventListener('click', openSearchScreen);
 doSearchBtn.addEventListener('click', performSearch);
 doSearchIdBtn.addEventListener('click', performSearchById);
+if (searchFavoritesBtn) searchFavoritesBtn.addEventListener('click', performSearchFavorites);
 searchInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') performSearch(); });
 searchIdInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') performSearchById(); });
 
@@ -284,6 +286,8 @@ function startTest(mode) {
             alert("¡Enhorabuena! No tienes preguntas falladas registradas.");
             return;
         }
+    } else if (mode === 'examen') {
+        filteredQuestions = [...allQuestions];
     } else {
         if (repoSelect && repoSelect.value !== 'ambos') {
             filteredQuestions = filteredQuestions.filter(q => q.sourceType === repoSelect.value);
@@ -668,6 +672,10 @@ function switchScreen(screenElement) {
 }
 
 function exitTest() {
+    if (examTimerInterval) {
+        clearInterval(examTimerInterval);
+        examTimerInterval = null;
+    }
     if (testMode === 'examen') {
         if (isConfirmDialogActive) return;
         isConfirmDialogActive = true;
@@ -675,6 +683,11 @@ function exitTest() {
         setTimeout(() => { isConfirmDialogActive = false; }, 300);
         if (res) {
             switchScreen(startScreen);
+        } else {
+            // Si cancela la salida, hay que reanudar el timer si era un examen
+            if (testMode === 'examen' && timeRemaining > 0 && !reviewMode) {
+                examTimerInterval = setInterval(timerTick, 1000);
+            }
         }
     } else {
         // Test normal: salir sin pedir confirmación
@@ -1168,6 +1181,18 @@ function performSearchById() {
     renderSearchResults(results);
 }
 
+function performSearchFavorites() {
+    const favs = JSON.parse(localStorage.getItem('appOpeFavorites') || '[]');
+    if (favs.length === 0) {
+        searchResultCount.textContent = '0';
+        searchResultsContainer.innerHTML = '<p style="text-align: center; color: var(--text-secondary); margin-top: 2rem;">No tienes preguntas favoritas guardadas.</p>';
+        return;
+    }
+    
+    const results = allQuestions.filter(q => favs.includes(q.pregunta));
+    renderSearchResults(results);
+}
+
 function renderSearchResults(results) {
     searchResultCount.textContent = results.length;
     searchResultsContainer.innerHTML = '';
@@ -1258,7 +1283,10 @@ function pauseTest() {
     };
     
     localStorage.setItem('appOpeSavedSession', JSON.stringify(session));
-    if (examTimerInterval) clearInterval(examTimerInterval);
+    if (examTimerInterval) {
+        clearInterval(examTimerInterval);
+        examTimerInterval = null;
+    }
     
     alert("Test pausado y guardado. Puedes reanudarlo más tarde.");
     switchScreen(startScreen);
@@ -1287,7 +1315,10 @@ function resumeSavedTest() {
     reviewMode = false;
     isResultSaved = false;
     
-    if (examTimerInterval) clearInterval(examTimerInterval);
+    if (examTimerInterval) {
+        clearInterval(examTimerInterval);
+        examTimerInterval = null;
+    }
     if (testMode === 'examen') {
         finalTimeRemainingText = '';
         examTimerContainer.classList.remove('hidden');

@@ -85,7 +85,7 @@
       "C": "Se articulará de forma preferentemente colegiada, atendiendo a los criterios de conocimientos y competencia y, en su caso, al de titulación del personal profesional que integra el equipo, en función de la actividad concreta a desarrollar, de la confianza y conocimiento recíproco de las capacidades de quienes forman el equipo, y de los principios de accesibilidad y continuidad asistencial de las personas atendidas.",
       "D": "Ninguna de las anteriores es correcta."
     },
-    "respuestaCorrecta": "A"
+    "respuestaCorrecta": "D"
   },
   {
     "id": 9,
@@ -129,7 +129,7 @@
       "C": "A recibir el reembolso de los gastos derivados de la asistencia sanitaria del catálogo de prestaciones del Sistema Nacional de Salud que pudiera requerir del servicio de salud de la comunidad autónoma en la que se encuentre desplazado/a.",
       "D": "Ninguna de las respuestas anteriores es correcta."
     },
-    "respuestaCorrecta": "D"
+    "respuestaCorrecta": "A"
   },
   {
     "id": 13,
@@ -217,7 +217,7 @@
       "C": "Realizar análisis epidemiológicos que permitan establecer estructuras y recursos según las previsiones en materia de salud pública y seguridad alimentaria.",
       "D": "Las respuestas a) y b) son verdaderas y la c) es falsa."
     },
-    "respuestaCorrecta": "D"
+    "respuestaCorrecta": "A"
   },
   {
     "id": 21,
@@ -228,7 +228,7 @@
       "C": "Integración en el régimen organizativo y funcional del servicio de salud y de sus centros e instituciones.",
       "D": "Coordinación, cooperación y mutua información entre las Administraciones sanitarias públicas."
     },
-    "respuestaCorrecta": "D"
+    "respuestaCorrecta": "B"
   },
   {
     "id": 22,
@@ -261,7 +261,7 @@
       "C": "En caso de que se adopte la pena de inhabilitación especial para la correspondiente profesión, siempre que esta exceda de seis años.",
       "D": "En caso de que se adopte la pena de inhabilitación especial para la correspondiente profesión, siempre que esta exceda de tres años."
     },
-    "respuestaCorrecta": "B"
+    "respuestaCorrecta": "C"
   },
   {
     "id": 25,
@@ -327,7 +327,7 @@
       "C": "El trabajo por turnos es una forma de organización del trabajo en equipo con arreglo al ritmo rotatorio y siempre de tipo continuo.",
       "D": "El período de localización es aquel período de tiempo en el que el personal se encuentra en situación de disponibilidad a los solos efectos de asegurar su posible localización."
     },
-    "respuestaCorrecta": "D"
+    "respuestaCorrecta": "B"
   },
   {
     "id": 31,
@@ -349,7 +349,7 @@
       "C": "Atendiendo a lo que establezca la legislación vigente, el personal estatutario de los servicios de salud podrá compatibilizar las funciones sanitarias y docente.",
       "D": "Para el personal licenciado sanitario el complemento específico resulta irrenunciable."
     },
-    "respuestaCorrecta": "B"
+    "respuestaCorrecta": "C"
   },
   {
     "id": 33,
@@ -360,7 +360,7 @@
       "C": "En el caso de que no se hubiera disfrutado del tiempo mínimo de descanso semanal en el período de tres meses se producirá una compensación a través del régimen de descansos alternativos.",
       "D": "El período de referencia para el cálculo del período de descanso semanal será de dos meses."
     },
-    "respuestaCorrecta": "D"
+    "respuestaCorrecta": "B"
   },
   {
     "id": 34,
@@ -382,7 +382,7 @@
       "C": "Los dos años inmediatamente anteriores.",
       "D": "Los tres años inmediatamente anteriores."
     },
-    "respuestaCorrecta": "C"
+    "respuestaCorrecta": "A"
   },
   {
     "id": 36,
@@ -448,7 +448,7 @@
       "C": "La obligación de dejar constancia por cualquier medio de todo proceso diagnóstico o terapéutico.",
       "D": "No existe en la Ley ninguna previsión a este respecto, de modo que será el personal facultativo el que decida si el proceso diagnóstico o terapéutico debe quedar registrado."
     },
-    "respuestaCorrecta": "C"
+    "respuestaCorrecta": "A"
   },
   {
     "id": 42,
@@ -459,7 +459,7 @@
       "C": "Es el instrumento jurídico mediante el que se articulan de manera directa las relaciones entre el Departamento competente en materia de sanidad y las organizaciones del ente público Osakidetza-Servicio Vasco de Salud que tiene naturaleza jurídica de un convenio de carácter especial.",
       "D": "Ninguna respuesta es correcta."
     },
-    "respuestaCorrecta": "A"
+    "respuestaCorrecta": "C"
   },
   {
     "id": 43,
@@ -481,7 +481,7 @@
       "C": "El Departamento competente en materia de sanidad debe elaborar anualmente y remitir al Parlamento un informe con la evaluación de los objetivos y determinaciones del Plan de Salud de Euskadi.",
       "D": "Son correctas las respuestas a) y c)."
     },
-    "respuestaCorrecta": "D"
+    "respuestaCorrecta": "C"
   },
   {
     "id": 45,
@@ -525,7 +525,7 @@
       "C": "Sin perjuicio de la multa que proceda imponer, en ciertos casos, la sanción económica que se imponga podrá ser incrementada hasta el triple de la cuantía del beneficio ilícito obtenido.",
       "D": "En los casos de infracciones muy graves, el Gobierno Vasco podrá acordar el cierre temporal del establecimiento, instalación o servicio por un plazo máximo de tres años."
     },
-    "respuestaCorrecta": "C"
+    "respuestaCorrecta": "B"
   },
   {
     "id": 49,
@@ -569,7 +569,7 @@
       "C": "La Presidencia del Ente.",
       "D": "Ninguno de los anteriores."
     },
-    "respuestaCorrecta": "C"
+    "respuestaCorrecta": "A"
   },
   {
     "id": 53,
@@ -580,7 +580,7 @@
       "C": "Con cinco integrantes en representación de la Administración de la Comunidad Autónoma, que nombrará el Gobierno: dos a propuesta de la persona titular del Departamento de Hacienda y Administración Pública y las tres restantes a propuesta de la persona titular de Sanidad.",
       "D": "Ninguna de los anteriores."
     },
-    "respuestaCorrecta": "A"
+    "respuestaCorrecta": "C"
   },
   {
     "id": 54,
@@ -591,7 +591,7 @@
       "C": "Será sometida a informe del Consejo de Administración del Ente.",
       "D": "Todas las anteriores son ciertas."
     },
-    "respuestaCorrecta": "D"
+    "respuestaCorrecta": "A"
   },
   {
     "id": 55,
@@ -657,7 +657,7 @@
       "C": "Oscilará entre cuatro y cinco.",
       "D": "La normativa que rige su estatuto jurídico no establece un número determinado sino un máximo de cinco."
     },
-    "respuestaCorrecta": "A"
+    "respuestaCorrecta": "D"
   },
   {
     "id": 61,
@@ -712,7 +712,7 @@
       "C": "La Dirección Médica del Ente.",
       "D": "Ninguna de las anteriores."
     },
-    "respuestaCorrecta": "D"
+    "respuestaCorrecta": "C"
   },
   {
     "id": 66,
@@ -778,7 +778,7 @@
       "C": "300.000 habitantes.",
       "D": "100.000 habitantes."
     },
-    "respuestaCorrecta": "D"
+    "respuestaCorrecta": "C"
   },
   {
     "id": 72,
@@ -789,7 +789,7 @@
       "C": "La Comisión de Seguridad, la Comisión de Docencia y la Comisión de Investigación.",
       "D": "El Consejo de Dirección, el Consejo Social y el Comité de Evaluación."
     },
-    "respuestaCorrecta": "A"
+    "respuestaCorrecta": "B"
   },
   {
     "id": 73,
@@ -855,7 +855,7 @@
       "C": "Dirección de Enfermería.",
       "D": "Dirección Económico-Financiera."
     },
-    "respuestaCorrecta": "A"
+    "respuestaCorrecta": "B"
   },
   {
     "id": 79,
@@ -899,7 +899,7 @@
       "C": "En relación a todas las acciones de carácter sanitario, incluyendo investigación y docencia, que se desarrollen en los centros, servicios o establecimientos sanitarios de titularidad pública o privada o concertados de Euskadi.",
       "D": "En relación a todas las acciones de carácter sanitario, incluyendo investigación y docencia, que se desarrollen en los centros, servicios o establecimientos sanitarios de titularidad pública o concertados que integran el sistema sanitario de Euskadi."
     },
-    "respuestaCorrecta": "C"
+    "respuestaCorrecta": "D"
   },
   {
     "id": 83,
@@ -910,7 +910,7 @@
       "C": "La promoción de la investigación científica en el marco del sistema sanitario de Euskadi.",
       "D": "Todas las respuestas anteriores son correctas."
     },
-    "respuestaCorrecta": "D"
+    "respuestaCorrecta": "A"
   },
   {
     "id": 84,
@@ -954,7 +954,7 @@
       "C": "Estarán disponibles en las Organizaciones de Servicios Sanitarios de Osakidetza- Servicio Vasco de Salud, pero no existe previsión en relación con los centros concertados, ni con los privados ni con el departamento competente en materia de sanidad.",
       "D": "Estarán disponibles en las Organizaciones de Servicios Sanitarios de Osakidetza- Servicio Vasco de Salud y en los centros sanitarios concertados y privados, pero no existe previsión en relación con el departamento competente en materia de sanidad."
     },
-    "respuestaCorrecta": "A"
+    "respuestaCorrecta": "B"
   },
   {
     "id": 88,
@@ -1042,7 +1042,7 @@
       "C": "Todos los riesgos probables en condiciones normales, conforme a la experiencia y al estado de la ciencia o directamente relacionados con el tipo de intervención.",
       "D": "Todos los riesgos, siempre que sean probables y graves, en condiciones normales, conforme a la experiencia y al estado de la ciencia o directamente relacionados con el tipo de intervención."
     },
-    "respuestaCorrecta": "D"
+    "respuestaCorrecta": "C"
   },
   {
     "id": 96,
@@ -1053,7 +1053,7 @@
       "C": "La dirección del centro, previa comprobación del informe clínico correspondiente, oirá a la persona paciente y, si persiste en su negativa, lo pondrá en conocimiento de la autoridad judicial para que confirme o revoque la decisión.",
       "D": "La dirección del centro, previa comprobación del informe clínico correspondiente, oirá a la persona paciente y, si persiste en su negativa, lo pondrá en conocimiento de la autoridad administrativa competente para que confirme o revoque la decisión."
     },
-    "respuestaCorrecta": "A"
+    "respuestaCorrecta": "C"
   },
   {
     "id": 97,
@@ -1086,7 +1086,7 @@
       "C": "Se extingue a partir, bien de la interposición de la demanda de nulidad, separación matrimonial o divorcio, bien de la extinción formalizada de la pareja de hecho o unión libre. Para el mantenimiento de la designación será necesario, en caso de nulidad, separación matrimonial o divorcio, que conste expresamente en el documento de instrucciones previas.",
       "D": "Se extingue bien a partir de la nulidad, separación matrimonial o divorcio, bien de la extinción formalizada de la pareja de hecho o unión libre. Para el mantenimiento de la designación será necesario, en caso de nulidad, separación matrimonial o divorcio, que conste expresamente en el documento de instrucciones previas."
     },
-    "respuestaCorrecta": "C"
+    "respuestaCorrecta": "A"
   },
   {
     "id": 100,
@@ -1108,7 +1108,7 @@
       "C": "Se formaliza por escrito y mediante uno de los siguientes procedimientos a elección de la persona que lo otorga: ante una notaría; ante la persona funcionaria o empleada pública encargada del Registro Vasco de Voluntades Anticipadas o del servicio de documentación de un centro sanitario de la Comunidad Autónoma del País Vasco; o ante dos testigos.",
       "D": "Se formaliza por escrito y mediante uno de los siguientes procedimientos a elección de la persona que lo otorga: ante una notaría; ante la persona funcionaria o empleada pública encargada del Registro Vasco de Voluntades Anticipadas o del servicio de documentación de un centro sanitario de la Comunidad Autónoma del País Vasco; o ante tres testigos."
     },
-    "respuestaCorrecta": "C"
+    "respuestaCorrecta": "B"
   },
   {
     "id": 102,
@@ -1119,7 +1119,7 @@
       "C": "Siempre que actúe libremente.",
       "D": "Siempre que conserve la capacidad y actúe libremente."
     },
-    "respuestaCorrecta": "B"
+    "respuestaCorrecta": "D"
   },
   {
     "id": 103,
@@ -1130,7 +1130,7 @@
       "C": "La persona otorgante conserve su capacidad, su libertad de actuación y la posibilidad de expresarse de manera inequívoca.",
       "D": "La persona otorgante conserve su capacidad, su libertad de actuación y la posibilidad de expresarse de manera inequívoca o a través de la persona interlocutora designada al efecto."
     },
-    "respuestaCorrecta": "C"
+    "respuestaCorrecta": "B"
   },
   {
     "id": 104,
@@ -1328,7 +1328,7 @@
       "C": "Siete Objetivos Generales.",
       "D": "Ocho Objetivos Generales."
     },
-    "respuestaCorrecta": "B"
+    "respuestaCorrecta": "C"
   },
   {
     "id": 122,
@@ -1559,7 +1559,7 @@
       "C": "La Corresponsabilidad.",
       "D": "El Plurilingüismo como eje central de la atención."
     },
-    "respuestaCorrecta": "C"
+    "respuestaCorrecta": "A"
   },
   {
     "id": 143,
@@ -1724,7 +1724,7 @@
       "C": "Seguridad en el proceso asistencial gestación-parto-puerperio.",
       "D": "Seguridad transfusional."
     },
-    "respuestaCorrecta": "C"
+    "respuestaCorrecta": "B"
   },
   {
     "id": 158,
@@ -1768,7 +1768,7 @@
       "C": "80% mujeres y 20% hombres",
       "D": "90% mujeres y 10% hombres"
     },
-    "respuestaCorrecta": "B"
+    "respuestaCorrecta": "C"
   },
   {
     "id": 162,
@@ -1834,7 +1834,7 @@
       "C": "Igualdad Salarial, con el objetivo de reducir a la mitad las categorías que tienen una brecha retributiva > 5%.",
       "D": "Investigación, aumentando el número de investigaciones con perspectiva de género."
     },
-    "respuestaCorrecta": "D"
+    "respuestaCorrecta": "C"
   },
   {
     "id": 168,
@@ -1922,7 +1922,7 @@
       "C": "Medicina familiar, pediatría, enfermería y matrona.",
       "D": "Todas las anteriores respuestas son correctas."
     },
-    "respuestaCorrecta": "A"
+    "respuestaCorrecta": "C"
   },
   {
     "id": 176,
@@ -2054,7 +2054,7 @@
       "C": "Eutanasia.",
       "D": "Asistencia para morir."
     },
-    "respuestaCorrecta": "C"
+    "respuestaCorrecta": "D"
   },
   {
     "id": 188,
@@ -2098,7 +2098,7 @@
       "C": "La dependencia de otra persona para la realización de al menos dos actividades básicas de la vida diaria.",
       "D": "Una dolencia que ha sido declarada irreversible y con un pronóstico de vida inferior a seis meses."
     },
-    "respuestaCorrecta": "B"
+    "respuestaCorrecta": "A"
   },
   {
     "id": 192,
