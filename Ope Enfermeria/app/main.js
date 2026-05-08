@@ -187,6 +187,11 @@ document.getElementById('navToggleBtn').addEventListener('click', toggleNavigato
 document.getElementById('flagQuestionBtn').addEventListener('click', toggleFlag);
 document.getElementById('reviewAnswersBtn').addEventListener('click', toggleResultReview);
 document.getElementById('retryFailedBtn').addEventListener('click', retryFailedQuestions);
+document.getElementById('openAchievementsBtn').addEventListener('click', openAchievementsModal);
+document.getElementById('closeAchievementsBtn').addEventListener('click', closeAchievementsModal);
+document.getElementById('achievementsModal').addEventListener('click', (e) => {
+    if (e.target === document.getElementById('achievementsModal')) closeAchievementsModal();
+});
 
 // Funciones
 async function autoLoadQuestions() {
@@ -242,6 +247,7 @@ async function autoLoadQuestions() {
         migrateStorageKeys();
         checkSavedSession();
         updateStreakUI();
+        updateAchievementsBadge();
     } catch (e) {
         console.error("Error cargando las preguntas:", e);
         const loadingMessage = document.getElementById('loadingMessage');
@@ -376,15 +382,18 @@ function startTest(mode) {
     userAnswers = new Array(testQuestions.length).fill(null);
     flaggedQuestions = [];
     
-    // Show navigator for exam mode
+    // Show navigator and flag button only for exam mode
     const navWrapper = document.getElementById('questionNavWrapper');
     const navGrid = document.getElementById('questionNavGrid');
+    const flagBtn = document.getElementById('flagQuestionBtn');
     if (testMode === 'examen') {
         navWrapper.classList.remove('hidden');
         navGrid.classList.remove('hidden');
+        if (flagBtn) flagBtn.style.display = '';
     } else {
-        navWrapper.classList.remove('hidden');
+        navWrapper.classList.add('hidden');
         navGrid.classList.add('hidden');
+        if (flagBtn) flagBtn.style.display = 'none';
     }
     
     incrementStreak();
@@ -549,6 +558,9 @@ function handleAnswerSelected(selectedBtn, selectedLetter, correctLetter) {
         localStorage.setItem('antigravity_last_seen_test', JSON.stringify(lastSeenMap));
         localStorage.setItem('appOpeQuestionStats', JSON.stringify(statsMap));
 
+        // Comprobar logros relacionados con tests normales
+        checkAndUnlockAchievements({ context: 'answer' });
+
     } else {
         const allBtns = optionsContainer.querySelectorAll('.option-btn');
         allBtns.forEach(b => b.classList.remove('selected'));
@@ -683,6 +695,9 @@ function submitExamHandler(isForceCall) {
     // Cambiar la vista superior
     scoreTrackerText.textContent = `Aciertos: ${correctAnswersCount}`;
     
+    // Comprobar logros al entregar examen
+    checkAndUnlockAchievements({ context: 'submit_exam' });
+    
     renderQuestion();
 }
 
@@ -758,6 +773,14 @@ function finishTest() {
     document.getElementById('resultReviewSection').classList.add('hidden');
     
     switchScreen(resultScreen);
+    
+    // Comprobar logros al terminar test
+    checkAndUnlockAchievements({
+        context: 'finish',
+        correct,
+        total,
+        percentage
+    });
     
     // Confetti for >90%
     if (percentage >= 90) {
@@ -1197,6 +1220,9 @@ function toggleFavoriteAction(q, btnElement) {
     }
     localStorage.setItem('appOpeFavorites', JSON.stringify(favs));
     
+    // Comprobar logro de coleccionista tras cambiar favoritas
+    checkAndUnlockAchievements({ context: 'favorite' });
+    
     if (testScreen.classList.contains('active') && testQuestions[currentQuestionIndex] && getQuestionKey(testQuestions[currentQuestionIndex]) === qKey) {
         if (favs.includes(qKey)) {
             toggleFavoriteBtn.style.color = '#facc15';
@@ -1474,6 +1500,20 @@ function resumeSavedTest() {
         examTimerContainer.classList.add('hidden');
     }
     
+    // Navigator and flag button: only for exam mode
+    const resumeNavWrapper = document.getElementById('questionNavWrapper');
+    const resumeNavGrid = document.getElementById('questionNavGrid');
+    const resumeFlagBtn = document.getElementById('flagQuestionBtn');
+    if (testMode === 'examen') {
+        resumeNavWrapper.classList.remove('hidden');
+        resumeNavGrid.classList.remove('hidden');
+        if (resumeFlagBtn) resumeFlagBtn.style.display = '';
+    } else {
+        resumeNavWrapper.classList.add('hidden');
+        resumeNavGrid.classList.add('hidden');
+        if (resumeFlagBtn) resumeFlagBtn.style.display = 'none';
+    }
+    
     localStorage.removeItem('appOpeSavedSession');
     checkSavedSession();
     
@@ -1509,6 +1549,9 @@ function incrementStreak() {
     streakData.lastDate = today;
     localStorage.setItem('appOpeStudyStreak', JSON.stringify(streakData));
     updateStreakUI();
+    
+    // Comprobar logro de racha
+    checkAndUnlockAchievements({ context: 'streak', streak: streakData.streak });
 }
 
 function updateStreakUI() {
@@ -1812,10 +1855,231 @@ function retryFailedQuestions() {
     userAnswers = new Array(testQuestions.length).fill(null);
     flaggedQuestions = [];
     
-    document.getElementById('questionNavWrapper').classList.remove('hidden');
+    // In retry mode (normal), hide navigator and flag button
+    document.getElementById('questionNavWrapper').classList.add('hidden');
     document.getElementById('questionNavGrid').classList.add('hidden');
+    const retryFlagBtn = document.getElementById('flagQuestionBtn');
+    if (retryFlagBtn) retryFlagBtn.style.display = 'none';
     
     switchScreen(testScreen);
     renderQuestion();
 }
 
+
+
+// ===== SISTEMA DE LOGROS (#11) =====
+
+const ACHIEVEMENTS = [
+    {
+        id: 'primer_test',
+        icon: '\ud83e\udd49',
+        name: 'Primer Test',
+        desc: 'Completa tu primer test o examen.',
+        check: () => {
+            const history = JSON.parse(localStorage.getItem('antigravity_history') || '[]');
+            return history.length >= 1;
+        }
+    },
+    {
+        id: 'decena',
+        icon: '\ud83d\udcd6',
+        name: 'Estudiante Constante',
+        desc: 'Completa 10 tests o ex\u00e1menes.',
+        check: () => {
+            const history = JSON.parse(localStorage.getItem('antigravity_history') || '[]');
+            return history.length >= 10;
+        }
+    },
+    {
+        id: 'francotirador',
+        icon: '\ud83c\udfaf',
+        name: 'Francotirador',
+        desc: 'Consigue un 100% en un test de 50+ preguntas.',
+        check: (ctx) => {
+            if (ctx && ctx.context === 'finish' && ctx.percentage === 100 && ctx.total >= 50) return true;
+            const history = JSON.parse(localStorage.getItem('antigravity_history') || '[]');
+            return history.some(r => r.total >= 50 && r.correct === r.total && r.answered === r.total);
+        }
+    },
+    {
+        id: 'perfeccionista',
+        icon: '\ud83d\udc8e',
+        name: 'Perfeccionista',
+        desc: 'Responde 10 preguntas seguidas correctamente en un test.',
+        check: () => {
+            return !!localStorage.getItem('appOpeAch_streak10');
+        }
+    },
+    {
+        id: 'racha_7',
+        icon: '\ud83d\udd25',
+        name: 'Racha de 7',
+        desc: '7 d\u00edas seguidos estudiando.',
+        check: (ctx) => {
+            if (ctx && ctx.context === 'streak' && ctx.streak >= 7) return true;
+            const streakData = JSON.parse(localStorage.getItem('appOpeStudyStreak') || '{"streak":0}');
+            return streakData.streak >= 7;
+        }
+    },
+    {
+        id: 'enciclopedia',
+        icon: '\ud83d\udcda',
+        name: 'Enciclopedia',
+        desc: 'Has visto al menos 500 preguntas distintas.',
+        check: () => {
+            const statsMap = JSON.parse(localStorage.getItem('appOpeQuestionStats') || '{}');
+            return Object.keys(statsMap).length >= 500;
+        }
+    },
+    {
+        id: 'coleccionista',
+        icon: '\u2b50',
+        name: 'Coleccionista',
+        desc: 'Marca 50 preguntas como favoritas.',
+        check: () => {
+            const favs = JSON.parse(localStorage.getItem('appOpeFavorites') || '[]');
+            return favs.length >= 50;
+        }
+    }
+];
+
+function loadUnlockedAchievements() {
+    return JSON.parse(localStorage.getItem('appOpeAchievements') || '{}');
+}
+
+function saveUnlockedAchievements(data) {
+    localStorage.setItem('appOpeAchievements', JSON.stringify(data));
+}
+
+let achievementToastQueue = [];
+let achievementToastActive = false;
+
+function checkAndUnlockAchievements(ctx = {}) {
+    if (ctx.context === 'answer' && testMode !== 'examen') {
+        let streak = 0;
+        for (let i = 0; i <= currentQuestionIndex; i++) {
+            if (userAnswers[i] && testQuestions[i] && userAnswers[i] === testQuestions[i].respuestaCorrecta) {
+                streak++;
+            } else {
+                streak = 0;
+            }
+        }
+        if (streak >= 10) {
+            localStorage.setItem('appOpeAch_streak10', '1');
+        }
+    }
+
+    const unlocked = loadUnlockedAchievements();
+    const newlyUnlocked = [];
+
+    for (const ach of ACHIEVEMENTS) {
+        if (unlocked[ach.id]) continue;
+        try {
+            if (ach.check(ctx)) {
+                const now = new Date().toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                unlocked[ach.id] = { date: now };
+                newlyUnlocked.push(ach);
+            }
+        } catch (e) {}
+    }
+
+    if (newlyUnlocked.length > 0) {
+        saveUnlockedAchievements(unlocked);
+        updateAchievementsBadge();
+        newlyUnlocked.forEach(ach => achievementToastQueue.push(ach));
+        if (!achievementToastActive) processToastQueue();
+    }
+}
+
+function processToastQueue() {
+    if (achievementToastQueue.length === 0) {
+        achievementToastActive = false;
+        return;
+    }
+    achievementToastActive = true;
+    const ach = achievementToastQueue.shift();
+    showAchievementToast(ach, () => {
+        setTimeout(processToastQueue, 400);
+    });
+}
+
+function showAchievementToast(ach, onDone) {
+    const toast = document.getElementById('achievementToast');
+    document.getElementById('achievementToastIcon').textContent = ach.icon;
+    document.getElementById('achievementToastName').textContent = ach.name;
+    document.getElementById('achievementToastDesc').textContent = ach.desc;
+
+    const iconEl = document.getElementById('achievementToastIcon');
+    iconEl.style.animation = 'none';
+    void iconEl.offsetWidth;
+    iconEl.style.animation = '';
+
+    toast.classList.add('show');
+
+    setTimeout(() => {
+        toast.classList.remove('show');
+        if (onDone) setTimeout(onDone, 500);
+    }, 3500);
+}
+
+function updateAchievementsBadge() {
+    const unlocked = loadUnlockedAchievements();
+    const count = Object.keys(unlocked).length;
+    const total = ACHIEVEMENTS.length;
+    const badge = document.getElementById('achievementsUnlockedBadge');
+    if (badge) badge.textContent = count + '/' + total;
+}
+
+function openAchievementsModal() {
+    renderAchievementsModal();
+    document.getElementById('achievementsModal').classList.add('open');
+}
+
+function closeAchievementsModal() {
+    document.getElementById('achievementsModal').classList.remove('open');
+}
+
+function renderAchievementsModal() {
+    const unlocked = loadUnlockedAchievements();
+    const total = ACHIEVEMENTS.length;
+    const count = Object.keys(unlocked).length;
+
+    document.getElementById('achievementsProgressText').textContent = count + ' de ' + total + ' desbloqueados';
+    const pct = total > 0 ? (count / total) * 100 : 0;
+    document.getElementById('achievementsProgressFill').style.width = pct + '%';
+
+    const grid = document.getElementById('achievementsGrid');
+    grid.innerHTML = '';
+
+    const sorted = [...ACHIEVEMENTS].sort((a, b) => {
+        const aU = !!unlocked[a.id];
+        const bU = !!unlocked[b.id];
+        if (aU && !bU) return -1;
+        if (!aU && bU) return 1;
+        return 0;
+    });
+
+    sorted.forEach(ach => {
+        const isUnlocked = !!unlocked[ach.id];
+        const card = document.createElement('div');
+        card.className = 'achievement-card ' + (isUnlocked ? 'unlocked' : 'locked');
+        card.setAttribute('data-id', ach.id);
+
+        const dateStr = isUnlocked
+            ? '<div class="achievement-date">\ud83d\udcc5 ' + unlocked[ach.id].date + '</div>'
+            : '';
+
+        card.innerHTML =
+            '<span class="achievement-badge">' + (isUnlocked ? '\u2713 Obtenido' : 'Bloqueado') + '</span>' +
+            '<div class="achievement-icon">' + ach.icon + '</div>' +
+            '<div class="achievement-name">' + ach.name + '</div>' +
+            '<div class="achievement-desc">' + ach.desc + '</div>' +
+            dateStr;
+
+        grid.appendChild(card);
+    });
+}
+
+window.addEventListener('load', () => {
+    setTimeout(() => checkAndUnlockAchievements({ context: 'load' }), 2000);
+});

@@ -112,6 +112,9 @@
                         Glosario</button>
                     <button id="viewHistoryBtn" class="premium-btn secondary" style="width: 100%;">📊 Ver Histórico de
                         Resultados</button>
+                    <button id="openAchievementsBtn" class="premium-btn secondary" style="width: 100%; border-color: rgba(245,158,11,0.5); color: #f59e0b; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                        🏆 Mis Logros <span id="achievementsUnlockedBadge" style="background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.3); border-radius: 1rem; padding: 0.1rem 0.5rem; font-size: 0.8rem; font-weight: 700;">0/7</span>
+                    </button>
                     <button id="howItWorksBtn" class="premium-btn secondary" style="width: 100%;">❓ ¿Cómo funciona la
                         app?</button>
                 </div>
@@ -597,6 +600,38 @@
                 por Email</button>
         </div>
     </div>
+    <!-- MODAL DE LOGROS -->
+    <div id="achievementsModal">
+        <div class="achievements-panel">
+            <div class="achievements-header">
+                <span class="achievements-title">🏆 Mis Logros</span>
+                <button class="achievements-close-btn" id="closeAchievementsBtn">✕</button>
+            </div>
+            <p class="achievements-subtitle">Completa desafíos para desbloquear insignias y demostrar tu progreso.</p>
+
+            <div class="achievements-progress-row">
+                <span class="achievements-progress-text" id="achievementsProgressText">0 de 7 desbloqueados</span>
+                <div class="achievements-progress-bar-bg">
+                    <div class="achievements-progress-bar-fill" id="achievementsProgressFill" style="width: 0%;"></div>
+                </div>
+            </div>
+
+            <div class="achievements-grid" id="achievementsGrid">
+                <!-- Las tarjetas se generan dinámicamente -->
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST DE LOGRO DESBLOQUEADO -->
+    <div id="achievementToast">
+        <span class="achievement-toast-icon" id="achievementToastIcon">🏆</span>
+        <div class="achievement-toast-text">
+            <span class="achievement-toast-label">¡Logro desbloqueado!</span>
+            <span class="achievement-toast-name" id="achievementToastName">Nombre del logro</span>
+            <span class="achievement-toast-desc" id="achievementToastDesc">Descripción breve</span>
+        </div>
+    </div>
+
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
