@@ -121,6 +121,15 @@ let examTimerInterval = null;
 let timeRemaining = 3600;
 let finalTimeRemainingText = '';
 
+let flaggedQuestions = [];
+let repoCompareChartInstance = null;
+let lastTestResults = null;
+
+function getQuestionKey(q) {
+    if (!q || !q.sourceType || !q.originalIndex) return q?.pregunta || '';
+    return `${q.sourceType}_${q.originalIndex}`;
+}
+
 document.addEventListener('DOMContentLoaded', autoLoadQuestions);
 startTestBtn.addEventListener('click', () => startTest('normal'));
 startExamBtn.addEventListener('click', () => startTest('examen'));
@@ -173,6 +182,12 @@ fcReportErrorBtn.addEventListener('click', () => openErrorModal(dailyFlashcards[
 closeErrorModalBtn.addEventListener('click', () => errorModal.style.display = 'none');
 sendErrorEmailBtn.addEventListener('click', sendErrorEmail);
 
+document.getElementById('themeToggleBtn').addEventListener('click', toggleTheme);
+document.getElementById('navToggleBtn').addEventListener('click', toggleNavigator);
+document.getElementById('flagQuestionBtn').addEventListener('click', toggleFlag);
+document.getElementById('reviewAnswersBtn').addEventListener('click', toggleResultReview);
+document.getElementById('retryFailedBtn').addEventListener('click', retryFailedQuestions);
+
 // Funciones
 async function autoLoadQuestions() {
     try {
@@ -224,6 +239,7 @@ async function autoLoadQuestions() {
             startTestBtn.textContent = 'Comenzar Test';
         }
         updateMaxRangeInfo();
+        migrateStorageKeys();
         checkSavedSession();
         updateStreakUI();
     } catch (e) {
@@ -275,13 +291,13 @@ function startTest(mode) {
     
     if (mode === 'favoritas') {
         const favs = JSON.parse(localStorage.getItem('appOpeFavorites') || '[]');
-        filteredQuestions = filteredQuestions.filter(q => favs.includes(q.pregunta));
+        filteredQuestions = filteredQuestions.filter(q => favs.includes(getQuestionKey(q)));
         if (filteredQuestions.length === 0) {
             alert("No tienes preguntas marcadas como favoritas todavía.");
             return;
         }
     } else if (mode === 'falladas') {
-        filteredQuestions = filteredQuestions.filter(q => (failuresMap[q.pregunta] || 0) > 0);
+        filteredQuestions = filteredQuestions.filter(q => (failuresMap[getQuestionKey(q)] || 0) > 0);
         if (filteredQuestions.length === 0) {
             alert("¡Enhorabuena! No tienes preguntas falladas registradas.");
             return;
@@ -309,8 +325,8 @@ function startTest(mode) {
     }
     
     let pool = filteredQuestions.map(q => {
-        let failures = failuresMap[q.pregunta] || 0;
-        let lastSeenTest = lastSeenMap[q.pregunta];
+        let failures = failuresMap[getQuestionKey(q)] || 0;
+        let lastSeenTest = lastSeenMap[getQuestionKey(q)];
         
         let testsUnseen = 0;
         if (lastSeenTest === undefined) {
@@ -358,6 +374,18 @@ function startTest(mode) {
     correctAnswersCount = 0;
     isResultSaved = false;
     userAnswers = new Array(testQuestions.length).fill(null);
+    flaggedQuestions = [];
+    
+    // Show navigator for exam mode
+    const navWrapper = document.getElementById('questionNavWrapper');
+    const navGrid = document.getElementById('questionNavGrid');
+    if (testMode === 'examen') {
+        navWrapper.classList.remove('hidden');
+        navGrid.classList.remove('hidden');
+    } else {
+        navWrapper.classList.remove('hidden');
+        navGrid.classList.add('hidden');
+    }
     
     incrementStreak();
     
@@ -383,8 +411,9 @@ function renderQuestion() {
     questionText.textContent = q.pregunta;
     
     // UI de Favorita y Nota
+    const qKey = getQuestionKey(q);
     const favs = JSON.parse(localStorage.getItem('appOpeFavorites') || '[]');
-    if (favs.includes(q.pregunta)) {
+    if (favs.includes(qKey)) {
         toggleFavoriteBtn.style.color = '#facc15';
         toggleFavoriteBtn.innerHTML = '⭐';
     } else {
@@ -393,8 +422,8 @@ function renderQuestion() {
     }
     
     const notes = JSON.parse(localStorage.getItem('appOpeNotes') || '{}');
-    if (notes[q.pregunta]) {
-        userNoteDisplay.textContent = `📝 Mi Nota:\n${notes[q.pregunta]}`;
+    if (notes[qKey]) {
+        userNoteDisplay.textContent = `📝 Mi Nota:\n${notes[qKey]}`;
         userNoteDisplay.classList.remove('hidden');
         openNoteBtn.style.color = '#6366f1';
     } else {
@@ -402,6 +431,16 @@ function renderQuestion() {
         userNoteDisplay.textContent = '';
         openNoteBtn.style.color = 'var(--text-secondary)';
     }
+
+    // Flag button state
+    const flagBtn = document.getElementById('flagQuestionBtn');
+    if (flaggedQuestions.includes(currentQuestionIndex)) {
+        flagBtn.classList.add('active');
+    } else {
+        flagBtn.classList.remove('active');
+    }
+
+    renderQuestionNavigator();
 
     optionsContainer.innerHTML = '';
     
@@ -476,6 +515,8 @@ function handleAnswerSelected(selectedBtn, selectedLetter, correctLetter) {
             correctAnswersCount++;
         } else {
             selectedBtn.classList.add('incorrect');
+            selectedBtn.classList.add('shake');
+            setTimeout(() => selectedBtn.classList.remove('shake'), 400);
         }
         scoreTrackerText.textContent = `Aciertos: ${correctAnswersCount}`;
 
@@ -486,7 +527,7 @@ function handleAnswerSelected(selectedBtn, selectedLetter, correctLetter) {
         let currentTestCounter = parseInt(localStorage.getItem('antigravity_test_counter') || '0', 10);
         
         const q = testQuestions[currentQuestionIndex];
-        const hash = q.pregunta;
+        const hash = getQuestionKey(q);
         
         lastSeenMap[hash] = currentTestCounter + 1;
         if (!statsMap[hash]) {
@@ -558,15 +599,29 @@ function manageNavigationButtons() {
 
 function proceedToNext() {
     if (currentQuestionIndex < testQuestions.length - 1) {
-        currentQuestionIndex++;
-        renderQuestion();
+        const panel = document.querySelector('.question-panel');
+        panel.classList.add('slide-out-left');
+        setTimeout(() => {
+            currentQuestionIndex++;
+            panel.classList.remove('slide-out-left');
+            panel.classList.add('slide-in-right');
+            renderQuestion();
+            setTimeout(() => panel.classList.remove('slide-in-right'), 200);
+        }, 150);
     }
 }
 
 function proceedToPrev() {
     if (currentQuestionIndex > 0) {
-        currentQuestionIndex--;
-        renderQuestion();
+        const panel = document.querySelector('.question-panel');
+        panel.classList.add('slide-out-right');
+        setTimeout(() => {
+            currentQuestionIndex--;
+            panel.classList.remove('slide-out-right');
+            panel.classList.add('slide-in-left');
+            renderQuestion();
+            setTimeout(() => panel.classList.remove('slide-in-left'), 200);
+        }, 150);
     }
 }
 
@@ -639,11 +694,41 @@ function finishTest() {
         isResultSaved = true;
     }
     
-    finalScoreText.textContent = correctAnswersCount;
-    document.querySelector('.score-max').textContent = `/ ${testQuestions.length}`;
+    // Calculate penalty breakdown
+    let correct = 0, wrong = 0, blank = 0;
+    for (let i = 0; i < testQuestions.length; i++) {
+        if (userAnswers[i] === null) {
+            blank++;
+        } else if (userAnswers[i] === testQuestions[i].respuestaCorrecta) {
+            correct++;
+        } else {
+            wrong++;
+        }
+    }
     
-    const percentage = (correctAnswersCount / testQuestions.length) * 100;
+    const netScore = correct - (wrong / 3);
+    const total = testQuestions.length;
+    const percentage = (correct / total) * 100;
+    const netPercentage = (netScore / total) * 100;
     
+    // Store for review
+    lastTestResults = { testQuestions: [...testQuestions], userAnswers: [...userAnswers], correct, wrong, blank, netScore };
+    
+    // Animate score counter
+    const scoreEl = document.getElementById('finalScoreText');
+    scoreEl.textContent = '0';
+    document.querySelector('.score-max').textContent = `/ ${total}`;
+    animateCountUp(scoreEl, correct);
+    
+    // Show penalty breakdown
+    const penaltyDiv = document.getElementById('penaltyBreakdown');
+    penaltyDiv.classList.remove('hidden');
+    document.getElementById('penaltyCorrect').textContent = `${correct} (+${correct.toFixed(2)})`;
+    document.getElementById('penaltyWrong').textContent = `${wrong} (-${(wrong / 3).toFixed(2)})`;
+    document.getElementById('penaltyBlank').textContent = `${blank} (0.00)`;
+    document.getElementById('penaltyNet').textContent = `${netScore.toFixed(2)} / ${total} (${netPercentage.toFixed(1)}%)`;
+    
+    // Feedback
     if (percentage >= 90) {
         feedbackMessage.textContent = "¡Sobresaliente! Estás muy preparad@.";
     } else if (percentage >= 70) {
@@ -660,8 +745,24 @@ function finishTest() {
     } else {
         remainingTimeFeedback.classList.add('hidden');
     }
-
+    
+    // Show retry failed button if there are wrong answers
+    const retryBtn = document.getElementById('retryFailedBtn');
+    if (wrong > 0) {
+        retryBtn.classList.remove('hidden');
+    } else {
+        retryBtn.classList.add('hidden');
+    }
+    
+    // Hide review section on fresh load
+    document.getElementById('resultReviewSection').classList.add('hidden');
+    
     switchScreen(resultScreen);
+    
+    // Confetti for >90%
+    if (percentage >= 90) {
+        setTimeout(launchConfetti, 400);
+    }
 }
 
 function switchScreen(screenElement) {
@@ -714,7 +815,7 @@ function saveResult() {
             respondidas++;
             
             if (testMode === 'examen') {
-                const hash = q.pregunta;
+                const hash = getQuestionKey(q);
                 
                 lastSeenMap[hash] = currentTestCounter;
                 if (!statsMap[hash]) {
@@ -761,21 +862,13 @@ function showHistory() {
 function renderHistory() {
     const historyData = JSON.parse(localStorage.getItem('antigravity_history') || '[]');
     
-    let totalE = 0;
-    let totalT = 0;
-    let totalQuestions = 0;
-    let totalCorrects = 0;
-    
-    const labels = [];
-    const dataPoints = [];
+    let totalE = 0, totalT = 0, totalQuestions = 0, totalCorrects = 0;
+    const labels = [], dataPoints = [];
     
     historyData.forEach((rec, index) => {
-        if (rec.mode === 'examen') totalE++;
-        else totalT++;
-        
+        if (rec.mode === 'examen') totalE++; else totalT++;
         totalQuestions += rec.answered;
         totalCorrects += rec.correct;
-        
         labels.push(`Nº ${index + 1} (${rec.mode === 'examen' ? 'E' : 'T'})`);
         const pct = rec.total > 0 ? (rec.correct / rec.total) * 100 : 0;
         dataPoints.push(pct.toFixed(1));
@@ -783,16 +876,74 @@ function renderHistory() {
     
     document.getElementById('histTotalSessions').textContent = `${totalE} / ${totalT}`;
     document.getElementById('histTotalQuestions').textContent = totalQuestions;
-    
     const overallWinRate = totalQuestions > 0 ? ((totalCorrects / totalQuestions) * 100).toFixed(1) : 0;
     document.getElementById('histWinRate').textContent = `${overallWinRate}%`;
 
-    const ctx = document.getElementById('historyChart').getContext('2d');
-    
-    if (chartInstance) {
-        chartInstance.destroy();
+    // Trend indicator
+    const trendEl = document.getElementById('histTrend');
+    if (dataPoints.length >= 5) {
+        const recent = dataPoints.slice(-5).reduce((s, v) => s + parseFloat(v), 0) / 5;
+        const prev = dataPoints.slice(-10, -5);
+        if (prev.length > 0) {
+            const prevAvg = prev.reduce((s, v) => s + parseFloat(v), 0) / prev.length;
+            const diff = recent - prevAvg;
+            if (diff > 2) {
+                trendEl.innerHTML = `<span class="trend-indicator up">\u2191 +${diff.toFixed(1)}%</span>`;
+            } else if (diff < -2) {
+                trendEl.innerHTML = `<span class="trend-indicator down">\u2193 ${diff.toFixed(1)}%</span>`;
+            } else {
+                trendEl.innerHTML = `<span class="trend-indicator stable">\u2194 Estable</span>`;
+            }
+        } else {
+            trendEl.innerHTML = `<span class="trend-indicator up">\u2191 ${recent.toFixed(1)}%</span>`;
+        }
+    } else {
+        trendEl.textContent = '\u2014';
     }
-    
+
+    // Coverage
+    const statsMap = JSON.parse(localStorage.getItem('appOpeQuestionStats') || '{}');
+    const seenCount = Object.keys(statsMap).length;
+    const totalAvail = allQuestions.length;
+    const coveragePct = totalAvail > 0 ? ((seenCount / totalAvail) * 100).toFixed(1) : 0;
+    document.getElementById('coverageSeen').textContent = seenCount;
+    document.getElementById('coverageTotal').textContent = `/ ${totalAvail} preguntas`;
+    document.getElementById('coverageFill').style.width = `${coveragePct}%`;
+    document.getElementById('coveragePct').textContent = `${coveragePct}%`;
+
+    // Repo comparison chart
+    let comunCorrect = 0, comunTotal = 0, especCorrect = 0, especTotal = 0;
+    for (const q of allQuestions) {
+        const s = statsMap[getQuestionKey(q)];
+        if (s) {
+            if (q.sourceType === 'comun') { comunCorrect += s.correct; comunTotal += s.seen; }
+            else { especCorrect += s.correct; especTotal += s.seen; }
+        }
+    }
+    const comunPct = comunTotal > 0 ? (comunCorrect / comunTotal * 100).toFixed(1) : 0;
+    const especPct = especTotal > 0 ? (especCorrect / especTotal * 100).toFixed(1) : 0;
+
+    const repoCtx = document.getElementById('repoCompareChart').getContext('2d');
+    if (repoCompareChartInstance) repoCompareChartInstance.destroy();
+    repoCompareChartInstance = new Chart(repoCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Com\u00fan', 'Espec\u00edfico'],
+            datasets: [{
+                label: '% Aciertos',
+                data: [comunPct, especPct],
+                backgroundColor: ['rgba(99, 102, 241, 0.6)', 'rgba(168, 85, 247, 0.6)'],
+                borderColor: ['#6366f1', '#a855f7'],
+                borderWidth: 1,
+                borderRadius: 6
+            }]
+        },
+        options: { responsive: true, scales: { y: { beginAtZero: true, max: 100 } }, plugins: { legend: { display: false } } }
+    });
+
+    // Main history chart
+    const ctx = document.getElementById('historyChart').getContext('2d');
+    if (chartInstance) chartInstance.destroy();
     chartInstance = new Chart(ctx, {
         type: 'line',
         data: {
@@ -806,26 +957,18 @@ function renderHistory() {
                 fill: true
             }]
         },
-        options: {
-            responsive: true,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    max: 100
-                }
-            }
-        }
+        options: { responsive: true, scales: { y: { beginAtZero: true, max: 100 } } }
     });
 
     // Calcular la pregunta más fallada
     const failuresMap = JSON.parse(localStorage.getItem('antigravity_failures') || '{}');
     let maxFailures = 0;
-    let worstQuestionText = null;
+    let worstQuestionKey = null;
     
-    for (const [qText, failures] of Object.entries(failuresMap)) {
+    for (const [qKey, failures] of Object.entries(failuresMap)) {
         if (failures > maxFailures) {
             maxFailures = failures;
-            worstQuestionText = qText;
+            worstQuestionKey = qKey;
         }
     }
     
@@ -833,14 +976,13 @@ function renderHistory() {
     const worstQuestionTitle = document.getElementById('worstQuestionTitle');
     const worstQuestionAnswer = document.getElementById('worstQuestionAnswer');
     
-    if (worstQuestionText && maxFailures > 0) {
+    if (worstQuestionKey && maxFailures > 0) {
         worstQuestionContainer.style.display = 'block';
-        worstQuestionTitle.textContent = worstQuestionText + ` (${maxFailures} fallos)`;
         
         let found = false;
-        // Buscar la respuesta correcta en allQuestions
         for (const qObj of allQuestions) {
-            if (qObj.pregunta === worstQuestionText) {
+            if (getQuestionKey(qObj) === worstQuestionKey) {
+                worstQuestionTitle.textContent = qObj.pregunta + ` (${maxFailures} fallos)`;
                 const correctLetter = qObj.respuestaCorrecta;
                 const correctText = qObj.opciones[correctLetter];
                 worstQuestionAnswer.textContent = `${correctLetter}) ${correctText}`;
@@ -850,6 +992,7 @@ function renderHistory() {
         }
         
         if (!found) {
+            worstQuestionTitle.textContent = `Pregunta ${worstQuestionKey} (${maxFailures} fallos)`;
             worstQuestionAnswer.textContent = "Carga el archivo que contiene esta pregunta para ver la respuesta correcta.";
         }
     } else {
@@ -911,7 +1054,7 @@ function getDailyFlashcards() {
     }
 
     let pool = filteredQuestions.map(q => {
-        let failures = failuresMap[q.pregunta] || 0;
+        let failures = failuresMap[getQuestionKey(q)] || 0;
         let weight = 1 + (failures * 3);
         return { q, weight };
     });
@@ -1036,16 +1179,17 @@ function sendErrorEmail() {
 // --- LOGICA FAVORITAS Y NOTAS ---
 function toggleFavoriteAction(q, btnElement) {
     if (!q) return;
+    const qKey = getQuestionKey(q);
     let favs = JSON.parse(localStorage.getItem('appOpeFavorites') || '[]');
     
-    if (favs.includes(q.pregunta)) {
-        favs = favs.filter(f => f !== q.pregunta);
+    if (favs.includes(qKey)) {
+        favs = favs.filter(f => f !== qKey);
         if (btnElement) {
             btnElement.style.color = 'var(--text-secondary)';
             btnElement.innerHTML = btnElement.id === 'statsToggleFavBtn' ? '☆ Favorita' : '☆';
         }
     } else {
-        favs.push(q.pregunta);
+        favs.push(qKey);
         if (btnElement) {
             btnElement.style.color = '#facc15';
             btnElement.innerHTML = btnElement.id === 'statsToggleFavBtn' ? '⭐ Favorita' : '⭐';
@@ -1053,9 +1197,8 @@ function toggleFavoriteAction(q, btnElement) {
     }
     localStorage.setItem('appOpeFavorites', JSON.stringify(favs));
     
-    // Si estamos en la pantalla de test, sincronizamos visualmente si es la misma pregunta
-    if (testScreen.classList.contains('active') && testQuestions[currentQuestionIndex]?.pregunta === q.pregunta) {
-        if (favs.includes(q.pregunta)) {
+    if (testScreen.classList.contains('active') && testQuestions[currentQuestionIndex] && getQuestionKey(testQuestions[currentQuestionIndex]) === qKey) {
+        if (favs.includes(qKey)) {
             toggleFavoriteBtn.style.color = '#facc15';
             toggleFavoriteBtn.innerHTML = '⭐';
         } else {
@@ -1074,9 +1217,10 @@ function openNoteModalAction(q) {
     if (!q) return;
     currentActiveQuestion = q;
     const notes = JSON.parse(localStorage.getItem('appOpeNotes') || '{}');
+    const qKey = getQuestionKey(q);
     
-    if (notes[q.pregunta]) {
-        noteTextarea.value = notes[q.pregunta];
+    if (notes[qKey]) {
+        noteTextarea.value = notes[qKey];
     } else {
         noteTextarea.value = '';
     }
@@ -1098,16 +1242,17 @@ function saveNote() {
     
     const notes = JSON.parse(localStorage.getItem('appOpeNotes') || '{}');
     const val = noteTextarea.value.trim();
+    const qKey = getQuestionKey(q);
     if (val) {
-        notes[q.pregunta] = val;
+        notes[qKey] = val;
     } else {
-        delete notes[q.pregunta];
+        delete notes[qKey];
     }
     
     localStorage.setItem('appOpeNotes', JSON.stringify(notes));
     noteModal.style.display = 'none';
     
-    if (testScreen.classList.contains('active') && testQuestions[currentQuestionIndex]?.pregunta === q.pregunta) {
+    if (testScreen.classList.contains('active') && testQuestions[currentQuestionIndex] && getQuestionKey(testQuestions[currentQuestionIndex]) === qKey) {
         renderQuestion();
     }
     if (statsModal.style.display === 'flex') {
@@ -1123,11 +1268,12 @@ function deleteNote() {
     if (!q) return;
     
     const notes = JSON.parse(localStorage.getItem('appOpeNotes') || '{}');
-    delete notes[q.pregunta];
+    const qKey = getQuestionKey(q);
+    delete notes[qKey];
     localStorage.setItem('appOpeNotes', JSON.stringify(notes));
     noteModal.style.display = 'none';
     
-    if (testScreen.classList.contains('active') && testQuestions[currentQuestionIndex]?.pregunta === q.pregunta) {
+    if (testScreen.classList.contains('active') && testQuestions[currentQuestionIndex] && getQuestionKey(testQuestions[currentQuestionIndex]) === qKey) {
         renderQuestion();
     }
     if (statsModal.style.display === 'flex') {
@@ -1189,7 +1335,7 @@ function performSearchFavorites() {
         return;
     }
     
-    const results = allQuestions.filter(q => favs.includes(q.pregunta));
+    const results = allQuestions.filter(q => favs.includes(getQuestionKey(q)));
     renderSearchResults(results);
 }
 
@@ -1230,6 +1376,7 @@ function renderSearchResults(results) {
 
 function openStatsModal(q) {
     currentActiveQuestion = q;
+    const qKey = getQuestionKey(q);
     statsQuestionTitle.textContent = `Nº ${q.originalIndex || '?'} - ${q.sourceName || 'General'}`;
     statsQuestionText.textContent = q.pregunta;
     
@@ -1237,18 +1384,17 @@ function openStatsModal(q) {
     statsCorrectAnswer.textContent = `Opción ${correctLetter}: ${q.opciones[correctLetter]}`;
     
     let statsMap = JSON.parse(localStorage.getItem('appOpeQuestionStats') || '{}');
-    const hash = q.pregunta;
-    const stats = statsMap[hash] || { seen: 0, correct: 0, wrong: 0 };
+    const stats = statsMap[qKey] || { seen: 0, correct: 0, wrong: 0 };
     
     let failuresMap = JSON.parse(localStorage.getItem('antigravity_failures') || '{}');
-    let historicalWrong = failuresMap[hash] || 0;
+    let historicalWrong = failuresMap[qKey] || 0;
     
     statsSeen.textContent = Math.max(stats.seen, historicalWrong);
     statsCorrect.textContent = stats.correct;
     statsWrong.textContent = Math.max(stats.wrong, historicalWrong);
     
     let favs = JSON.parse(localStorage.getItem('appOpeFavorites') || '[]');
-    if (favs.includes(q.pregunta)) {
+    if (favs.includes(qKey)) {
         statsToggleFavBtn.style.color = '#facc15';
         statsToggleFavBtn.innerHTML = '⭐ Favorita';
     } else {
@@ -1257,7 +1403,7 @@ function openStatsModal(q) {
     }
     
     let notes = JSON.parse(localStorage.getItem('appOpeNotes') || '{}');
-    if (notes[q.pregunta]) {
+    if (notes[qKey]) {
         statsOpenNoteBtn.style.color = '#6366f1';
         statsOpenNoteBtn.innerHTML = '📝 Ver Mis Notas';
     } else {
@@ -1388,5 +1534,288 @@ function updateStreakUI() {
     } else {
         streakContainer.classList.add('hidden');
     }
+}
+
+// --- MIGRACIÓN DE CLAVES (#14) ---
+function migrateStorageKeys() {
+    if (localStorage.getItem('appOpe_migrated_v2')) return;
+    if (allQuestions.length === 0) return;
+    
+    const textToKey = {};
+    allQuestions.forEach(q => { textToKey[q.pregunta] = getQuestionKey(q); });
+    
+    function migrateObject(storageKey) {
+        const data = JSON.parse(localStorage.getItem(storageKey) || '{}');
+        const newData = {};
+        let changed = false;
+        for (const [key, val] of Object.entries(data)) {
+            if (textToKey[key]) { newData[textToKey[key]] = val; changed = true; }
+            else { newData[key] = val; }
+        }
+        if (changed) localStorage.setItem(storageKey, JSON.stringify(newData));
+    }
+    
+    // Migrate favorites (array)
+    let favs = JSON.parse(localStorage.getItem('appOpeFavorites') || '[]');
+    if (favs.length > 0 && favs[0] && favs[0].length > 30) {
+        favs = favs.map(text => textToKey[text] || text);
+        localStorage.setItem('appOpeFavorites', JSON.stringify(favs));
+    }
+    
+    migrateObject('appOpeNotes');
+    migrateObject('antigravity_failures');
+    migrateObject('antigravity_last_seen_test');
+    migrateObject('appOpeQuestionStats');
+    
+    localStorage.setItem('appOpe_migrated_v2', 'true');
+    console.log('Storage keys migrated to v2 format.');
+}
+
+// --- THEME TOGGLE (#3) ---
+function toggleTheme() {
+    const body = document.body;
+    const btn = document.getElementById('themeToggleBtn');
+    body.classList.toggle('light-mode');
+    const isLight = body.classList.contains('light-mode');
+    btn.textContent = isLight ? '\u2600\ufe0f' : '\ud83c\udf19';
+    localStorage.setItem('appOpeTheme', isLight ? 'light' : 'dark');
+}
+
+function applyTheme() {
+    const saved = localStorage.getItem('appOpeTheme');
+    const btn = document.getElementById('themeToggleBtn');
+    if (saved === 'light') {
+        document.body.classList.add('light-mode');
+        btn.textContent = '\u2600\ufe0f';
+    }
+}
+applyTheme();
+
+// --- ANIMACIONES (#4) ---
+function animateCountUp(element, target) {
+    let current = 0;
+    const duration = 800;
+    const step = Math.max(1, Math.floor(target / (duration / 30)));
+    const interval = setInterval(() => {
+        current += step;
+        if (current >= target) {
+            current = target;
+            clearInterval(interval);
+            element.classList.add('score-pulse');
+            setTimeout(() => element.classList.remove('score-pulse'), 600);
+        }
+        element.textContent = current;
+    }, 30);
+}
+
+function launchConfetti() {
+    const canvas = document.getElementById('confettiCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    
+    const particles = [];
+    const colors = ['#6366f1', '#818cf8', '#c084fc', '#a855f7', '#22c55e', '#facc15', '#f87171', '#38bdf8'];
+    
+    for (let i = 0; i < 120; i++) {
+        particles.push({
+            x: Math.random() * canvas.width,
+            y: -10 - Math.random() * canvas.height * 0.5,
+            w: 4 + Math.random() * 6,
+            h: 4 + Math.random() * 6,
+            vx: (Math.random() - 0.5) * 4,
+            vy: 2 + Math.random() * 4,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            rot: Math.random() * Math.PI * 2,
+            rotSpeed: (Math.random() - 0.5) * 0.2,
+            life: 1
+        });
+    }
+    
+    let frame = 0;
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        let alive = false;
+        particles.forEach(p => {
+            if (p.life <= 0) return;
+            alive = true;
+            p.x += p.vx;
+            p.y += p.vy;
+            p.vy += 0.05;
+            p.rot += p.rotSpeed;
+            p.life -= 0.005;
+            ctx.save();
+            ctx.translate(p.x, p.y);
+            ctx.rotate(p.rot);
+            ctx.globalAlpha = p.life;
+            ctx.fillStyle = p.color;
+            ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+            ctx.restore();
+        });
+        frame++;
+        if (alive && frame < 300) requestAnimationFrame(draw);
+        else ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+    requestAnimationFrame(draw);
+}
+
+// --- QUESTION NAVIGATOR (#10) ---
+function toggleNavigator() {
+    const grid = document.getElementById('questionNavGrid');
+    grid.classList.toggle('hidden');
+    if (!grid.classList.contains('hidden')) {
+        renderQuestionNavigator();
+    }
+}
+
+function renderQuestionNavigator() {
+    const grid = document.getElementById('questionNavGrid');
+    if (!grid || grid.classList.contains('hidden')) return;
+    
+    grid.innerHTML = '';
+    for (let i = 0; i < testQuestions.length; i++) {
+        const item = document.createElement('div');
+        item.className = 'nav-item';
+        item.textContent = i + 1;
+        
+        if (i === currentQuestionIndex) item.classList.add('current');
+        if (userAnswers[i] !== null) item.classList.add('answered');
+        if (flaggedQuestions.includes(i)) item.classList.add('flagged');
+        
+        item.addEventListener('click', () => jumpToQuestion(i));
+        grid.appendChild(item);
+    }
+}
+
+function jumpToQuestion(index) {
+    if (index < 0 || index >= testQuestions.length) return;
+    if (testMode !== 'examen' && !reviewMode && !userAnswers[index] && index !== currentQuestionIndex) {
+        // In normal mode, can only jump to answered or current
+        if (userAnswers[currentQuestionIndex] === null) return;
+    }
+    currentQuestionIndex = index;
+    renderQuestion();
+}
+
+function toggleFlag() {
+    const idx = currentQuestionIndex;
+    const pos = flaggedQuestions.indexOf(idx);
+    if (pos >= 0) {
+        flaggedQuestions.splice(pos, 1);
+    } else {
+        flaggedQuestions.push(idx);
+    }
+    const flagBtn = document.getElementById('flagQuestionBtn');
+    flagBtn.classList.toggle('active');
+    renderQuestionNavigator();
+}
+
+// --- RESULT REVIEW (#2) ---
+function toggleResultReview() {
+    const section = document.getElementById('resultReviewSection');
+    const isHidden = section.classList.contains('hidden');
+    if (isHidden) {
+        section.classList.remove('hidden');
+        renderResultReview();
+    } else {
+        section.classList.add('hidden');
+    }
+}
+
+function renderResultReview() {
+    if (!lastTestResults) return;
+    const container = document.getElementById('resultReviewList');
+    container.innerHTML = '';
+    
+    const { testQuestions: tq, userAnswers: ua } = lastTestResults;
+    
+    tq.forEach((q, i) => {
+        const answer = ua[i];
+        let icon = '\u2b1c';
+        if (answer === null) icon = '\u2b1c';
+        else if (answer === q.respuestaCorrecta) icon = '\u2705';
+        else icon = '\u274c';
+        
+        const item = document.createElement('div');
+        item.className = 'result-review-item';
+        item.innerHTML = `
+            <span class="result-review-icon">${icon}</span>
+            <span class="result-review-num">${i + 1}</span>
+            <span class="result-review-text">${q.pregunta.substring(0, 80)}${q.pregunta.length > 80 ? '...' : ''}</span>
+        `;
+        
+        item.addEventListener('click', () => {
+            const existing = item.nextElementSibling;
+            if (existing && existing.classList.contains('result-review-detail')) {
+                existing.remove();
+                return;
+            }
+            // Remove other open details
+            container.querySelectorAll('.result-review-detail').forEach(d => d.remove());
+            
+            const detail = document.createElement('div');
+            detail.className = 'result-review-detail';
+            
+            const correctLetter = q.respuestaCorrecta;
+            let html = `<p style="font-weight:600;margin-bottom:0.75rem;color:var(--text-primary);font-size:0.95rem;">${q.pregunta}</p>`;
+            
+            ['A', 'B', 'C', 'D'].forEach(letter => {
+                if (!q.opciones[letter]) return;
+                let style = 'padding:0.5rem;margin:0.25rem 0;border-radius:0.5rem;font-size:0.9rem;';
+                if (letter === correctLetter) {
+                    style += 'background:var(--success-bg);border:1px solid var(--success);color:var(--success);';
+                } else if (letter === answer && answer !== correctLetter) {
+                    style += 'background:var(--error-bg);border:1px solid var(--error);color:var(--error);';
+                } else {
+                    style += 'background:var(--surface-subtle);border:1px solid var(--border-color);color:var(--text-secondary);';
+                }
+                html += `<div style="${style}"><strong>${letter})</strong> ${q.opciones[letter]}</div>`;
+            });
+            
+            if (answer === null) {
+                html += `<p style="margin-top:0.5rem;color:var(--text-secondary);font-size:0.85rem;">No respondida</p>`;
+            }
+            
+            detail.innerHTML = html;
+            item.after(detail);
+        });
+        
+        container.appendChild(item);
+    });
+}
+
+function retryFailedQuestions() {
+    if (!lastTestResults) return;
+    const { testQuestions: tq, userAnswers: ua } = lastTestResults;
+    
+    const failed = [];
+    for (let i = 0; i < tq.length; i++) {
+        if (ua[i] !== null && ua[i] !== tq[i].respuestaCorrecta) {
+            failed.push(tq[i]);
+        }
+    }
+    
+    if (failed.length === 0) {
+        alert('No hay preguntas falladas para repetir.');
+        return;
+    }
+    
+    testMode = 'normal';
+    reviewMode = false;
+    examTimerContainer.classList.add('hidden');
+    if (examTimerInterval) clearInterval(examTimerInterval);
+    
+    testQuestions = failed.sort(() => Math.random() - 0.5);
+    currentQuestionIndex = 0;
+    correctAnswersCount = 0;
+    isResultSaved = false;
+    userAnswers = new Array(testQuestions.length).fill(null);
+    flaggedQuestions = [];
+    
+    document.getElementById('questionNavWrapper').classList.remove('hidden');
+    document.getElementById('questionNavGrid').classList.add('hidden');
+    
+    switchScreen(testScreen);
+    renderQuestion();
 }
 

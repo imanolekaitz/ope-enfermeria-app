@@ -1,11 +1,13 @@
 // Cambiar CACHE_NAME para forzar una actualización profunda inmediata
-const CACHE_NAME = 'ope-enfermeria-cache-v2';
+const CACHE_NAME = 'ope-enfermeria-cache-v3';
 const urlsToCache = [
     './',
     './index.html',
     './style.css',
     './main.js',
-    './icon.png'
+    './icon.png',
+    './data/preguntas_comunes.json',
+    './data/preguntas_especificas.json'
 ];
 
 // Instalar SW y pre-cachear los recursos esenciales para que funcione sin internet
