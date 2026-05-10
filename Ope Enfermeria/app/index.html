@@ -54,19 +54,22 @@
                             <option value="especifico">Solo Específico</option>
                         </select>
                     </div>
-                    <div style="display: flex; gap: 0.5rem;">
-                        <div style="flex-grow: 1;">
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                        <div style="flex-grow: 1; min-width: 80px;">
                             <label style="color: var(--text-primary); font-size: 0.85rem;">Desde preg. nº:</label>
                             <input type="number" id="rangeStart" class="premium-btn secondary"
                                 style="padding: 0.5rem; width: 100%; border: 1px solid var(--border-color);"
-                                placeholder="Todas" min="1">
+                                placeholder="1" min="1">
                         </div>
-                        <div style="flex-grow: 1;">
+                        <div style="flex-grow: 1; min-width: 80px;">
                             <label style="color: var(--text-primary); font-size: 0.85rem;">Hasta preg. nº <span
                                     id="maxRangeInfo"></span>:</label>
                             <input type="number" id="rangeEnd" class="premium-btn secondary"
                                 style="padding: 0.5rem; width: 100%; border: 1px solid var(--border-color);"
-                                placeholder="Todas" min="1">
+                                placeholder="Máx" min="1">
+                        </div>
+                        <div style="display: flex; align-items: flex-end;">
+                            <button id="rangeAllBtn" onclick="setRangeAll()" class="premium-btn secondary" title="Seleccionar todo el temario" style="padding: 0.5rem 0.8rem; font-size: 0.85rem; white-space: nowrap; border-color: #818cf8; color: #818cf8;">📚 Todo</button>
                         </div>
                     </div>
                 </div>
@@ -381,7 +384,7 @@
                 pregunta:</p>
             <div style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
                 <input type="number" id="searchIdInput" class="premium-btn secondary"
-                    style="flex-grow: 1; padding: 0.8rem; border: 1px solid var(--border-color); font-size: 1rem; text-align: left;"
+                    style="flex-grow: 1; min-width: 80px; padding: 0.8rem; border: 1px solid var(--border-color); font-size: 1rem; text-align: left;"
                     placeholder="Nº Pregunta..." min="1">
                 <select id="searchRepoSelect" class="premium-btn secondary"
                     style="padding: 0.8rem; border: 1px solid var(--border-color);">
@@ -390,6 +393,20 @@
                     <option value="especifico">Específico</option>
                 </select>
                 <button id="doSearchIdBtn" class="premium-btn primary">Buscar</button>
+            </div>
+
+            <!-- Acciones rápidas de listado -->
+            <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 1rem; padding: 1rem; margin-bottom: 1.5rem;">
+                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.75rem; font-weight: 600;">📋 Listar todo el repositorio:</p>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
+                    <select id="listAllRepoSelect" class="premium-btn secondary"
+                        style="flex-grow: 1; padding: 0.7rem; border: 1px solid var(--border-color); font-size: 0.9rem;">
+                        <option value="ambos">Ambos (Común + Específico)</option>
+                        <option value="comun">Solo Común</option>
+                        <option value="especifico">Solo Específico</option>
+                    </select>
+                    <button id="listAllBtn" class="premium-btn secondary" style="flex-grow: 1; border-color: #818cf8; color: #818cf8;">📋 Listar Todo</button>
+                </div>
             </div>
 
             <button id="searchFavoritesBtn" class="premium-btn secondary" style="width: 100%; margin-bottom: 1.5rem; border-color: #facc15; color: #facc15;">⭐ Listar todas mis Favoritas</button>

@@ -22,6 +22,8 @@ const searchIdInput = document.getElementById('searchIdInput');
 const searchRepoSelect = document.getElementById('searchRepoSelect');
 const doSearchIdBtn = document.getElementById('doSearchIdBtn');
 const searchFavoritesBtn = document.getElementById('searchFavoritesBtn');
+const listAllBtn = document.getElementById('listAllBtn');
+const listAllRepoSelect = document.getElementById('listAllRepoSelect');
 const searchResultCount = document.getElementById('searchResultCount');
 const searchResultsContainer = document.getElementById('searchResultsContainer');
 
@@ -149,6 +151,7 @@ openSearchBtn.addEventListener('click', openSearchScreen);
 doSearchBtn.addEventListener('click', performSearch);
 doSearchIdBtn.addEventListener('click', performSearchById);
 if (searchFavoritesBtn) searchFavoritesBtn.addEventListener('click', performSearchFavorites);
+if (listAllBtn) listAllBtn.addEventListener('click', performListAll);
 searchInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') performSearch(); });
 searchIdInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') performSearchById(); });
 
@@ -258,6 +261,8 @@ async function autoLoadQuestions() {
 function updateMaxRangeInfo() {
     let repoSelect = document.getElementById('repoSelect');
     let maxRangeInfo = document.getElementById('maxRangeInfo');
+    let rangeStart = document.getElementById('rangeStart');
+    let rangeEnd = document.getElementById('rangeEnd');
     if(repoSelect && maxRangeInfo && allQuestions.length > 0) {
         let count = 0;
         if (repoSelect.value === 'ambos') {
@@ -266,9 +271,46 @@ function updateMaxRangeInfo() {
             count = allQuestions.filter(q => q.sourceType === repoSelect.value).length;
         }
         maxRangeInfo.textContent = `(Máx: ${count})`;
+        
+        // Clamp existing values to valid range
+        if (rangeStart && rangeStart.value) {
+            let v = parseInt(rangeStart.value, 10);
+            if (isNaN(v) || v < 1) rangeStart.value = '';
+            else if (v > count) rangeStart.value = count;
+        }
+        if (rangeEnd && rangeEnd.value) {
+            let v = parseInt(rangeEnd.value, 10);
+            if (isNaN(v) || v < 1) rangeEnd.value = '';
+            else if (v > count) rangeEnd.value = count;
+        }
+        
+        // Update max attribute
+        if (rangeStart) rangeStart.max = count;
+        if (rangeEnd) rangeEnd.max = count;
     }
 }
 document.getElementById('repoSelect').addEventListener('change', updateMaxRangeInfo);
+
+// Validate range inputs on blur to keep values within bounds
+function clampRangeInput(inputEl, maxCount) {
+    if (!inputEl || !inputEl.value) return;
+    let v = parseInt(inputEl.value, 10);
+    if (isNaN(v) || v < 1) { inputEl.value = ''; return; }
+    let repoSelect = document.getElementById('repoSelect');
+    let count = (repoSelect && repoSelect.value !== 'ambos')
+        ? allQuestions.filter(q => q.sourceType === repoSelect.value).length
+        : allQuestions.length;
+    if (v > count) inputEl.value = count;
+}
+
+document.getElementById('rangeStart').addEventListener('blur', function() { clampRangeInput(this); });
+document.getElementById('rangeEnd').addEventListener('blur', function() { clampRangeInput(this); });
+
+// Helper: set both inputs to "all" (clear = todas)
+function setRangeAll() {
+    document.getElementById('rangeStart').value = '';
+    document.getElementById('rangeEnd').value = '';
+}
 
 function startTest(mode) {
     testMode = mode;
@@ -1310,6 +1352,7 @@ function deleteNote() {
 // --- LOGICA BUSCADOR / GLOSARIO ---
 function openSearchScreen() {
     searchInput.value = '';
+    searchIdInput.value = '';
     searchResultCount.textContent = '0';
     searchResultsContainer.innerHTML = '<p style="text-align: center; color: var(--text-secondary); margin-top: 2rem;">Escribe algo arriba para buscar entre todas las preguntas.</p>';
     switchScreen(searchScreen);
@@ -1362,6 +1405,22 @@ function performSearchFavorites() {
     }
     
     const results = allQuestions.filter(q => favs.includes(getQuestionKey(q)));
+    renderSearchResults(results);
+}
+
+function performListAll() {
+    const repoVal = listAllRepoSelect ? listAllRepoSelect.value : 'ambos';
+    let results;
+    if (repoVal === 'ambos') {
+        results = [...allQuestions];
+    } else {
+        results = allQuestions.filter(q => q.sourceType === repoVal);
+    }
+    if (results.length === 0) {
+        searchResultCount.textContent = '0';
+        searchResultsContainer.innerHTML = '<p style="text-align: center; color: var(--text-secondary); margin-top: 2rem;">No hay preguntas disponibles para ese repositorio.</p>';
+        return;
+    }
     renderSearchResults(results);
 }
 

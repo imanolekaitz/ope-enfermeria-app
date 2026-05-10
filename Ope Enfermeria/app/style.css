@@ -165,6 +165,12 @@ body {
     animation: fadeIn 0.4s ease-out forwards;
 }
 
+@media (max-width: 480px) {
+    .screen {
+        padding: 0.75rem;
+    }
+}
+
 .screen.active {
     display: block;
 }
@@ -184,6 +190,13 @@ body {
     padding: 3rem;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
     transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+@media (max-width: 480px) {
+    .glass-panel {
+        padding: 1.25rem;
+        border-radius: 1rem;
+    }
 }
 
 /* Tipografía */
@@ -308,6 +321,13 @@ input[type="file"] {
     hyphens: auto;
 }
 
+@media (max-width: 480px) {
+    .question-text {
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+    }
+}
+
 .options-container {
     display: flex;
     flex-direction: column;
@@ -327,6 +347,14 @@ input[type="file"] {
     transition: all 0.2s ease;
     display: flex;
     align-items: center;
+}
+
+@media (max-width: 480px) {
+    .option-btn {
+        padding: 0.85rem 1rem;
+        font-size: 0.95rem;
+        border-radius: 0.75rem;
+    }
 }
 
 .option-btn:hover:not(:disabled) {
@@ -1199,5 +1227,84 @@ body.light-mode .achievement-card.locked {
     }
     .question-nav-grid {
         grid-template-columns: repeat(auto-fill, minmax(32px, 1fr));
+    }
+    .achievements-grid {
+        grid-template-columns: 1fr;
+    }
+    .achievements-panel {
+        padding: 1.5rem;
+    }
+}
+
+/* Extra Small Mobile (≤ 420px) */
+@media (max-width: 420px) {
+    .glass-panel {
+        padding: 1rem;
+        border-radius: 0.875rem;
+    }
+    .gradient-text {
+        font-size: 1.6rem;
+    }
+    .subtitle {
+        font-size: 1rem;
+        margin-bottom: 1.25rem;
+    }
+    .premium-btn, .upload-btn {
+        padding: 0.8rem 1.2rem;
+        font-size: 0.95rem;
+    }
+    .stats-grid-advanced {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.5rem;
+    }
+    .stat-card-adv .stat-value {
+        font-size: 1.2rem;
+    }
+    .score-circle {
+        width: 120px;
+        height: 120px;
+    }
+    .score-number {
+        font-size: 2.4rem;
+    }
+    .score-max {
+        font-size: 1.1rem;
+    }
+    /* Test header more compact on small phones */
+    .test-header {
+        margin-bottom: 1rem;
+    }
+    .progress-stats {
+        font-size: 0.75rem;
+    }
+    #currentQuestionNumber {
+        font-size: 0.75rem;
+    }
+    /* Make flag/fav/note buttons smaller */
+    #toggleFavoriteBtn, #openNoteBtn, .flag-btn {
+        padding: 0.35rem !important;
+        font-size: 1rem !important;
+    }
+    /* Pause/exit buttons more compact */
+    #pauseTestBtn, #exitTestBtn {
+        padding: 0.4rem 0.6rem !important;
+        font-size: 0.8rem !important;
+    }
+    /* Result review section */
+    .result-review-container {
+        max-height: 40vh;
+    }
+    /* Search screen */
+    #searchScreen .glass-panel {
+        padding: 1rem;
+    }
+    /* History screen */
+    #historyScreen .glass-panel {
+        padding: 1rem;
+    }
+    /* Achievement toast smaller on very small screens */
+    #achievementToast {
+        min-width: 240px;
+        padding: 0.75rem 1rem;
     }
 }
