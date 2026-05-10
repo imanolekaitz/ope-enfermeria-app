@@ -1,5 +1,5 @@
 <!-- 
-    OPE NURSING SIMULATOR 
+    OPE DE ENFERMERIA 2026
     Desarrollado por Ekaitzel
     Optimizado para dispositivos móviles, con sistema de logros, buscador y estadísticas.
 -->
@@ -74,7 +74,10 @@
                                 placeholder="Máx" min="1">
                         </div>
                         <div style="display: flex; align-items: flex-end;">
-                            <button id="rangeAllBtn" onclick="setRangeAll()" class="premium-btn secondary" title="Seleccionar todo el temario" style="padding: 0.5rem 0.8rem; font-size: 0.85rem; white-space: nowrap; border-color: #818cf8; color: #818cf8;">📚 Todo</button>
+                            <button id="rangeAllBtn" onclick="setRangeAll()" class="premium-btn secondary"
+                                title="Seleccionar todo el temario"
+                                style="padding: 0.5rem 0.8rem; font-size: 0.85rem; white-space: nowrap; border-color: #818cf8; color: #818cf8;">📚
+                                Todo</button>
                         </div>
                     </div>
                 </div>
@@ -98,7 +101,7 @@
                             <option value="100">100 pregs.</option>
                             <option value="all">Todas las seleccionadas</option>
                         </select>
-                        <button id="startTestBtn" class="premium-btn secondary" style="flex-grow: 2;">Comenzar
+                        <button id="startTestBtn" class="premium-btn primary" style="flex-grow: 2;">Comenzar
                             Test</button>
                     </div>
 
@@ -120,8 +123,10 @@
                         Glosario</button>
                     <button id="viewHistoryBtn" class="premium-btn secondary" style="width: 100%;">📊 Ver Histórico de
                         Resultados</button>
-                    <button id="openAchievementsBtn" class="premium-btn secondary" style="width: 100%; border-color: rgba(245,158,11,0.5); color: #f59e0b; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
-                        🏆 Mis Logros <span id="achievementsUnlockedBadge" style="background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.3); border-radius: 1rem; padding: 0.1rem 0.5rem; font-size: 0.8rem; font-weight: 700;">0/7</span>
+                    <button id="openAchievementsBtn" class="premium-btn secondary"
+                        style="width: 100%; border-color: rgba(245,158,11,0.5); color: #f59e0b; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                        🏆 Mis Logros <span id="achievementsUnlockedBadge"
+                            style="background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.3); border-radius: 1rem; padding: 0.1rem 0.5rem; font-size: 0.8rem; font-weight: 700;">0/7</span>
                     </button>
                     <button id="howItWorksBtn" class="premium-btn secondary" style="width: 100%;">❓ ¿Cómo funciona la
                         app?</button>
@@ -222,10 +227,14 @@
             </div>
 
             <div id="penaltyBreakdown" class="penalty-breakdown hidden">
-                <div class="penalty-row"><span>✅ Aciertos</span><span id="penaltyCorrect" class="penalty-value positive">0</span></div>
-                <div class="penalty-row"><span>❌ Errores</span><span id="penaltyWrong" class="penalty-value negative">0</span></div>
-                <div class="penalty-row"><span>⬜ En blanco</span><span id="penaltyBlank" class="penalty-value neutral">0</span></div>
-                <div class="penalty-row total"><span>📊 Nota neta</span><span id="penaltyNet" class="penalty-value">0</span></div>
+                <div class="penalty-row"><span>✅ Aciertos</span><span id="penaltyCorrect"
+                        class="penalty-value positive">0</span></div>
+                <div class="penalty-row"><span>❌ Errores</span><span id="penaltyWrong"
+                        class="penalty-value negative">0</span></div>
+                <div class="penalty-row"><span>⬜ En blanco</span><span id="penaltyBlank"
+                        class="penalty-value neutral">0</span></div>
+                <div class="penalty-row total"><span>📊 Nota neta</span><span id="penaltyNet"
+                        class="penalty-value">0</span></div>
             </div>
 
             <p id="feedbackMessage" class="feedback-msg">Buen intento. ¡Sigue preparándote!</p>
@@ -234,7 +243,8 @@
 
             <div style="display:flex;gap:0.5rem;justify-content:center;flex-wrap:wrap;margin-top:1.5rem;">
                 <button id="reviewAnswersBtn" class="premium-btn secondary">📋 Revisar Respuestas</button>
-                <button id="retryFailedBtn" class="premium-btn secondary hidden" style="border-color:#f87171;color:#f87171;">🔁 Repetir Falladas</button>
+                <button id="retryFailedBtn" class="premium-btn secondary hidden"
+                    style="border-color:#f87171;color:#f87171;">🔁 Repetir Falladas</button>
                 <button id="tryAgainBtn" class="premium-btn primary">Realizar otro test</button>
             </div>
 
@@ -283,8 +293,12 @@
                         <span id="coverageSeen" style="color:var(--text-primary);font-weight:600;">0</span>
                         <span id="coverageTotal" style="color:var(--text-secondary);">/ 0 preguntas</span>
                     </div>
-                    <div class="coverage-bar-bg"><div id="coverageFill" class="coverage-bar-fill" style="width:0%;"></div></div>
-                    <p id="coveragePct" style="text-align:center;margin-top:0.5rem;font-weight:700;color:var(--accent);font-size:1.1rem;">0%</p>
+                    <div class="coverage-bar-bg">
+                        <div id="coverageFill" class="coverage-bar-fill" style="width:0%;"></div>
+                    </div>
+                    <p id="coveragePct"
+                        style="text-align:center;margin-top:0.5rem;font-weight:700;color:var(--accent);font-size:1.1rem;">
+                        0%</p>
                 </div>
                 <div class="stat-card-adv" style="flex:1;min-width:200px;text-align:left;">
                     <h3 style="margin-bottom:0.75rem;">📈 Común vs Específico</h3>
@@ -293,23 +307,30 @@
             </div>
 
             <div class="chart-container" style="margin-bottom:1.5rem;">
-                <h3 style="font-size:0.9rem;color:var(--text-secondary);margin-bottom:0.5rem;">Evolución de aciertos</h3>
+                <h3 style="font-size:0.9rem;color:var(--text-secondary);margin-bottom:0.5rem;">Evolución de aciertos
+                </h3>
                 <canvas id="historyChart" height="100"></canvas>
             </div>
 
             <div id="worstQuestionContainer"
                 style="background: rgba(255, 60, 60, 0.1); border: 1px solid rgba(255, 60, 60, 0.3); border-radius: 1rem; padding: 1.5rem; margin-bottom: 2rem; display: none;">
-                <h3 style="color: #ff6b6b; margin-top: 0; margin-bottom: 0.5rem; font-size: 1.2rem;">❌ Pregunta más fallada</h3>
-                <p id="worstQuestionTitle" style="font-weight: 600; margin-bottom: 0.5rem; line-height: 1.4; color: var(--text-primary);">[Pregunta]</p>
-                <div style="background: var(--surface-subtle); padding: 1rem; border-radius: 0.5rem; border-left: 4px solid #51cf66;">
-                    <span style="color: #51cf66; font-weight: bold; display: block; margin-bottom: 0.3rem;">✔ Respuesta correcta: </span>
+                <h3 style="color: #ff6b6b; margin-top: 0; margin-bottom: 0.5rem; font-size: 1.2rem;">❌ Pregunta más
+                    fallada</h3>
+                <p id="worstQuestionTitle"
+                    style="font-weight: 600; margin-bottom: 0.5rem; line-height: 1.4; color: var(--text-primary);">
+                    [Pregunta]</p>
+                <div
+                    style="background: var(--surface-subtle); padding: 1rem; border-radius: 0.5rem; border-left: 4px solid #51cf66;">
+                    <span style="color: #51cf66; font-weight: bold; display: block; margin-bottom: 0.3rem;">✔ Respuesta
+                        correcta: </span>
                     <span id="worstQuestionAnswer" style="color: var(--text-primary);">[Respuesta]</span>
                 </div>
             </div>
 
             <div style="text-align: right;">
                 <button id="clearHistoryBtn" class="premium-btn"
-                    style="background: var(--error-bg); color: var(--error); border: 1px solid var(--error);">🗑 Borrar Historial</button>
+                    style="background: var(--error-bg); color: var(--error); border: 1px solid var(--error);">🗑 Borrar
+                    Historial</button>
             </div>
         </div>
     </main>
@@ -407,8 +428,10 @@
             </div>
 
             <!-- Acciones rápidas de listado -->
-            <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 1rem; padding: 1rem; margin-bottom: 1.5rem;">
-                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.75rem; font-weight: 600;">📋 Listar todo el repositorio:</p>
+            <div
+                style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 1rem; padding: 1rem; margin-bottom: 1.5rem;">
+                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.75rem; font-weight: 600;">
+                    📋 Listar todo el repositorio:</p>
                 <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
                     <select id="listAllRepoSelect" class="premium-btn secondary"
                         style="flex-grow: 1; padding: 0.7rem; border: 1px solid var(--border-color); font-size: 0.9rem;">
@@ -416,11 +439,14 @@
                         <option value="comun">Solo Común</option>
                         <option value="especifico">Solo Específico</option>
                     </select>
-                    <button id="listAllBtn" class="premium-btn secondary" style="flex-grow: 1; border-color: #818cf8; color: #818cf8;">📋 Listar Todo</button>
+                    <button id="listAllBtn" class="premium-btn secondary"
+                        style="flex-grow: 1; border-color: #818cf8; color: #818cf8;">📋 Listar Todo</button>
                 </div>
             </div>
 
-            <button id="searchFavoritesBtn" class="premium-btn secondary" style="width: 100%; margin-bottom: 1.5rem; border-color: #facc15; color: #facc15;">⭐ Listar todas mis Favoritas</button>
+            <button id="searchFavoritesBtn" class="premium-btn secondary"
+                style="width: 100%; margin-bottom: 1.5rem; border-color: #facc15; color: #facc15;">⭐ Listar todas mis
+                Favoritas</button>
 
             <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.9rem;">Resultados encontrados:
                 <span id="searchResultCount" style="font-weight: bold; color: var(--text-primary);">0</span>
@@ -504,7 +530,7 @@
     </main>
 
     <!-- MODALES DE LA APLICACIÓN -->
-    
+
     <!-- MODAL NOTAS -->
     <div id="noteModal"
         style="position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1010; padding: 1rem;">
