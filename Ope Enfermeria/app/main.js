@@ -1,11 +1,18 @@
-const startScreen = document.getElementById('startScreen');
-const testScreen = document.getElementById('testScreen');
-const resultScreen = document.getElementById('resultScreen');
-const historyScreen = document.getElementById('historyScreen');
-const infoScreen = document.getElementById('infoScreen');
-const flashcardScreen = document.getElementById('flashcardScreen');
-const searchScreen = document.getElementById('searchScreen');
+/** 
+ * SELECTORES DE PANTALLAS PRINCIPALES
+ * Se utilizan para alternar la visibilidad de las diferentes secciones de la aplicación.
+ */
+const startScreen = document.getElementById('startScreen');   // Pantalla de inicio
+const testScreen = document.getElementById('testScreen');     // Pantalla de realización de test
+const resultScreen = document.getElementById('resultScreen'); // Pantalla de resultados finales
+const historyScreen = document.getElementById('historyScreen'); // Pantalla de historial y estadísticas
+const infoScreen = document.getElementById('infoScreen');       // Pantalla de "Cómo funciona"
+const flashcardScreen = document.getElementById('flashcardScreen'); // Pantalla de modo Flashcards
+const searchScreen = document.getElementById('searchScreen');   // Pantalla del buscador/glosario
 
+/** 
+ * BOTONES Y ELEMENTOS DE NAVEGACIÓN
+ */
 const resumeTestBtn = document.getElementById('resumeTestBtn');
 const startFavoritesBtn = document.getElementById('startFavoritesBtn');
 const startFailedBtn = document.getElementById('startFailedBtn');
@@ -15,6 +22,9 @@ const toggleFavoriteBtn = document.getElementById('toggleFavoriteBtn');
 const openNoteBtn = document.getElementById('openNoteBtn');
 const userNoteDisplay = document.getElementById('userNoteDisplay');
 
+/** 
+ * ELEMENTOS DEL BUSCADOR
+ */
 const searchToStartBtn = document.getElementById('searchToStartBtn');
 const searchInput = document.getElementById('searchInput');
 const doSearchBtn = document.getElementById('doSearchBtn');
@@ -27,12 +37,18 @@ const listAllRepoSelect = document.getElementById('listAllRepoSelect');
 const searchResultCount = document.getElementById('searchResultCount');
 const searchResultsContainer = document.getElementById('searchResultsContainer');
 
+/** 
+ * ELEMENTOS DEL MODAL DE NOTAS
+ */
 const noteModal = document.getElementById('noteModal');
 const closeNoteModalBtn = document.getElementById('closeNoteModalBtn');
 const noteTextarea = document.getElementById('noteTextarea');
 const deleteNoteBtn = document.getElementById('deleteNoteBtn');
 const saveNoteBtn = document.getElementById('saveNoteBtn');
 
+/** 
+ * ELEMENTOS DEL MODAL DE ESTADÍSTICAS POR PREGUNTA
+ */
 const statsModal = document.getElementById('statsModal');
 const closeStatsModalBtn = document.getElementById('closeStatsModalBtn');
 const statsQuestionTitle = document.getElementById('statsQuestionTitle');
@@ -45,11 +61,14 @@ const statsToggleFavBtn = document.getElementById('statsToggleFavBtn');
 const statsOpenNoteBtn = document.getElementById('statsOpenNoteBtn');
 const statsReportBtn = document.getElementById('statsReportBtn');
 
+// Pregunta activa para los modales de notas/estadísticas
 let currentActiveQuestion = null;
 
+/** 
+ * ELEMENTOS DE UI DIVERSOS (RACHAS, CARGA, TIMER, PROGRESS)
+ */
 const streakContainer = document.getElementById('streakContainer');
 const streakCountText = document.getElementById('streakCount');
-
 const loadedFilesInfo = document.getElementById('loadedFilesInfo');
 const fileCountText = document.getElementById('fileCount');
 const totalAvailableText = document.getElementById('totalAvailable');
@@ -73,6 +92,9 @@ const testProgressFill = document.getElementById('testProgressFill');
 const questionText = document.getElementById('questionText');
 const optionsContainer = document.getElementById('optionsContainer');
 
+/** 
+ * ELEMENTOS DEL MODO FLASHCARDS
+ */
 const flashcardElement = document.getElementById('flashcardElement');
 const fcQuestionText = document.getElementById('fcQuestionText');
 const fcAnswerText = document.getElementById('fcAnswerText');
@@ -82,15 +104,24 @@ const fcNextBtn = document.getElementById('fcNextBtn');
 const fcPrevBtn = document.getElementById('fcPrevBtn');
 const fcFinishBtn = document.getElementById('fcFinishBtn');
 
+/** 
+ * BOTONES DE CONTROL DEL TEST
+ */
 const nextBtn = document.getElementById('nextBtn');
 const prevBtn = document.getElementById('prevBtn');
 const submitExamBtn = document.getElementById('submitExamBtn');
 const exitTestBtn = document.getElementById('exitTestBtn');
 
+/** 
+ * ELEMENTOS DE LA PANTALLA DE RESULTADOS
+ */
 const finalScoreText = document.getElementById('finalScoreText');
 const feedbackMessage = document.getElementById('feedbackMessage');
 const tryAgainBtn = document.getElementById('tryAgainBtn');
 
+/** 
+ * ELEMENTOS DEL MODAL DE REPORTE DE ERRORES
+ */
 const errorModal = document.getElementById('errorModal');
 const reportErrorBtn = document.getElementById('reportErrorBtn');
 const fcReportErrorBtn = document.getElementById('fcReportErrorBtn');
@@ -101,32 +132,39 @@ const errorUserSuggestion = document.getElementById('errorUserSuggestion');
 const errorUserComment = document.getElementById('errorUserComment');
 const sendErrorEmailBtn = document.getElementById('sendErrorEmailBtn');
 
-// Estado
-let allQuestions = [];
-let testQuestions = [];
-let currentQuestionIndex = 0;
-let correctAnswersCount = 0;
+/** 
+ * VARIABLES DE ESTADO DE LA APLICACIÓN
+ */
+let allQuestions = [];       // Todas las preguntas cargadas desde los JSON
+let testQuestions = [];      // Preguntas seleccionadas para el test actual
+let currentQuestionIndex = 0; // Índice de la pregunta actual en el test
+let correctAnswersCount = 0;  // Contador de aciertos en el test actual
 
-let dailyFlashcards = [];
-let currentFlashcardIndex = 0;
+let dailyFlashcards = [];    // Preguntas seleccionadas para las flashcards del día
+let currentFlashcardIndex = 0; // Índice de la flashcard actual
 
-let testMode = 'normal'; // 'normal' | 'examen'
-let reviewMode = false;
-let userAnswers = [];
-let chartInstance = null;
-let isResultSaved = false;
-let isConfirmDialogActive = false;
+let testMode = 'normal';     // 'normal' | 'examen' | 'favoritas' | 'falladas'
+let reviewMode = false;      // Indica si el usuario está revisando un test terminado
+let userAnswers = [];        // Almacena las respuestas elegidas por el usuario
+let chartInstance = null;    // Instancia de Chart.js para el historial
+let isResultSaved = false;   // Controla que el resultado no se guarde dos veces
+let isConfirmDialogActive = false; // Evita solapamiento de diálogos de confirmación
 
-let currentErrorQuestion = null;
+let currentErrorQuestion = null; // Pregunta sobre la que se está reportando un error
 
-let examTimerInterval = null;
-let timeRemaining = 3600;
-let finalTimeRemainingText = '';
+let examTimerInterval = null; // Intervalo para el cronómetro del examen
+let timeRemaining = 3600;     // Tiempo restante en segundos
+let finalTimeRemainingText = ''; // Texto con el tiempo sobrante al terminar examen
 
-let flaggedQuestions = [];
-let repoCompareChartInstance = null;
-let lastTestResults = null;
+let flaggedQuestions = [];    // Índices de preguntas marcadas con bandera
+let repoCompareChartInstance = null; // Gráfico comparativo de repositorios
+let lastTestResults = null;   // Almacena datos del último test para la revisión detallada
 
+/**
+ * Genera una clave única para cada pregunta basada en su repositorio e índice original.
+ * @param {Object} q Objeto de la pregunta.
+ * @returns {string} Clave única identificativa.
+ */
 function getQuestionKey(q) {
     if (!q || !q.sourceType || !q.originalIndex) return q?.pregunta || '';
     return `${q.sourceType}_${q.originalIndex}`;
@@ -196,7 +234,10 @@ document.getElementById('achievementsModal').addEventListener('click', (e) => {
     if (e.target === document.getElementById('achievementsModal')) closeAchievementsModal();
 });
 
-// Funciones
+/**
+ * Carga automáticamente las preguntas desde los archivos JSON locales.
+ * Limpia y procesa los datos para añadir metadatos de origen.
+ */
 async function autoLoadQuestions() {
     try {
         const sources = [
@@ -212,6 +253,7 @@ async function autoLoadQuestions() {
                 const response = await fetch(source.url);
                 if (response.ok) {
                     const data = await response.json();
+                    // Filtrar preguntas vacías y añadir metadatos
                     const validQuestions = data.filter(q => q.respuestaCorrecta && q.respuestaCorrecta !== "").map((q, idx) => ({
                         ...q,
                         originalIndex: idx + 1,
@@ -228,6 +270,7 @@ async function autoLoadQuestions() {
         
         allQuestions = allLoadedQuestions;
         
+        // Actualizar UI con la cantidad de preguntas disponibles
         fileCountText.textContent = loadedCount.toString();
         totalAvailableText.textContent = allQuestions.length;
         
@@ -235,6 +278,7 @@ async function autoLoadQuestions() {
         const loadingZone = document.getElementById('loadingZone');
         if (loadingZone) loadingZone.style.display = 'none';
 
+        // Habilitar/Deshabilitar botones de inicio
         if (allQuestions.length === 0) {
             startTestBtn.disabled = true;
             startExamBtn.disabled = true;
@@ -246,6 +290,8 @@ async function autoLoadQuestions() {
             startFlashcardsBtn.disabled = false;
             startTestBtn.textContent = 'Comenzar Test';
         }
+        
+        // Inicializar lógica de la aplicación
         updateMaxRangeInfo();
         migrateStorageKeys();
         checkSavedSession();
@@ -258,6 +304,10 @@ async function autoLoadQuestions() {
     }
 }
 
+/**
+ * Actualiza la información visual del máximo de preguntas según el repositorio seleccionado.
+ * También asegura que los inputs de rango no excedan los límites.
+ */
 function updateMaxRangeInfo() {
     let repoSelect = document.getElementById('repoSelect');
     let maxRangeInfo = document.getElementById('maxRangeInfo');
@@ -272,7 +322,7 @@ function updateMaxRangeInfo() {
         }
         maxRangeInfo.textContent = `(Máx: ${count})`;
         
-        // Clamp existing values to valid range
+        // Ajustar valores de rango si exceden el nuevo máximo
         if (rangeStart && rangeStart.value) {
             let v = parseInt(rangeStart.value, 10);
             if (isNaN(v) || v < 1) rangeStart.value = '';
@@ -284,15 +334,17 @@ function updateMaxRangeInfo() {
             else if (v > count) rangeEnd.value = count;
         }
         
-        // Update max attribute
         if (rangeStart) rangeStart.max = count;
         if (rangeEnd) rangeEnd.max = count;
     }
 }
 document.getElementById('repoSelect').addEventListener('change', updateMaxRangeInfo);
 
-// Validate range inputs on blur to keep values within bounds
-function clampRangeInput(inputEl, maxCount) {
+/**
+ * Limita el valor de un input numérico al rango permitido.
+ * @param {HTMLElement} inputEl Elemento input.
+ */
+function clampRangeInput(inputEl) {
     if (!inputEl || !inputEl.value) return;
     let v = parseInt(inputEl.value, 10);
     if (isNaN(v) || v < 1) { inputEl.value = ''; return; }
@@ -306,19 +358,28 @@ function clampRangeInput(inputEl, maxCount) {
 document.getElementById('rangeStart').addEventListener('blur', function() { clampRangeInput(this); });
 document.getElementById('rangeEnd').addEventListener('blur', function() { clampRangeInput(this); });
 
-// Helper: set both inputs to "all" (clear = todas)
+/**
+ * Limpia los campos de rango para seleccionar "todo" el temario.
+ */
 function setRangeAll() {
     document.getElementById('rangeStart').value = '';
     document.getElementById('rangeEnd').value = '';
 }
 
+/**
+ * Configura e inicia un nuevo test basado en el modo seleccionado.
+ * Aplica filtros de repositorio, rangos y un sistema de pesos para favorecer 
+ * preguntas falladas o no vistas recientemente.
+ * @param {string} mode Modo del test: 'normal', 'examen', 'favoritas', 'falladas'.
+ */
 function startTest(mode) {
     testMode = mode;
     reviewMode = false;
     
+    // Limpiar timer si existe
     if (examTimerInterval) clearInterval(examTimerInterval);
     if (mode === 'examen') {
-        timeRemaining = 3600;
+        timeRemaining = 3600; // 60 minutos
         finalTimeRemainingText = '';
         examTimerContainer.classList.remove('hidden');
         updateTimerDisplay();
@@ -327,6 +388,7 @@ function startTest(mode) {
         examTimerContainer.classList.add('hidden');
     }
     
+    // Cargar mapas de datos desde localStorage
     let failuresMap = JSON.parse(localStorage.getItem('antigravity_failures') || '{}');
     let lastSeenMap = JSON.parse(localStorage.getItem('antigravity_last_seen_test') || '{}');
     let currentTestCounter = parseInt(localStorage.getItem('antigravity_test_counter') || '0', 10);
@@ -337,6 +399,7 @@ function startTest(mode) {
     
     let filteredQuestions = [...allQuestions];
     
+    // Aplicar filtros según el modo
     if (mode === 'favoritas') {
         const favs = JSON.parse(localStorage.getItem('appOpeFavorites') || '[]');
         filteredQuestions = filteredQuestions.filter(q => favs.includes(getQuestionKey(q)));
@@ -351,8 +414,9 @@ function startTest(mode) {
             return;
         }
     } else if (mode === 'examen') {
-        filteredQuestions = [...allQuestions];
+        filteredQuestions = [...allQuestions]; // El examen usa todo el repositorio
     } else {
+        // Modo normal con filtros de repositorio y rango
         if (repoSelect && repoSelect.value !== 'ambos') {
             filteredQuestions = filteredQuestions.filter(q => q.sourceType === repoSelect.value);
         }
@@ -372,6 +436,12 @@ function startTest(mode) {
         return;
     }
     
+    /**
+     * Sistema de selección inteligente por pesos:
+     * - Peso base: 1
+     * - +3 por cada fallo previo
+     * - Bonus por tiempo sin verla (tests pasados desde la última vez)
+     */
     let pool = filteredQuestions.map(q => {
         let failures = failuresMap[getQuestionKey(q)] || 0;
         let lastSeenTest = lastSeenMap[getQuestionKey(q)];
@@ -389,6 +459,7 @@ function startTest(mode) {
     
     testQuestions = [];
     
+    // Determinar longitud del test
     let maxQuestions = 100;
     if (mode === 'normal') {
         const selectEl = document.getElementById('testLengthSelect');
@@ -403,6 +474,7 @@ function startTest(mode) {
     
     const limit = Math.min(maxQuestions, pool.length);
     
+    // Selección aleatoria ponderada
     for (let i = 0; i < limit; i++) {
         let totalWeight = pool.reduce((sum, item) => sum + item.weight, 0);
         let randomNum = Math.random() * totalWeight;
@@ -418,13 +490,14 @@ function startTest(mode) {
         }
     }
     
+    // Reiniciar estado del test
     currentQuestionIndex = 0;
     correctAnswersCount = 0;
     isResultSaved = false;
     userAnswers = new Array(testQuestions.length).fill(null);
     flaggedQuestions = [];
     
-    // Show navigator and flag button only for exam mode
+    // Configuración de UI según modo examen/estudio
     const navWrapper = document.getElementById('questionNavWrapper');
     const navGrid = document.getElementById('questionNavGrid');
     const flagBtn = document.getElementById('flagQuestionBtn');
@@ -439,14 +512,17 @@ function startTest(mode) {
     }
     
     incrementStreak();
-    
     switchScreen(testScreen);
     renderQuestion();
 }
 
+/**
+ * Dibuja la pregunta actual en pantalla, gestionando opciones, favoritos y notas.
+ */
 function renderQuestion() {
     const q = testQuestions[currentQuestionIndex];
     
+    // Actualizar encabezados
     currentQuestionNumberText.textContent = `Pregunta ${currentQuestionIndex + 1} de ${testQuestions.length} | (Nº ${q.originalIndex || '?'} - ${q.sourceName || 'General'})`;
     
     if (testMode !== 'examen' || reviewMode) {
@@ -456,12 +532,13 @@ function renderQuestion() {
         scoreTrackerText.textContent = `Respondidas: ${respondidas}`;
     }
 
+    // Barra de progreso
     const progress = ((currentQuestionIndex + 1) / testQuestions.length) * 100;
     testProgressFill.style.width = `${progress}%`;
     
     questionText.textContent = q.pregunta;
     
-    // UI de Favorita y Nota
+    // Estado de Favorita
     const qKey = getQuestionKey(q);
     const favs = JSON.parse(localStorage.getItem('appOpeFavorites') || '[]');
     if (favs.includes(qKey)) {
@@ -472,6 +549,7 @@ function renderQuestion() {
         toggleFavoriteBtn.innerHTML = '☆';
     }
     
+    // Visualización de Notas del usuario
     const notes = JSON.parse(localStorage.getItem('appOpeNotes') || '{}');
     if (notes[qKey]) {
         userNoteDisplay.textContent = `📝 Mi Nota:\n${notes[qKey]}`;
@@ -483,7 +561,7 @@ function renderQuestion() {
         openNoteBtn.style.color = 'var(--text-secondary)';
     }
 
-    // Flag button state
+    // Estado del botón de bandera (flag)
     const flagBtn = document.getElementById('flagQuestionBtn');
     if (flaggedQuestions.includes(currentQuestionIndex)) {
         flagBtn.classList.add('active');
@@ -493,8 +571,8 @@ function renderQuestion() {
 
     renderQuestionNavigator();
 
+    // Renderizar opciones (A, B, C, D)
     optionsContainer.innerHTML = '';
-    
     const options = [
         { letter: 'A', text: q.opciones.A },
         { letter: 'B', text: q.opciones.B },
@@ -514,10 +592,9 @@ function renderQuestion() {
         
         const userA = userAnswers[currentQuestionIndex];
         
+        // Lógica visual según modo de test y si ya ha sido respondida
         if (testMode === 'examen' && !reviewMode) {
-            if (userA === opt.letter) {
-                btn.classList.add('selected');
-            }
+            if (userA === opt.letter) btn.classList.add('selected');
             btn.onclick = () => handleAnswerSelected(btn, opt.letter, q.respuestaCorrecta);
         } else if (reviewMode) {
             btn.disabled = true;
@@ -529,7 +606,6 @@ function renderQuestion() {
             }
         } else if (testMode !== 'examen') {
             if (userA) {
-                // Ya respondido
                 btn.disabled = true;
                 btn.style.cursor = 'default';
                 if (opt.letter === q.respuestaCorrecta) {
@@ -548,10 +624,17 @@ function renderQuestion() {
     manageNavigationButtons();
 }
 
+/**
+ * Gestiona la selección de una respuesta, actualiza el estado y las estadísticas.
+ * @param {HTMLElement} selectedBtn Botón pulsado.
+ * @param {string} selectedLetter Letra seleccionada (A, B, C, D).
+ * @param {string} correctLetter Letra de la respuesta correcta.
+ */
 function handleAnswerSelected(selectedBtn, selectedLetter, correctLetter) {
     userAnswers[currentQuestionIndex] = selectedLetter;
 
     if (testMode !== 'examen') {
+        // En modo normal, mostrar corrección inmediata
         const allBtns = optionsContainer.querySelectorAll('.option-btn');
         allBtns.forEach(b => {
             b.disabled = true;
@@ -566,12 +649,12 @@ function handleAnswerSelected(selectedBtn, selectedLetter, correctLetter) {
             correctAnswersCount++;
         } else {
             selectedBtn.classList.add('incorrect');
-            selectedBtn.classList.add('shake');
+            selectedBtn.classList.add('shake'); // Efecto visual de error
             setTimeout(() => selectedBtn.classList.remove('shake'), 400);
         }
         scoreTrackerText.textContent = `Aciertos: ${correctAnswersCount}`;
 
-        // Guardar estadísticas de esta pregunta inmediatamente
+        // Guardar estadísticas de esta pregunta inmediatamente para aprendizaje adaptativo
         let failuresMap = JSON.parse(localStorage.getItem('antigravity_failures') || '{}');
         let lastSeenMap = JSON.parse(localStorage.getItem('antigravity_last_seen_test') || '{}');
         let statsMap = JSON.parse(localStorage.getItem('appOpeQuestionStats') || '{}');
@@ -604,6 +687,7 @@ function handleAnswerSelected(selectedBtn, selectedLetter, correctLetter) {
         checkAndUnlockAchievements({ context: 'answer' });
 
     } else {
+        // En modo examen, solo marcar la opción seleccionada sin corregir aún
         const allBtns = optionsContainer.querySelectorAll('.option-btn');
         allBtns.forEach(b => b.classList.remove('selected'));
         selectedBtn.classList.add('selected');
@@ -615,6 +699,9 @@ function handleAnswerSelected(selectedBtn, selectedLetter, correctLetter) {
     manageNavigationButtons();
 }
 
+/**
+ * Controla la visibilidad de los botones de navegación (Siguiente, Anterior, Entregar).
+ */
 function manageNavigationButtons() {
     nextBtn.classList.add('hidden');
     prevBtn.classList.add('hidden');
@@ -625,6 +712,7 @@ function manageNavigationButtons() {
     }
 
     if (currentQuestionIndex < testQuestions.length - 1) {
+        // Solo permitir avanzar si se ha respondido (en modo normal) o si es modo examen
         if (testMode === 'examen' || reviewMode || userAnswers[currentQuestionIndex]) {
             nextBtn.classList.remove('hidden');
         }
@@ -634,7 +722,7 @@ function manageNavigationButtons() {
             submitExamBtn.onclick = submitExamHandler;
         }
     } else {
-        // Última pregunta
+        // Última pregunta: mostrar botón de finalizar
         if (testMode === 'examen' && !reviewMode) {
             submitExamBtn.classList.remove('hidden');
             submitExamBtn.textContent = "Entregar Examen";
@@ -651,6 +739,9 @@ function manageNavigationButtons() {
     }
 }
 
+/**
+ * Avanza a la siguiente pregunta con una animación de deslizamiento.
+ */
 function proceedToNext() {
     if (currentQuestionIndex < testQuestions.length - 1) {
         const panel = document.querySelector('.question-panel');
@@ -665,6 +756,9 @@ function proceedToNext() {
     }
 }
 
+/**
+ * Retrocede a la pregunta anterior con una animación de deslizamiento.
+ */
 function proceedToPrev() {
     if (currentQuestionIndex > 0) {
         const panel = document.querySelector('.question-panel');
@@ -679,12 +773,18 @@ function proceedToPrev() {
     }
 }
 
+/**
+ * Actualiza el texto visual del cronómetro (MM:SS).
+ */
 function updateTimerDisplay() {
     const minutes = Math.floor(timeRemaining / 60);
     const seconds = timeRemaining % 60;
     examTimerText.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 }
 
+/**
+ * Función que se ejecuta cada segundo para decrementar el tiempo del examen.
+ */
 function timerTick() {
     if (timeRemaining > 0) {
         timeRemaining--;
@@ -693,11 +793,15 @@ function timerTick() {
         clearInterval(examTimerInterval);
         alert("¡Se acabó el tiempo!");
         if (testMode === 'examen' && !reviewMode) {
-             submitExamHandler(true);
+             submitExamHandler(true); // Entrega forzada al agotar el tiempo
         }
     }
 }
 
+/**
+ * Maneja la entrega del examen, calculando la nota final y activando el modo revisión.
+ * @param {boolean} isForceCall Indica si la entrega es forzada (ej. por tiempo agotado).
+ */
 function submitExamHandler(isForceCall) {
     if (isForceCall !== true) {
         if (isConfirmDialogActive) return;
@@ -707,6 +811,7 @@ function submitExamHandler(isForceCall) {
         if (!res) return;
     }
     
+    // Detener el cronómetro y calcular tiempo restante
     if (examTimerInterval) {
         clearInterval(examTimerInterval);
         if (timeRemaining > 0) {
@@ -719,6 +824,7 @@ function submitExamHandler(isForceCall) {
     }
     examTimerContainer.classList.add('hidden');
     
+    // Calcular aciertos finales
     correctAnswersCount = 0;
     for (let i = 0; i < testQuestions.length; i++) {
         if (userAnswers[i] === testQuestions[i].respuestaCorrecta) {
@@ -726,23 +832,24 @@ function submitExamHandler(isForceCall) {
         }
     }
     
+    // Guardar resultados
     if (!isResultSaved) {
         saveResult();
         isResultSaved = true;
     }
     
-    reviewMode = true;
-    currentQuestionIndex = 0; // Volvemos a la 1
+    reviewMode = true; // Activar modo de revisión detallada
+    currentQuestionIndex = 0; 
     
-    // Cambiar la vista superior
     scoreTrackerText.textContent = `Aciertos: ${correctAnswersCount}`;
-    
-    // Comprobar logros al entregar examen
     checkAndUnlockAchievements({ context: 'submit_exam' });
-    
     renderQuestion();
 }
 
+/**
+ * Finaliza un test (modo normal o tras revisión) y muestra la pantalla de resultados.
+ * Calcula la puntuación neta aplicando penalizaciones por fallos (-1/3).
+ */
 function finishTest() {
     testProgressFill.style.width = '100%';
     
@@ -751,7 +858,7 @@ function finishTest() {
         isResultSaved = true;
     }
     
-    // Calculate penalty breakdown
+    // Cálculo detallado de estadísticas y penalizaciones OPE
     let correct = 0, wrong = 0, blank = 0;
     for (let i = 0; i < testQuestions.length; i++) {
         if (userAnswers[i] === null) {
@@ -768,16 +875,16 @@ function finishTest() {
     const percentage = (correct / total) * 100;
     const netPercentage = (netScore / total) * 100;
     
-    // Store for review
+    // Almacenar datos para la revisión posterior
     lastTestResults = { testQuestions: [...testQuestions], userAnswers: [...userAnswers], correct, wrong, blank, netScore };
     
-    // Animate score counter
+    // Mostrar nota final con animación
     const scoreEl = document.getElementById('finalScoreText');
     scoreEl.textContent = '0';
     document.querySelector('.score-max').textContent = `/ ${total}`;
     animateCountUp(scoreEl, correct);
     
-    // Show penalty breakdown
+    // Desglose de penalización
     const penaltyDiv = document.getElementById('penaltyBreakdown');
     penaltyDiv.classList.remove('hidden');
     document.getElementById('penaltyCorrect').textContent = `${correct} (+${correct.toFixed(2)})`;
@@ -785,7 +892,7 @@ function finishTest() {
     document.getElementById('penaltyBlank').textContent = `${blank} (0.00)`;
     document.getElementById('penaltyNet').textContent = `${netScore.toFixed(2)} / ${total} (${netPercentage.toFixed(1)}%)`;
     
-    // Feedback
+    // Mensaje de feedback motivador
     if (percentage >= 90) {
         feedbackMessage.textContent = "¡Sobresaliente! Estás muy preparad@.";
     } else if (percentage >= 70) {
@@ -830,6 +937,10 @@ function finishTest() {
     }
 }
 
+/**
+ * Cambia la visibilidad entre las diferentes pantallas de la aplicación.
+ * @param {HTMLElement} screenElement Elemento de la pantalla a mostrar.
+ */
 function switchScreen(screenElement) {
     [startScreen, testScreen, resultScreen, historyScreen, infoScreen, flashcardScreen, searchScreen].forEach(el => {
         if(el) el.classList.remove('active');
@@ -837,6 +948,9 @@ function switchScreen(screenElement) {
     screenElement.classList.add('active');
 }
 
+/**
+ * Sale del test actual, pidiendo confirmación si es un examen en curso.
+ */
 function exitTest() {
     if (examTimerInterval) {
         clearInterval(examTimerInterval);
@@ -850,24 +964,27 @@ function exitTest() {
         if (res) {
             switchScreen(startScreen);
         } else {
-            // Si cancela la salida, hay que reanudar el timer si era un examen
+            // Reanudar cronómetro si se cancela la salida
             if (testMode === 'examen' && timeRemaining > 0 && !reviewMode) {
                 examTimerInterval = setInterval(timerTick, 1000);
             }
         }
     } else {
-        // Test normal: salir sin pedir confirmación
         switchScreen(startScreen);
     }
 }
 
+/**
+ * Guarda los resultados del test en el historial y actualiza las estadísticas de las preguntas.
+ */
 function saveResult() {
     const historyData = JSON.parse(localStorage.getItem('antigravity_history') || '[]');
     let failuresMap = JSON.parse(localStorage.getItem('antigravity_failures') || '{}');
     let lastSeenMap = JSON.parse(localStorage.getItem('antigravity_last_seen_test') || '{}');
     let statsMap = JSON.parse(localStorage.getItem('appOpeQuestionStats') || '{}');
-    let currentTestCounter = parseInt(localStorage.getItem('antigravity_test_counter') || '0', 10) + 1;
     
+    // Incrementar contador global de tests realizados
+    let currentTestCounter = parseInt(localStorage.getItem('antigravity_test_counter') || '0', 10) + 1;
     localStorage.setItem('antigravity_test_counter', currentTestCounter.toString());
     
     let respondidas = 0;
@@ -879,6 +996,7 @@ function saveResult() {
         if (ua !== null) {
             respondidas++;
             
+            // En modo examen, los resultados se guardan al final
             if (testMode === 'examen') {
                 const hash = getQuestionKey(q);
                 
@@ -919,11 +1037,18 @@ function saveResult() {
     localStorage.setItem('antigravity_history', JSON.stringify(historyData));
 }
 
+/**
+ * Muestra la pantalla de historial y estadísticas generales.
+ */
 function showHistory() {
     switchScreen(historyScreen);
     renderHistory();
 }
 
+/**
+ * Procesa y dibuja las estadísticas avanzadas: gráficos, tendencias, cobertura 
+ * y detección de la pregunta más fallada del usuario.
+ */
 function renderHistory() {
     const historyData = JSON.parse(localStorage.getItem('antigravity_history') || '[]');
     
@@ -944,7 +1069,7 @@ function renderHistory() {
     const overallWinRate = totalQuestions > 0 ? ((totalCorrects / totalQuestions) * 100).toFixed(1) : 0;
     document.getElementById('histWinRate').textContent = `${overallWinRate}%`;
 
-    // Trend indicator
+    // Indicador de Tendencia de los últimos tests
     const trendEl = document.getElementById('histTrend');
     if (dataPoints.length >= 5) {
         const recent = dataPoints.slice(-5).reduce((s, v) => s + parseFloat(v), 0) / 5;
@@ -966,7 +1091,7 @@ function renderHistory() {
         trendEl.textContent = '\u2014';
     }
 
-    // Coverage
+    // Cobertura del Temario (cuántas preguntas únicas ha visto el usuario)
     const statsMap = JSON.parse(localStorage.getItem('appOpeQuestionStats') || '{}');
     const seenCount = Object.keys(statsMap).length;
     const totalAvail = allQuestions.length;
@@ -976,7 +1101,7 @@ function renderHistory() {
     document.getElementById('coverageFill').style.width = `${coveragePct}%`;
     document.getElementById('coveragePct').textContent = `${coveragePct}%`;
 
-    // Repo comparison chart
+    // Gráfico comparativo por Repositorio (Aciertos Común vs Específico)
     let comunCorrect = 0, comunTotal = 0, especCorrect = 0, especTotal = 0;
     for (const q of allQuestions) {
         const s = statsMap[getQuestionKey(q)];
@@ -1006,7 +1131,7 @@ function renderHistory() {
         options: { responsive: true, scales: { y: { beginAtZero: true, max: 100 } }, plugins: { legend: { display: false } } }
     });
 
-    // Main history chart
+    // Gráfico de Evolución Temporal
     const ctx = document.getElementById('historyChart').getContext('2d');
     if (chartInstance) chartInstance.destroy();
     chartInstance = new Chart(ctx, {
@@ -1025,7 +1150,7 @@ function renderHistory() {
         options: { responsive: true, scales: { y: { beginAtZero: true, max: 100 } } }
     });
 
-    // Calcular la pregunta más fallada
+    // Detección de la pregunta más fallada (Némesis)
     const failuresMap = JSON.parse(localStorage.getItem('antigravity_failures') || '{}');
     let maxFailures = 0;
     let worstQuestionKey = null;
@@ -1065,6 +1190,9 @@ function renderHistory() {
     }
 }
 
+/**
+ * Borra todo el historial y estadísticas almacenadas localmente.
+ */
 function clearHistory() {
     if (isConfirmDialogActive) return;
     isConfirmDialogActive = true;
@@ -1080,37 +1208,36 @@ function clearHistory() {
     }
 }
 
-// --- LÓGICA DE FLASHCARDS ---
-
+/**
+ * Genera o recupera las 10 Flashcards diarias.
+ * Se eligen favoreciendo aquellas con más fallos previos para reforzar el aprendizaje.
+ * @returns {Array} Lista de preguntas seleccionadas.
+ */
 function getDailyFlashcards() {
     const todayStr = new Date().toDateString();
     const stored = JSON.parse(localStorage.getItem('antigravity_daily_flashcards') || '{}');
     
-    // Si ya existen para hoy y son válidas
+    // Si ya existen para hoy y son válidas, se reutilizan
     if (stored.date === todayStr && stored.questions && stored.questions.length > 0) {
         return stored.questions;
     }
 
     // Generar nuevas flashcards
     let failuresMap = JSON.parse(localStorage.getItem('antigravity_failures') || '{}');
-
     let repoSelect = document.getElementById('repoSelect');
     let rangeStart = document.getElementById('rangeStart');
     let rangeEnd = document.getElementById('rangeEnd');
     
     let filteredQuestions = [...allQuestions];
     
+    // Aplicar filtros de repositorio y rango actuales
     if (repoSelect && repoSelect.value !== 'ambos') {
         filteredQuestions = filteredQuestions.filter(q => q.sourceType === repoSelect.value);
     }
     let minVal = 1;
     let maxVal = filteredQuestions.length;
-    if (rangeStart && rangeStart.value) {
-        minVal = parseInt(rangeStart.value, 10);
-    }
-    if (rangeEnd && rangeEnd.value) {
-        maxVal = parseInt(rangeEnd.value, 10);
-    }
+    if (rangeStart && rangeStart.value) minVal = parseInt(rangeStart.value, 10);
+    if (rangeEnd && rangeEnd.value) maxVal = parseInt(rangeEnd.value, 10);
     filteredQuestions = filteredQuestions.slice(minVal - 1, maxVal);
     
     if (filteredQuestions.length === 0) {
@@ -1118,6 +1245,7 @@ function getDailyFlashcards() {
         return [];
     }
 
+    // Ponderación por fallos: más fallos = más probabilidad de aparecer
     let pool = filteredQuestions.map(q => {
         let failures = failuresMap[getQuestionKey(q)] || 0;
         let weight = 1 + (failures * 3);
@@ -1148,6 +1276,9 @@ function getDailyFlashcards() {
     return fcs;
 }
 
+/**
+ * Inicia el modo de estudio con Flashcards.
+ */
 function startFlashcards() {
     dailyFlashcards = getDailyFlashcards();
     if(dailyFlashcards.length === 0) return;
@@ -1157,17 +1288,20 @@ function startFlashcards() {
     renderFlashcard();
 }
 
+/**
+ * Renderiza la flashcard actual (Anverso con pregunta, Reverso con respuesta).
+ */
 function renderFlashcard() {
     const rawQ = dailyFlashcards[currentFlashcardIndex];
+    // Asegurar que tenemos el objeto completo de la pregunta
     const q = allQuestions.find(x => x.pregunta === rawQ.pregunta) || rawQ;
+    
     flashcardNumberText.textContent = `Flashcard ${currentFlashcardIndex + 1}/${dailyFlashcards.length} | (Nº ${q.originalIndex || '?'} - ${q.sourceName || 'General'})`;
     
     const progress = ((currentFlashcardIndex + 1) / dailyFlashcards.length) * 100;
     flashcardProgressFill.style.width = `${progress}%`;
     
-    // Reiniciar estado volteado
     flashcardElement.classList.remove('is-flipped');
-    
     fcQuestionText.textContent = q.pregunta;
     
     const correctLetter = q.respuestaCorrecta;
@@ -1177,22 +1311,22 @@ function renderFlashcard() {
     manageFlashcardsButtons();
 }
 
+/**
+ * Controla la navegación entre flashcards.
+ */
 function manageFlashcardsButtons() {
     fcPrevBtn.classList.add('hidden');
     fcNextBtn.classList.add('hidden');
     fcFinishBtn.classList.add('hidden');
     
-    if (currentFlashcardIndex > 0) {
-        fcPrevBtn.classList.remove('hidden');
-    }
-    
-    if (currentFlashcardIndex < dailyFlashcards.length - 1) {
-        fcNextBtn.classList.remove('hidden');
-    } else {
-        fcFinishBtn.classList.remove('hidden');
-    }
+    if (currentFlashcardIndex > 0) fcPrevBtn.classList.remove('hidden');
+    if (currentFlashcardIndex < dailyFlashcards.length - 1) fcNextBtn.classList.remove('hidden');
+    else fcFinishBtn.classList.remove('hidden');
 }
 
+/**
+ * Avanza a la siguiente flashcard.
+ */
 function proceedToNextFlashcard() {
     if (currentFlashcardIndex < dailyFlashcards.length - 1) {
         currentFlashcardIndex++;
@@ -1200,6 +1334,9 @@ function proceedToNextFlashcard() {
     }
 }
 
+/**
+ * Retrocede a la flashcard anterior.
+ */
 function proceedToPrevFlashcard() {
     if (currentFlashcardIndex > 0) {
         currentFlashcardIndex--;
@@ -1207,11 +1344,18 @@ function proceedToPrevFlashcard() {
     }
 }
 
+/**
+ * Finaliza el modo flashcards y vuelve al inicio.
+ */
 function finishFlashcards() {
     switchScreen(startScreen);
 }
 
 // --- LOGICA REPORTE DE ERRORES ---
+/**
+ * Abre el modal para reportar un error en una pregunta específica.
+ * @param {Object} questionObj Objeto de la pregunta.
+ */
 function openErrorModal(questionObj) {
     if(!questionObj) return;
     currentErrorQuestion = questionObj;
@@ -1223,6 +1367,9 @@ function openErrorModal(questionObj) {
     errorModal.style.display = 'flex';
 }
 
+/**
+ * Prepara y envía un correo electrónico con los detalles del error reportado.
+ */
 function sendErrorEmail() {
     if(!currentErrorQuestion) return;
     const subject = encodeURIComponent("Error en Pregunta Simulador OPE");
@@ -1242,6 +1389,12 @@ function sendErrorEmail() {
 }
 
 // --- LOGICA FAVORITAS Y NOTAS ---
+/**
+ * Lógica compartida para marcar/desmarcar favoritos.
+ * Actualiza el estado visual del botón disparador.
+ * @param {Object} q Objeto de la pregunta.
+ * @param {HTMLElement} btnElement Botón que dispara el cambio (opcional).
+ */
 function toggleFavoriteAction(q, btnElement) {
     if (!q) return;
     const qKey = getQuestionKey(q);
@@ -1262,9 +1415,10 @@ function toggleFavoriteAction(q, btnElement) {
     }
     localStorage.setItem('appOpeFavorites', JSON.stringify(favs));
     
-    // Comprobar logro de coleccionista tras cambiar favoritas
+    // Comprobar logro de coleccionista
     checkAndUnlockAchievements({ context: 'favorite' });
     
+    // Sincronizar UI de test si es la pregunta actual
     if (testScreen.classList.contains('active') && testQuestions[currentQuestionIndex] && getQuestionKey(testQuestions[currentQuestionIndex]) === qKey) {
         if (favs.includes(qKey)) {
             toggleFavoriteBtn.style.color = '#facc15';
@@ -1276,33 +1430,42 @@ function toggleFavoriteAction(q, btnElement) {
     }
 }
 
+/**
+ * Alterna el favorito de la pregunta actual del test.
+ */
 function toggleFavorite() {
     if (!testQuestions || testQuestions.length === 0) return;
     toggleFavoriteAction(testQuestions[currentQuestionIndex], toggleFavoriteBtn);
 }
 
+/**
+ * Abre el modal de notas para una pregunta.
+ * @param {Object} q Objeto de la pregunta.
+ */
 function openNoteModalAction(q) {
     if (!q) return;
     currentActiveQuestion = q;
     const notes = JSON.parse(localStorage.getItem('appOpeNotes') || '{}');
     const qKey = getQuestionKey(q);
     
-    if (notes[qKey]) {
-        noteTextarea.value = notes[qKey];
-    } else {
-        noteTextarea.value = '';
-    }
-    
+    noteTextarea.value = notes[qKey] || '';
     noteModal.style.display = 'flex';
 }
 
+/**
+ * Abre el modal de notas para la pregunta actual del test.
+ */
 function openNoteModal() {
     if (!testQuestions || testQuestions.length === 0) return;
     openNoteModalAction(testQuestions[currentQuestionIndex]);
 }
 
+/**
+ * Guarda la nota personal escrita por el usuario.
+ */
 function saveNote() {
     let q = currentActiveQuestion;
+    // Si no hay una activa en el buscador, intentamos usar la del test en curso
     if (!q && testQuestions && testQuestions.length > 0) {
         q = testQuestions[currentQuestionIndex];
     }
@@ -1311,23 +1474,23 @@ function saveNote() {
     const notes = JSON.parse(localStorage.getItem('appOpeNotes') || '{}');
     const val = noteTextarea.value.trim();
     const qKey = getQuestionKey(q);
-    if (val) {
-        notes[qKey] = val;
-    } else {
-        delete notes[qKey];
-    }
+    
+    if (val) notes[qKey] = val;
+    else delete notes[qKey];
     
     localStorage.setItem('appOpeNotes', JSON.stringify(notes));
     noteModal.style.display = 'none';
     
+    // Refrescar UI pertinente
     if (testScreen.classList.contains('active') && testQuestions[currentQuestionIndex] && getQuestionKey(testQuestions[currentQuestionIndex]) === qKey) {
         renderQuestion();
     }
-    if (statsModal.style.display === 'flex') {
-        openStatsModal(q);
-    }
+    if (statsModal.style.display === 'flex') openStatsModal(q);
 }
 
+/**
+ * Borra la nota personal de la pregunta activa.
+ */
 function deleteNote() {
     let q = currentActiveQuestion;
     if (!q && testQuestions && testQuestions.length > 0) {
@@ -1344,12 +1507,13 @@ function deleteNote() {
     if (testScreen.classList.contains('active') && testQuestions[currentQuestionIndex] && getQuestionKey(testQuestions[currentQuestionIndex]) === qKey) {
         renderQuestion();
     }
-    if (statsModal.style.display === 'flex') {
-        openStatsModal(q);
-    }
+    if (statsModal.style.display === 'flex') openStatsModal(q);
 }
 
 // --- LOGICA BUSCADOR / GLOSARIO ---
+/**
+ * Abre la pantalla del buscador avanzado.
+ */
 function openSearchScreen() {
     searchInput.value = '';
     searchIdInput.value = '';
@@ -1358,6 +1522,10 @@ function openSearchScreen() {
     switchScreen(searchScreen);
 }
 
+/**
+ * Ejecuta una búsqueda de texto global.
+ * Utiliza normalización Unicode para ignorar tildes y diacríticos.
+ */
 function performSearch() {
     const rawQuery = searchInput.value.trim();
     if (!rawQuery) {
@@ -1365,6 +1533,9 @@ function performSearch() {
         return;
     }
     
+    /**
+     * Normaliza una cadena para búsqueda insensible a acentos.
+     */
     const normalizeStr = (str) => {
         if (!str) return "";
         return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
@@ -1380,11 +1551,13 @@ function performSearch() {
     renderSearchResults(results);
 }
 
+/**
+ * Busca preguntas por número de ID o índice original en el repositorio seleccionado.
+ */
 function performSearchById() {
     const numStr = searchIdInput.value.trim();
-    if (!numStr) {
-        return;
-    }
+    if (!numStr) return;
+    
     const num = parseInt(numStr, 10);
     const repo = searchRepoSelect.value;
     
@@ -1396,6 +1569,9 @@ function performSearchById() {
     renderSearchResults(results);
 }
 
+/**
+ * Filtra y muestra todas las preguntas guardadas en Favoritos.
+ */
 function performSearchFavorites() {
     const favs = JSON.parse(localStorage.getItem('appOpeFavorites') || '[]');
     if (favs.length === 0) {
@@ -1408,14 +1584,15 @@ function performSearchFavorites() {
     renderSearchResults(results);
 }
 
+/**
+ * Lista todas las preguntas de un repositorio concreto.
+ */
 function performListAll() {
     const repoVal = listAllRepoSelect ? listAllRepoSelect.value : 'ambos';
     let results;
-    if (repoVal === 'ambos') {
-        results = [...allQuestions];
-    } else {
-        results = allQuestions.filter(q => q.sourceType === repoVal);
-    }
+    if (repoVal === 'ambos') results = [...allQuestions];
+    else results = allQuestions.filter(q => q.sourceType === repoVal);
+    
     if (results.length === 0) {
         searchResultCount.textContent = '0';
         searchResultsContainer.innerHTML = '<p style="text-align: center; color: var(--text-secondary); margin-top: 2rem;">No hay preguntas disponibles para ese repositorio.</p>';
@@ -1424,6 +1601,10 @@ function performListAll() {
     renderSearchResults(results);
 }
 
+/**
+ * Renderiza los resultados de búsqueda con un diseño de tarjetas informativas.
+ * @param {Array} results Lista de preguntas.
+ */
 function renderSearchResults(results) {
     searchResultCount.textContent = results.length;
     searchResultsContainer.innerHTML = '';
@@ -1438,6 +1619,7 @@ function renderSearchResults(results) {
         const correctText = q.opciones[correctLetter];
         
         const div = document.createElement('div');
+        div.className = 'search-result-card'; // Clase estilizada en CSS
         div.style.background = 'rgba(255,255,255,0.05)';
         div.style.padding = '1rem';
         div.style.borderRadius = '0.5rem';
@@ -1459,6 +1641,11 @@ function renderSearchResults(results) {
     });
 }
 
+/**
+ * Abre un modal con estadísticas detalladas de la pregunta.
+ * Muestra aciertos, errores y permite gestionar favoritas/notas.
+ * @param {Object} q Objeto de la pregunta.
+ */
 function openStatsModal(q) {
     currentActiveQuestion = q;
     const qKey = getQuestionKey(q);
@@ -1468,16 +1655,20 @@ function openStatsModal(q) {
     const correctLetter = q.respuestaCorrecta;
     statsCorrectAnswer.textContent = `Opción ${correctLetter}: ${q.opciones[correctLetter]}`;
     
+    // Cargar estadísticas generales
     let statsMap = JSON.parse(localStorage.getItem('appOpeQuestionStats') || '{}');
     const stats = statsMap[qKey] || { seen: 0, correct: 0, wrong: 0 };
     
+    // Cargar historial de fallos específicos
     let failuresMap = JSON.parse(localStorage.getItem('antigravity_failures') || '{}');
     let historicalWrong = failuresMap[qKey] || 0;
     
+    // Mostrar estadísticas consolidadas
     statsSeen.textContent = Math.max(stats.seen, historicalWrong);
     statsCorrect.textContent = stats.correct;
     statsWrong.textContent = Math.max(stats.wrong, historicalWrong);
     
+    // Actualizar estado visual de favorita
     let favs = JSON.parse(localStorage.getItem('appOpeFavorites') || '[]');
     if (favs.includes(qKey)) {
         statsToggleFavBtn.style.color = '#facc15';
@@ -1487,6 +1678,7 @@ function openStatsModal(q) {
         statsToggleFavBtn.innerHTML = '☆ Favorita';
     }
     
+    // Actualizar estado visual de notas
     let notes = JSON.parse(localStorage.getItem('appOpeNotes') || '{}');
     if (notes[qKey]) {
         statsOpenNoteBtn.style.color = '#6366f1';
@@ -1638,7 +1830,10 @@ function updateStreakUI() {
     }
 }
 
-// --- MIGRACIÓN DE CLAVES (#14) ---
+/**
+ * MIGRACIÓN DE DATOS (v2): Convierte claves de texto a claves únicas (Repo_Index).
+ * Necesario para mantener la consistencia entre dispositivos y actualizaciones.
+ */
 function migrateStorageKeys() {
     if (localStorage.getItem('appOpe_migrated_v2')) return;
     if (allQuestions.length === 0) return;
@@ -1657,7 +1852,7 @@ function migrateStorageKeys() {
         if (changed) localStorage.setItem(storageKey, JSON.stringify(newData));
     }
     
-    // Migrate favorites (array)
+    // Migrar favoritos (formato array)
     let favs = JSON.parse(localStorage.getItem('appOpeFavorites') || '[]');
     if (favs.length > 0 && favs[0] && favs[0].length > 30) {
         favs = favs.map(text => textToKey[text] || text);
@@ -1673,7 +1868,9 @@ function migrateStorageKeys() {
     console.log('Storage keys migrated to v2 format.');
 }
 
-// --- THEME TOGGLE (#3) ---
+/**
+ * Alterna el tema de la aplicación (Claro / Oscuro).
+ */
 function toggleTheme() {
     const body = document.body;
     const btn = document.getElementById('themeToggleBtn');
@@ -1683,6 +1880,9 @@ function toggleTheme() {
     localStorage.setItem('appOpeTheme', isLight ? 'light' : 'dark');
 }
 
+/**
+ * Aplica el tema guardado en el arranque.
+ */
 function applyTheme() {
     const saved = localStorage.getItem('appOpeTheme');
     const btn = document.getElementById('themeToggleBtn');
@@ -1693,7 +1893,11 @@ function applyTheme() {
 }
 applyTheme();
 
-// --- ANIMACIONES (#4) ---
+/**
+ * Animación de conteo ascendente para números.
+ * @param {HTMLElement} element Elemento donde mostrar el número.
+ * @param {number} target Valor final.
+ */
 function animateCountUp(element, target) {
     let current = 0;
     const duration = 800;
@@ -1710,6 +1914,9 @@ function animateCountUp(element, target) {
     }, 30);
 }
 
+/**
+ * Lanza una animación de confeti en toda la pantalla.
+ */
 function launchConfetti() {
     const canvas = document.getElementById('confettiCanvas');
     const ctx = canvas.getContext('2d');
@@ -1761,7 +1968,9 @@ function launchConfetti() {
     requestAnimationFrame(draw);
 }
 
-// --- QUESTION NAVIGATOR (#10) ---
+/**
+ * Abre/Cierra el panel de navegación rápida por preguntas (Grid).
+ */
 function toggleNavigator() {
     const grid = document.getElementById('questionNavGrid');
     grid.classList.toggle('hidden');
@@ -1770,6 +1979,9 @@ function toggleNavigator() {
     }
 }
 
+/**
+ * Renderiza los botones de navegación rápida.
+ */
 function renderQuestionNavigator() {
     const grid = document.getElementById('questionNavGrid');
     if (!grid || grid.classList.contains('hidden')) return;
@@ -1789,16 +2001,23 @@ function renderQuestionNavigator() {
     }
 }
 
+/**
+ * Salta directamente a una pregunta específica.
+ * @param {number} index Índice de la pregunta.
+ */
 function jumpToQuestion(index) {
     if (index < 0 || index >= testQuestions.length) return;
+    // En modo normal, no se puede saltar hacia adelante si no se ha respondido la actual
     if (testMode !== 'examen' && !reviewMode && !userAnswers[index] && index !== currentQuestionIndex) {
-        // In normal mode, can only jump to answered or current
         if (userAnswers[currentQuestionIndex] === null) return;
     }
     currentQuestionIndex = index;
     renderQuestion();
 }
 
+/**
+ * Marca/Desmarca la pregunta actual con una bandera (flag) para revisión.
+ */
 function toggleFlag() {
     const idx = currentQuestionIndex;
     const pos = flaggedQuestions.indexOf(idx);
@@ -1812,7 +2031,9 @@ function toggleFlag() {
     renderQuestionNavigator();
 }
 
-// --- RESULT REVIEW (#2) ---
+/**
+ * Abre/Cierra la lista detallada de revisión de respuestas tras finalizar un test.
+ */
 function toggleResultReview() {
     const section = document.getElementById('resultReviewSection');
     const isHidden = section.classList.contains('hidden');
@@ -1824,6 +2045,9 @@ function toggleResultReview() {
     }
 }
 
+/**
+ * Dibuja la lista de revisión con iconos de acierto/error y desplegable de detalles.
+ */
 function renderResultReview() {
     if (!lastTestResults) return;
     const container = document.getElementById('resultReviewList');
@@ -1852,7 +2076,6 @@ function renderResultReview() {
                 existing.remove();
                 return;
             }
-            // Remove other open details
             container.querySelectorAll('.result-review-detail').forEach(d => d.remove());
             
             const detail = document.createElement('div');
@@ -1874,9 +2097,7 @@ function renderResultReview() {
                 html += `<div style="${style}"><strong>${letter})</strong> ${q.opciones[letter]}</div>`;
             });
             
-            if (answer === null) {
-                html += `<p style="margin-top:0.5rem;color:var(--text-secondary);font-size:0.85rem;">No respondida</p>`;
-            }
+            if (answer === null) html += `<p style="margin-top:0.5rem;color:var(--text-secondary);font-size:0.85rem;">No respondida</p>`;
             
             detail.innerHTML = html;
             item.after(detail);
@@ -1886,16 +2107,13 @@ function renderResultReview() {
     });
 }
 
+/**
+ * Inicia un nuevo test rápido compuesto solo por las preguntas falladas en el último intento.
+ */
 function retryFailedQuestions() {
     if (!lastTestResults) return;
     const { testQuestions: tq, userAnswers: ua } = lastTestResults;
-    
-    const failed = [];
-    for (let i = 0; i < tq.length; i++) {
-        if (ua[i] !== null && ua[i] !== tq[i].respuestaCorrecta) {
-            failed.push(tq[i]);
-        }
-    }
+    const failed = tq.filter((q, i) => ua[i] !== null && ua[i] !== q.respuestaCorrecta);
     
     if (failed.length === 0) {
         alert('No hay preguntas falladas para repetir.');
@@ -1914,7 +2132,6 @@ function retryFailedQuestions() {
     userAnswers = new Array(testQuestions.length).fill(null);
     flaggedQuestions = [];
     
-    // In retry mode (normal), hide navigator and flag button
     document.getElementById('questionNavWrapper').classList.add('hidden');
     document.getElementById('questionNavGrid').classList.add('hidden');
     const retryFlagBtn = document.getElementById('flagQuestionBtn');
@@ -1924,108 +2141,37 @@ function retryFailedQuestions() {
     renderQuestion();
 }
 
-
-
-// ===== SISTEMA DE LOGROS (#11) =====
-
+/** 
+ * DEFINICIÓN DEL SISTEMA DE LOGROS
+ */
 const ACHIEVEMENTS = [
-    {
-        id: 'primer_test',
-        icon: '\ud83e\udd49',
-        name: 'Primer Test',
-        desc: 'Completa tu primer test o examen.',
-        check: () => {
-            const history = JSON.parse(localStorage.getItem('antigravity_history') || '[]');
-            return history.length >= 1;
-        }
-    },
-    {
-        id: 'decena',
-        icon: '\ud83d\udcd6',
-        name: 'Estudiante Constante',
-        desc: 'Completa 10 tests o ex\u00e1menes.',
-        check: () => {
-            const history = JSON.parse(localStorage.getItem('antigravity_history') || '[]');
-            return history.length >= 10;
-        }
-    },
-    {
-        id: 'francotirador',
-        icon: '\ud83c\udfaf',
-        name: 'Francotirador',
-        desc: 'Consigue un 100% en un test de 50+ preguntas.',
-        check: (ctx) => {
-            if (ctx && ctx.context === 'finish' && ctx.percentage === 100 && ctx.total >= 50) return true;
-            const history = JSON.parse(localStorage.getItem('antigravity_history') || '[]');
-            return history.some(r => r.total >= 50 && r.correct === r.total && r.answered === r.total);
-        }
-    },
-    {
-        id: 'perfeccionista',
-        icon: '\ud83d\udc8e',
-        name: 'Perfeccionista',
-        desc: 'Responde 10 preguntas seguidas correctamente en un test.',
-        check: () => {
-            return !!localStorage.getItem('appOpeAch_streak10');
-        }
-    },
-    {
-        id: 'racha_7',
-        icon: '\ud83d\udd25',
-        name: 'Racha de 7',
-        desc: '7 d\u00edas seguidos estudiando.',
-        check: (ctx) => {
-            if (ctx && ctx.context === 'streak' && ctx.streak >= 7) return true;
-            const streakData = JSON.parse(localStorage.getItem('appOpeStudyStreak') || '{"streak":0}');
-            return streakData.streak >= 7;
-        }
-    },
-    {
-        id: 'enciclopedia',
-        icon: '\ud83d\udcda',
-        name: 'Enciclopedia',
-        desc: 'Has visto al menos 500 preguntas distintas.',
-        check: () => {
-            const statsMap = JSON.parse(localStorage.getItem('appOpeQuestionStats') || '{}');
-            return Object.keys(statsMap).length >= 500;
-        }
-    },
-    {
-        id: 'coleccionista',
-        icon: '\u2b50',
-        name: 'Coleccionista',
-        desc: 'Marca 50 preguntas como favoritas.',
-        check: () => {
-            const favs = JSON.parse(localStorage.getItem('appOpeFavorites') || '[]');
-            return favs.length >= 50;
-        }
-    }
+    { id: 'primer_test', icon: '\ud83e\udd49', name: 'Primer Test', desc: 'Completa tu primer test o examen.', check: () => JSON.parse(localStorage.getItem('antigravity_history') || '[]').length >= 1 },
+    { id: 'decena', icon: '\ud83d\udcd6', name: 'Estudiante Constante', desc: 'Completa 10 tests o ex\u00e1menes.', check: () => JSON.parse(localStorage.getItem('antigravity_history') || '[]').length >= 10 },
+    { id: 'francotirador', icon: '\ud83c\udfaf', name: 'Francotirador', desc: 'Consigue un 100% en un test de 50+ preguntas.', check: (ctx) => (ctx && ctx.context === 'finish' && ctx.percentage === 100 && ctx.total >= 50) || JSON.parse(localStorage.getItem('antigravity_history') || '[]').some(r => r.total >= 50 && r.correct === r.total && r.answered === r.total) },
+    { id: 'perfeccionista', icon: '\ud83d\udc8e', name: 'Perfeccionista', desc: 'Responde 10 preguntas seguidas correctamente en un test.', check: () => !!localStorage.getItem('appOpeAch_streak10') },
+    { id: 'racha_7', icon: '\ud83d\udd25', name: 'Racha de 7', desc: '7 d\u00edas seguidos estudiando.', check: (ctx) => (ctx && ctx.context === 'streak' && ctx.streak >= 7) || JSON.parse(localStorage.getItem('appOpeStudyStreak') || '{"streak":0}').streak >= 7 },
+    { id: 'enciclopedia', icon: '\ud83d\udcda', name: 'Enciclopedia', desc: 'Has visto al menos 500 preguntas distintas.', check: () => Object.keys(JSON.parse(localStorage.getItem('appOpeQuestionStats') || '{}')).length >= 500 },
+    { id: 'coleccionista', icon: '\u2b50', name: 'Coleccionista', desc: 'Marca 50 preguntas como favoritas.', check: () => JSON.parse(localStorage.getItem('appOpeFavorites') || '[]').length >= 50 }
 ];
 
-function loadUnlockedAchievements() {
-    return JSON.parse(localStorage.getItem('appOpeAchievements') || '{}');
-}
-
-function saveUnlockedAchievements(data) {
-    localStorage.setItem('appOpeAchievements', JSON.stringify(data));
-}
+function loadUnlockedAchievements() { return JSON.parse(localStorage.getItem('appOpeAchievements') || '{}'); }
+function saveUnlockedAchievements(data) { localStorage.setItem('appOpeAchievements', JSON.stringify(data)); }
 
 let achievementToastQueue = [];
 let achievementToastActive = false;
 
+/**
+ * Comprueba si el usuario ha cumplido las condiciones para desbloquear nuevos logros.
+ * @param {Object} ctx Contexto del evento (finish, answer, streak, etc.)
+ */
 function checkAndUnlockAchievements(ctx = {}) {
     if (ctx.context === 'answer' && testMode !== 'examen') {
         let streak = 0;
         for (let i = 0; i <= currentQuestionIndex; i++) {
-            if (userAnswers[i] && testQuestions[i] && userAnswers[i] === testQuestions[i].respuestaCorrecta) {
-                streak++;
-            } else {
-                streak = 0;
-            }
+            if (userAnswers[i] && testQuestions[i] && userAnswers[i] === testQuestions[i].respuestaCorrecta) streak++;
+            else streak = 0;
         }
-        if (streak >= 10) {
-            localStorage.setItem('appOpeAch_streak10', '1');
-        }
+        if (streak >= 10) localStorage.setItem('appOpeAch_streak10', '1');
     }
 
     const unlocked = loadUnlockedAchievements();
@@ -2051,15 +2197,10 @@ function checkAndUnlockAchievements(ctx = {}) {
 }
 
 function processToastQueue() {
-    if (achievementToastQueue.length === 0) {
-        achievementToastActive = false;
-        return;
-    }
+    if (achievementToastQueue.length === 0) { achievementToastActive = false; return; }
     achievementToastActive = true;
     const ach = achievementToastQueue.shift();
-    showAchievementToast(ach, () => {
-        setTimeout(processToastQueue, 400);
-    });
+    showAchievementToast(ach, () => setTimeout(processToastQueue, 400));
 }
 
 function showAchievementToast(ach, onDone) {
@@ -2067,78 +2208,40 @@ function showAchievementToast(ach, onDone) {
     document.getElementById('achievementToastIcon').textContent = ach.icon;
     document.getElementById('achievementToastName').textContent = ach.name;
     document.getElementById('achievementToastDesc').textContent = ach.desc;
-
     const iconEl = document.getElementById('achievementToastIcon');
-    iconEl.style.animation = 'none';
-    void iconEl.offsetWidth;
-    iconEl.style.animation = '';
-
+    iconEl.style.animation = 'none'; void iconEl.offsetWidth; iconEl.style.animation = '';
     toast.classList.add('show');
-
-    setTimeout(() => {
-        toast.classList.remove('show');
-        if (onDone) setTimeout(onDone, 500);
-    }, 3500);
+    setTimeout(() => { toast.classList.remove('show'); if (onDone) setTimeout(onDone, 500); }, 3500);
 }
 
 function updateAchievementsBadge() {
     const unlocked = loadUnlockedAchievements();
-    const count = Object.keys(unlocked).length;
-    const total = ACHIEVEMENTS.length;
     const badge = document.getElementById('achievementsUnlockedBadge');
-    if (badge) badge.textContent = count + '/' + total;
+    if (badge) badge.textContent = Object.keys(unlocked).length + '/' + ACHIEVEMENTS.length;
 }
 
-function openAchievementsModal() {
-    renderAchievementsModal();
-    document.getElementById('achievementsModal').classList.add('open');
-}
+function openAchievementsModal() { renderAchievementsModal(); document.getElementById('achievementsModal').classList.add('open'); }
+function closeAchievementsModal() { document.getElementById('achievementsModal').classList.remove('open'); }
 
-function closeAchievementsModal() {
-    document.getElementById('achievementsModal').classList.remove('open');
-}
-
+/**
+ * Renderiza el modal de logros con tarjetas desbloqueadas y bloqueadas.
+ */
 function renderAchievementsModal() {
     const unlocked = loadUnlockedAchievements();
     const total = ACHIEVEMENTS.length;
     const count = Object.keys(unlocked).length;
-
     document.getElementById('achievementsProgressText').textContent = count + ' de ' + total + ' desbloqueados';
-    const pct = total > 0 ? (count / total) * 100 : 0;
-    document.getElementById('achievementsProgressFill').style.width = pct + '%';
-
+    document.getElementById('achievementsProgressFill').style.width = (total > 0 ? (count / total) * 100 : 0) + '%';
     const grid = document.getElementById('achievementsGrid');
     grid.innerHTML = '';
-
-    const sorted = [...ACHIEVEMENTS].sort((a, b) => {
-        const aU = !!unlocked[a.id];
-        const bU = !!unlocked[b.id];
-        if (aU && !bU) return -1;
-        if (!aU && bU) return 1;
-        return 0;
-    });
-
-    sorted.forEach(ach => {
+    [...ACHIEVEMENTS].sort((a, b) => (!!unlocked[a.id] === !!unlocked[b.id]) ? 0 : (!!unlocked[a.id] ? -1 : 1)).forEach(ach => {
         const isUnlocked = !!unlocked[ach.id];
         const card = document.createElement('div');
         card.className = 'achievement-card ' + (isUnlocked ? 'unlocked' : 'locked');
-        card.setAttribute('data-id', ach.id);
-
-        const dateStr = isUnlocked
-            ? '<div class="achievement-date">\ud83d\udcc5 ' + unlocked[ach.id].date + '</div>'
-            : '';
-
-        card.innerHTML =
-            '<span class="achievement-badge">' + (isUnlocked ? '\u2713 Obtenido' : 'Bloqueado') + '</span>' +
-            '<div class="achievement-icon">' + ach.icon + '</div>' +
-            '<div class="achievement-name">' + ach.name + '</div>' +
-            '<div class="achievement-desc">' + ach.desc + '</div>' +
-            dateStr;
-
+        card.innerHTML = `<span class="achievement-badge">${isUnlocked ? '\u2713 Obtenido' : 'Bloqueado'}</span><div class="achievement-icon">${ach.icon}</div><div class="achievement-name">${ach.name}</div><div class="achievement-desc">${ach.desc}</div>${isUnlocked ? '<div class="achievement-date">\ud83d\udcc5 ' + unlocked[ach.id].date + '</div>' : ''}`;
         grid.appendChild(card);
     });
 }
 
-window.addEventListener('load', () => {
-    setTimeout(() => checkAndUnlockAchievements({ context: 'load' }), 2000);
-});
+// Comprobación inicial de logros al cargar
+window.addEventListener('load', () => setTimeout(() => checkAndUnlockAchievements({ context: 'load' }), 2000));

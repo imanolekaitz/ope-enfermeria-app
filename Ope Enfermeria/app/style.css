@@ -1,3 +1,4 @@
+/* ===== VARIABLES Y SISTEMA DE DISEÑO ===== */
 :root {
     --bg-dark: #09090b;
     --panel-bg: rgba(24, 24, 27, 0.7);
@@ -96,6 +97,8 @@ body.light-mode #errorModal .glass-panel {
     background: var(--surface-hover);
 }
 
+
+/* ===== REGLAS GLOBALES Y RESET ===== */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -156,7 +159,7 @@ body {
     100% { transform: translateY(30px) scale(1.05); }
 }
 
-/* Vistas / Pantallas */
+/* ===== PANTALLAS Y CONTENEDORES PRINCIPALES ===== */
 .screen {
     display: none;
     width: 100%;
@@ -180,7 +183,7 @@ body {
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* Paneles Glassmorphism */
+/* ===== COMPONENTES DE UI (BOTONES, PANELES) ===== */
 .glass-panel {
     background: var(--panel-bg);
     backdrop-filter: blur(16px);
@@ -1202,6 +1205,8 @@ body.light-mode .achievement-card.locked {
 }
 
 /* Mobile Optimizations */
+
+/* ===== RESPONSIVIDAD (MEDIA QUERIES) ===== */
 @media (max-width: 600px) {
     .glass-panel {
         padding: 1.5rem;
