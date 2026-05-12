@@ -79,86 +79,96 @@ class StorageService {
              * MAPEO ESTRATÉGICO HACIA TABLAS SUPABASE
              */
             if (key === 'appOpeFavorites') {
-                // Mapeo a user_question_data (is_favorite)
                 const favorites = JSON.parse(value || '[]');
-                // Procesamos el último delta o hacemos un barrido seguro
-                // Para simplificar y asegurar, hacemos un volcado estructurado
-                for (const hash of favorites) {
-                    await this.supabase.from('user_question_data').upsert({
-                        user_id: userId,
-                        question_hash: hash,
-                        is_favorite: true,
-                        updated_at: new Date().toISOString()
-                    }, { onConflict: 'user_id, question_hash' });
+                const batch = favorites.map(hash => ({
+                    user_id: userId,
+                    question_hash: hash,
+                    is_favorite: true,
+                    updated_at: new Date().toISOString()
+                }));
+                for (let i = 0; i < batch.length; i += 200) {
+                    await this.supabase.from('user_question_data').upsert(batch.slice(i, i + 200), { onConflict: 'user_id, question_hash' });
                 }
             } 
             else if (key === 'appOpeNotes') {
                 const notesMap = JSON.parse(value || '{}');
-                for (const [hash, note] of Object.entries(notesMap)) {
-                    await this.supabase.from('user_question_data').upsert({
-                        user_id: userId,
-                        question_hash: hash,
-                        user_note: note,
-                        updated_at: new Date().toISOString()
-                    }, { onConflict: 'user_id, question_hash' });
+                const batch = Object.entries(notesMap).map(([hash, note]) => ({
+                    user_id: userId,
+                    question_hash: hash,
+                    user_note: note,
+                    updated_at: new Date().toISOString()
+                }));
+                for (let i = 0; i < batch.length; i += 200) {
+                    await this.supabase.from('user_question_data').upsert(batch.slice(i, i + 200), { onConflict: 'user_id, question_hash' });
                 }
             }
             else if (key === 'appOpeQuestionStats') {
                 const statsMap = JSON.parse(value || '{}');
-                // Almacena analíticas individuales de visualización
-                for (const [hash, stats] of Object.entries(statsMap)) {
-                    await this.supabase.from('user_question_stats').upsert({
-                        user_id: userId,
-                        question_hash: hash,
-                        seen_count: stats.seen || 0,
-                        correct_count: stats.correct || 0,
-                        wrong_count: stats.wrong || 0,
-                        updated_at: new Date().toISOString()
-                    }, { onConflict: 'user_id, question_hash' });
+                const batch = Object.entries(statsMap).map(([hash, stats]) => ({
+                    user_id: userId,
+                    question_hash: hash,
+                    seen_count: stats.seen || 0,
+                    correct_count: stats.correct || 0,
+                    wrong_count: stats.wrong || 0,
+                    updated_at: new Date().toISOString()
+                }));
+                for (let i = 0; i < batch.length; i += 200) {
+                    await this.supabase.from('user_question_stats').upsert(batch.slice(i, i + 200), { onConflict: 'user_id, question_hash' });
                 }
             }
             else if (key === 'antigravity_failures') {
                 const failuresMap = JSON.parse(value || '{}');
-                for (const [hash, count] of Object.entries(failuresMap)) {
-                    await this.supabase.from('user_question_stats').upsert({
-                        user_id: userId,
-                        question_hash: hash,
-                        failures_count: count,
-                        updated_at: new Date().toISOString()
-                    }, { onConflict: 'user_id, question_hash' });
+                const batch = Object.entries(failuresMap).map(([hash, count]) => ({
+                    user_id: userId,
+                    question_hash: hash,
+                    failures_count: count,
+                    updated_at: new Date().toISOString()
+                }));
+                for (let i = 0; i < batch.length; i += 200) {
+                    await this.supabase.from('user_question_stats').upsert(batch.slice(i, i + 200), { onConflict: 'user_id, question_hash' });
                 }
             }
             else if (key === 'antigravity_last_seen_test') {
                 const lastSeenMap = JSON.parse(value || '{}');
-                for (const [hash, testIndex] of Object.entries(lastSeenMap)) {
-                    await this.supabase.from('user_question_stats').upsert({
-                        user_id: userId,
-                        question_hash: hash,
-                        last_seen_test_index: testIndex,
-                        updated_at: new Date().toISOString()
-                    }, { onConflict: 'user_id, question_hash' });
+                const batch = Object.entries(lastSeenMap).map(([hash, testIndex]) => ({
+                    user_id: userId,
+                    question_hash: hash,
+                    last_seen_test_index: testIndex,
+                    updated_at: new Date().toISOString()
+                }));
+                for (let i = 0; i < batch.length; i += 200) {
+                    await this.supabase.from('user_question_stats').upsert(batch.slice(i, i + 200), { onConflict: 'user_id, question_hash' });
                 }
             }
             else if (key === 'ope_achievements') {
                 const achievements = JSON.parse(value || '[]');
-                for (const achId of achievements) {
-                    await this.supabase.from('user_achievements').upsert({
-                        user_id: userId,
-                        achievement_id: achId,
-                        unlocked_at: new Date().toISOString()
-                    }, { onConflict: 'user_id, achievement_id' });
+                const batch = achievements.map(achId => ({
+                    user_id: userId,
+                    achievement_id: achId,
+                    unlocked_at: new Date().toISOString()
+                }));
+                for (let i = 0; i < batch.length; i += 200) {
+                    await this.supabase.from('user_achievements').upsert(batch.slice(i, i + 200), { onConflict: 'user_id, achievement_id' });
                 }
             }
             else if (key === 'antigravity_test_counter' || key === 'ope_streak') {
-                // Actualiza estadísticas globales en el perfil del usuario
                 const totalTests = parseInt(localStorage.getItem('antigravity_test_counter') || '0', 10);
                 const streakData = JSON.parse(localStorage.getItem('ope_streak') || '{}');
                 
-                await this.supabase.from('user_profiles').update({
+                await this.supabase.from('user_profiles').upsert({
+                    user_id: userId,
                     current_streak: streakData.count || 0,
                     last_active_date: streakData.lastDate || '',
-                    total_tests_completed: totalTests
-                }).eq('user_id', userId);
+                    total_tests_completed: totalTests,
+                    updated_at: new Date().toISOString()
+                }, { onConflict: 'user_id' });
+            }
+            else if (key === 'antigravity_history') {
+                // Propagación ultrarrobusta e independiente de esquemas en user_metadata del token
+                const historyArr = JSON.parse(value || '[]');
+                await this.supabase.auth.updateUser({
+                    data: { antigravity_history: historyArr }
+                });
             }
         } catch (error) {
             // Guardar acción fallida en cola persistente si hay un problema temporal de red o base de datos
@@ -267,6 +277,11 @@ class StorageService {
                 localStorage.setItem('ope_achievements', JSON.stringify(achList));
             }
 
+            // 5. Restaurar el Historial de Sesiones desde los Metadatos Nativos
+            if (user.user_metadata && user.user_metadata.antigravity_history) {
+                localStorage.setItem('antigravity_history', JSON.stringify(user.user_metadata.antigravity_history));
+            }
+
             console.log('✅ Estado consolidado perfectamente en memoria local.');
             // Disparar evento a la UI para repintar si estamos en pantalla activa
             window.dispatchEvent(new CustomEvent('cloudStateSynced'));
@@ -326,7 +341,8 @@ class StorageService {
             'antigravity_last_seen_test',
             'ope_achievements',
             'antigravity_test_counter',
-            'ope_streak'
+            'ope_streak',
+            'antigravity_history'
         ];
         
         let totalItemsMerged = 0;
