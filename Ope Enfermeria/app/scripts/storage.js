@@ -151,13 +151,13 @@ class StorageService {
                     await this.supabase.from('user_achievements').upsert(batch.slice(i, i + 200), { onConflict: 'user_id, achievement_id' });
                 }
             }
-            else if (key === 'antigravity_test_counter' || key === 'ope_streak') {
+            else if (key === 'antigravity_test_counter' || key === 'appOpeStudyStreak') {
                 const totalTests = parseInt(localStorage.getItem('antigravity_test_counter') || '0', 10);
-                const streakData = JSON.parse(localStorage.getItem('ope_streak') || '{}');
+                const streakData = JSON.parse(localStorage.getItem('appOpeStudyStreak') || '{}');
                 
                 await this.supabase.from('user_profiles').upsert({
                     user_id: userId,
-                    current_streak: streakData.count || 0,
+                    current_streak: streakData.streak || 0,
                     last_active_date: streakData.lastDate || '',
                     total_tests_completed: totalTests,
                     updated_at: new Date().toISOString()
@@ -229,8 +229,8 @@ class StorageService {
                     localStorage.setItem('antigravity_test_counter', profile.total_tests_completed.toString());
                 }
                 if (profile.current_streak) {
-                    localStorage.setItem('ope_streak', JSON.stringify({
-                        count: profile.current_streak,
+                    localStorage.setItem('appOpeStudyStreak', JSON.stringify({
+                        streak: profile.current_streak,
                         lastDate: profile.last_active_date || ''
                     }));
                 }
@@ -341,7 +341,7 @@ class StorageService {
             'antigravity_last_seen_test',
             'ope_achievements',
             'antigravity_test_counter',
-            'ope_streak',
+            'appOpeStudyStreak',
             'antigravity_history'
         ];
         

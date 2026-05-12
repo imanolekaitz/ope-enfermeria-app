@@ -175,6 +175,9 @@ window.addEventListener('cloudStateSynced', () => {
     updateStreakUI();
     updateAchievementsBadge();
     checkSavedSession();
+    if (typeof renderHistory === 'function') {
+        renderHistory();
+    }
     if (typeof testScreen !== 'undefined' && testScreen?.classList.contains('active') && typeof renderQuestion === 'function') {
         renderQuestion();
     }
