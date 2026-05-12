@@ -2420,3 +2420,28 @@ function requestUserAccountDeletion() {
         }
     }
 }
+
+// --- BASTIONADO DE SEGURIDAD: CIERRE AUTOMÁTICO DE SESIÓN POR INACTIVIDAD ---
+let inactivityTimerTimeout = null;
+const INACTIVITY_LIMIT_MS = 7 * 24 * 60 * 60 * 1000; // 7 días en milisegundos
+
+function resetInactivityTimer() {
+    if (inactivityTimerTimeout) clearTimeout(inactivityTimerTimeout);
+    inactivityTimerTimeout = setTimeout(() => {
+        // Ejecutar cierre de sesión si existe la capa de almacenamiento activa
+        if (window.appStorage && window.appStorage.supabase) {
+            console.log('🔒 Límite de inactividad superado (7 días). Cerrando sesión nativa por seguridad...');
+            window.appStorage.logout().then(() => {
+                alert("🔒 Sesión cerrada por inactividad prolongada por seguridad.");
+            }).catch(e => console.warn('Aviso cerrando sesión por inactividad:', e));
+        }
+    }, INACTIVITY_LIMIT_MS);
+}
+
+// Iniciar y enlazar eventos pasivos de monitoreo al montar el DOM
+window.addEventListener('DOMContentLoaded', () => {
+    resetInactivityTimer();
+    ['click', 'touchstart', 'keydown', 'scroll'].forEach(evt => {
+        document.addEventListener(evt, resetInactivityTimer, { passive: true });
+    });
+});
