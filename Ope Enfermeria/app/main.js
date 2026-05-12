@@ -171,6 +171,14 @@ function getQuestionKey(q) {
 }
 
 document.addEventListener('DOMContentLoaded', autoLoadQuestions);
+window.addEventListener('cloudStateSynced', () => {
+    updateStreakUI();
+    updateAchievementsBadge();
+    checkSavedSession();
+    if (typeof testScreen !== 'undefined' && testScreen?.classList.contains('active') && typeof renderQuestion === 'function') {
+        renderQuestion();
+    }
+});
 startTestBtn.addEventListener('click', () => startTest('normal'));
 startExamBtn.addEventListener('click', () => startTest('examen'));
 startFavoritesBtn.addEventListener('click', () => startTest('favoritas'));
@@ -297,6 +305,10 @@ async function autoLoadQuestions() {
         checkSavedSession();
         updateStreakUI();
         updateAchievementsBadge();
+        // Consolidar estado remoto asíncronamente desde la nube
+        if (window.appStorage) {
+            window.appStorage.pullAndConsolidateCloudState();
+        }
     } catch (e) {
         console.error("Error cargando las preguntas:", e);
         const loadingMessage = document.getElementById('loadingMessage');
@@ -679,9 +691,9 @@ function handleAnswerSelected(selectedBtn, selectedLetter, correctLetter) {
             failuresMap[hash] = (failuresMap[hash] || 0) + 1;
         }
         
-        localStorage.setItem('antigravity_failures', JSON.stringify(failuresMap));
-        localStorage.setItem('antigravity_last_seen_test', JSON.stringify(lastSeenMap));
-        localStorage.setItem('appOpeQuestionStats', JSON.stringify(statsMap));
+        window.appStorage.setItem('antigravity_failures', JSON.stringify(failuresMap));
+        window.appStorage.setItem('antigravity_last_seen_test', JSON.stringify(lastSeenMap));
+        window.appStorage.setItem('appOpeQuestionStats', JSON.stringify(statsMap));
 
         // Comprobar logros relacionados con tests normales
         checkAndUnlockAchievements({ context: 'answer' });
@@ -985,7 +997,7 @@ function saveResult() {
     
     // Incrementar contador global de tests realizados
     let currentTestCounter = parseInt(localStorage.getItem('antigravity_test_counter') || '0', 10) + 1;
-    localStorage.setItem('antigravity_test_counter', currentTestCounter.toString());
+    window.appStorage.setItem('antigravity_test_counter', currentTestCounter.toString());
     
     let respondidas = 0;
     
@@ -1020,9 +1032,9 @@ function saveResult() {
     }
     
     if (testMode === 'examen') {
-        localStorage.setItem('antigravity_failures', JSON.stringify(failuresMap));
-        localStorage.setItem('antigravity_last_seen_test', JSON.stringify(lastSeenMap));
-        localStorage.setItem('appOpeQuestionStats', JSON.stringify(statsMap));
+        window.appStorage.setItem('antigravity_failures', JSON.stringify(failuresMap));
+        window.appStorage.setItem('antigravity_last_seen_test', JSON.stringify(lastSeenMap));
+        window.appStorage.setItem('appOpeQuestionStats', JSON.stringify(statsMap));
     }
     
     const record = {
@@ -1034,7 +1046,7 @@ function saveResult() {
     };
     
     historyData.push(record);
-    localStorage.setItem('antigravity_history', JSON.stringify(historyData));
+    window.appStorage.setItem('antigravity_history', JSON.stringify(historyData));
 }
 
 /**
@@ -1268,7 +1280,7 @@ function getDailyFlashcards() {
         }
     }
     
-    localStorage.setItem('antigravity_daily_flashcards', JSON.stringify({
+    window.appStorage.setItem('antigravity_daily_flashcards', JSON.stringify({
         date: todayStr,
         questions: fcs
     }));
@@ -1413,7 +1425,7 @@ function toggleFavoriteAction(q, btnElement) {
             btnElement.innerHTML = btnElement.id === 'statsToggleFavBtn' ? '⭐ Favorita' : '⭐';
         }
     }
-    localStorage.setItem('appOpeFavorites', JSON.stringify(favs));
+    window.appStorage.setItem('appOpeFavorites', JSON.stringify(favs));
     
     // Comprobar logro de coleccionista
     checkAndUnlockAchievements({ context: 'favorite' });
@@ -1478,7 +1490,7 @@ function saveNote() {
     if (val) notes[qKey] = val;
     else delete notes[qKey];
     
-    localStorage.setItem('appOpeNotes', JSON.stringify(notes));
+    window.appStorage.setItem('appOpeNotes', JSON.stringify(notes));
     noteModal.style.display = 'none';
     
     // Refrescar UI pertinente
@@ -1501,7 +1513,7 @@ function deleteNote() {
     const notes = JSON.parse(localStorage.getItem('appOpeNotes') || '{}');
     const qKey = getQuestionKey(q);
     delete notes[qKey];
-    localStorage.setItem('appOpeNotes', JSON.stringify(notes));
+    window.appStorage.setItem('appOpeNotes', JSON.stringify(notes));
     noteModal.style.display = 'none';
     
     if (testScreen.classList.contains('active') && testQuestions[currentQuestionIndex] && getQuestionKey(testQuestions[currentQuestionIndex]) === qKey) {
@@ -1705,7 +1717,7 @@ function pauseTest() {
         date: new Date().toISOString()
     };
     
-    localStorage.setItem('appOpeSavedSession', JSON.stringify(session));
+    window.appStorage.setItem('appOpeSavedSession', JSON.stringify(session));
     if (examTimerInterval) {
         clearInterval(examTimerInterval);
         examTimerInterval = null;
@@ -1798,7 +1810,7 @@ function incrementStreak() {
     }
     
     streakData.lastDate = today;
-    localStorage.setItem('appOpeStudyStreak', JSON.stringify(streakData));
+    window.appStorage.setItem('appOpeStudyStreak', JSON.stringify(streakData));
     updateStreakUI();
     
     // Comprobar logro de racha
@@ -1818,7 +1830,7 @@ function updateStreakUI() {
         if (diffDays > 1) {
             // Perdió la racha ayer o antes
             streakData.streak = 0;
-            localStorage.setItem('appOpeStudyStreak', JSON.stringify(streakData));
+            window.appStorage.setItem('appOpeStudyStreak', JSON.stringify(streakData));
         }
     }
     
@@ -1849,14 +1861,14 @@ function migrateStorageKeys() {
             if (textToKey[key]) { newData[textToKey[key]] = val; changed = true; }
             else { newData[key] = val; }
         }
-        if (changed) localStorage.setItem(storageKey, JSON.stringify(newData));
+        if (changed) window.appStorage.setItem(storageKey, JSON.stringify(newData));
     }
     
     // Migrar favoritos (formato array)
     let favs = JSON.parse(localStorage.getItem('appOpeFavorites') || '[]');
     if (favs.length > 0 && favs[0] && favs[0].length > 30) {
         favs = favs.map(text => textToKey[text] || text);
-        localStorage.setItem('appOpeFavorites', JSON.stringify(favs));
+        window.appStorage.setItem('appOpeFavorites', JSON.stringify(favs));
     }
     
     migrateObject('appOpeNotes');
@@ -1877,7 +1889,7 @@ function toggleTheme() {
     body.classList.toggle('light-mode');
     const isLight = body.classList.contains('light-mode');
     btn.textContent = isLight ? '\u2600\ufe0f' : '\ud83c\udf19';
-    localStorage.setItem('appOpeTheme', isLight ? 'light' : 'dark');
+    window.appStorage.setItem('appOpeTheme', isLight ? 'light' : 'dark');
 }
 
 /**
@@ -2155,7 +2167,7 @@ const ACHIEVEMENTS = [
 ];
 
 function loadUnlockedAchievements() { return JSON.parse(localStorage.getItem('appOpeAchievements') || '{}'); }
-function saveUnlockedAchievements(data) { localStorage.setItem('appOpeAchievements', JSON.stringify(data)); }
+function saveUnlockedAchievements(data) { window.appStorage.setItem('appOpeAchievements', JSON.stringify(data)); }
 
 let achievementToastQueue = [];
 let achievementToastActive = false;
@@ -2171,7 +2183,7 @@ function checkAndUnlockAchievements(ctx = {}) {
             if (userAnswers[i] && testQuestions[i] && userAnswers[i] === testQuestions[i].respuestaCorrecta) streak++;
             else streak = 0;
         }
-        if (streak >= 10) localStorage.setItem('appOpeAch_streak10', '1');
+        if (streak >= 10) window.appStorage.setItem('appOpeAch_streak10', '1');
     }
 
     const unlocked = loadUnlockedAchievements();
@@ -2245,3 +2257,166 @@ function renderAchievementsModal() {
 
 // Comprobación inicial de logros al cargar
 window.addEventListener('load', () => setTimeout(() => checkAndUnlockAchievements({ context: 'load' }), 2000));
+
+/* ===== CONTROLADORES DE INTERFAZ DE AUTENTICACIÓN (FASE 4) ===== */
+let currentAuthTab = 'login';
+
+function openAuthModal() {
+    const modal = document.getElementById('authModal');
+    if (!modal) return;
+    modal.classList.remove('hidden');
+    refreshAuthModalViewState();
+}
+
+function closeAuthModal() {
+    const modal = document.getElementById('authModal');
+    if (modal) modal.classList.add('hidden');
+}
+
+async function refreshAuthModalViewState() {
+    if (!window.appStorage || !window.appStorage.supabase) return;
+    const { data: { session } } = await window.appStorage.supabase.auth.getSession();
+    const loggedPanel = document.getElementById('authLoggedPanel');
+    const formFields = document.getElementById('authFormFieldsContainer');
+    const emailDisplay = document.getElementById('authLoggedUserEmail');
+    const errorMsg = document.getElementById('authErrorMsg');
+    const tabBtns = document.querySelectorAll('#authModal button[id^="tab"]');
+
+    if (errorMsg) errorMsg.classList.add('hidden');
+
+    if (session && session.user) {
+        if (loggedPanel) loggedPanel.classList.remove('hidden');
+        if (formFields) formFields.classList.add('hidden');
+        if (emailDisplay) emailDisplay.textContent = session.user.email;
+        tabBtns.forEach(btn => btn.parentElement.classList.add('hidden'));
+    } else {
+        if (loggedPanel) loggedPanel.classList.add('hidden');
+        if (formFields) formFields.classList.remove('hidden');
+        tabBtns.forEach(btn => btn.parentElement.classList.remove('hidden'));
+    }
+}
+
+function switchAuthTab(tab) {
+    currentAuthTab = tab;
+    const loginBtn = document.getElementById('tabLoginBtn');
+    const regBtn = document.getElementById('tabRegisterBtn');
+    const errorMsg = document.getElementById('authErrorMsg');
+    const submitBtn = document.getElementById('authSubmitBtn');
+    
+    if (errorMsg) errorMsg.classList.add('hidden');
+
+    if (tab === 'login') {
+        if (loginBtn) { loginBtn.style.background = 'var(--accent)'; loginBtn.style.color = 'white'; }
+        if (regBtn) { regBtn.style.background = 'transparent'; regBtn.style.color = 'var(--text-secondary)'; }
+        if (submitBtn) submitBtn.textContent = 'Entrar';
+    } else {
+        if (regBtn) { regBtn.style.background = 'var(--accent)'; regBtn.style.color = 'white'; }
+        if (loginBtn) { loginBtn.style.background = 'transparent'; loginBtn.style.color = 'var(--text-secondary)'; }
+        if (submitBtn) submitBtn.textContent = 'Crear Cuenta';
+    }
+}
+
+async function submitAuthForm() {
+    const emailInput = document.getElementById('authEmailInput');
+    const passInput = document.getElementById('authPasswordInput');
+    const errorMsg = document.getElementById('authErrorMsg');
+    const submitBtn = document.getElementById('authSubmitBtn');
+
+    if (!emailInput || !passInput || !errorMsg) return;
+
+    const email = emailInput.value.trim();
+    const pass = passInput.value;
+
+    if (!email || !email.includes('@')) {
+        errorMsg.textContent = 'Por favor, introduce un correo electrónico válido.';
+        errorMsg.classList.remove('hidden');
+        return;
+    }
+
+    if (pass.length < 6) {
+        errorMsg.textContent = 'La contraseña debe tener al menos 6 caracteres.';
+        errorMsg.classList.remove('hidden');
+        return;
+    }
+
+    errorMsg.classList.add('hidden');
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = 'Conectando...';
+    submitBtn.disabled = true;
+
+    try {
+        let res;
+        if (currentAuthTab === 'login') {
+            res = await window.appStorage.loginWithEmail(email, pass);
+        } else {
+            res = await window.appStorage.registerWithEmail(email, pass);
+        }
+
+        if (res?.error) {
+            errorMsg.textContent = 'Error de acceso: ' + (res.error.message.includes('Invalid') ? 'Credenciales incorrectas o ya registrado' : res.error.message);
+            errorMsg.classList.remove('hidden');
+        } else {
+            // Éxito absoluto, recargamos el estado visual
+            refreshAuthModalViewState();
+            updateHeaderCloudTriggerBadge();
+            setTimeout(closeAuthModal, 1200);
+        }
+    } catch (err) {
+        errorMsg.textContent = 'Error de conexión con la nube.';
+        errorMsg.classList.remove('hidden');
+    } finally {
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+    }
+}
+
+// Sincronización continua de la cabecera minimalista
+async function updateHeaderCloudTriggerBadge() {
+    const triggerBtn = document.getElementById('cloudAuthTriggerBtn');
+    const statusIcon = document.getElementById('cloudAuthStatusIcon');
+    const statusText = document.getElementById('cloudAuthStatusText');
+    
+    if (!triggerBtn || !window.appStorage || !window.appStorage.supabase) return;
+
+    const { data: { session } } = await window.appStorage.supabase.auth.getSession();
+    if (session && session.user) {
+        triggerBtn.classList.add('synced');
+        triggerBtn.title = 'Sesión Activa: ' + session.user.email + ' (clic para gestionar)';
+        if (statusIcon) statusIcon.style.color = '#22c55e';
+        if (statusText) statusText.textContent = 'Sincronizado';
+    } else {
+        triggerBtn.classList.remove('synced');
+        triggerBtn.title = 'Sincronizar en la nube';
+        if (statusIcon) statusIcon.style.color = 'var(--text-secondary)';
+        if (statusText) statusText.textContent = 'Sincronizar';
+    }
+}
+
+// Escuchar consolidación global para repintar cabecera en vivo
+window.addEventListener('cloudStateSynced', () => {
+    updateHeaderCloudTriggerBadge();
+    refreshAuthModalViewState();
+});
+
+// Notificación animada tras registrarse y combinar con éxito
+window.addEventListener('cloudDataMerged', (e) => {
+    showAchievementToast({
+        icon: '☁️',
+        name: '¡Fusión Completa!',
+        desc: `Se han volcado ${e.detail?.count || 0} favoritos/notas a tu cuenta en la nube.`
+    });
+});
+
+// Carga inicial al montar la UI
+window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(updateHeaderCloudTriggerBadge, 500);
+});
+
+// Solicitud segura de borrado de cuenta e historial (Fase 5)
+function requestUserAccountDeletion() {
+    if (confirm("⚠️ ADVERTENCIA DE PRIVACIDAD:\n\n¿Estás totalmente seguro de que deseas cerrar sesión, desenlazar tu cuenta y borrar de inmediato todo tu historial local de estudio en este dispositivo?\n\nEsta acción de supresión local es irreversible.")) {
+        if (window.appStorage) {
+            window.appStorage.deleteUserAccount();
+        }
+    }
+}

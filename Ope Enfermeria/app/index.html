@@ -19,6 +19,12 @@
 </head>
 
 <body>
+    <div style="position: fixed; top: 1rem; right: 4.5rem; z-index: 999;">
+        <button id="cloudAuthTriggerBtn" onclick="openAuthModal()" style="background: var(--surface-subtle); border: 1px solid var(--border-color); color: var(--text-primary); padding: 0 1rem; height: 44px; border-radius: 22px; font-size: 0.95rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.4rem; backdrop-filter: blur(8px); transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+            <span id="cloudAuthStatusIcon" style="color: var(--text-secondary);">☁️</span>
+            <span id="cloudAuthStatusText" style="font-family: var(--font-body);">Sincronizar</span>
+        </button>
+    </div>
     <button class="theme-toggle" id="themeToggleBtn" title="Cambiar tema">🌙</button>
     <canvas id="confettiCanvas"></canvas>
     <div class="background-effects">
@@ -525,6 +531,22 @@
                     <strong>⚠️ Reportar Error</strong> para enviar un aviso por email con tu sugerencia de
                     corrección.
                 </li>
+                <li style="border-top: 1px solid var(--border-color); padding-top: 1.5rem; margin-top: 0.5rem;">
+                    <span style="font-size: 1.3rem; margin-bottom: 0.5rem; display: block; color: var(--accent);">☁️ <strong>Sincronización Multidispositivo</strong></span>
+                    Al hacer clic en el botón superior <strong>☁️ Sincronizar</strong>, puedes crear una cuenta o iniciar sesión mediante <strong>Google</strong> o Email/Contraseña. Esto te permite guardar tu historial, rachas, notas y favoritas de forma permanente en la nube para continuar estudiando exactamente en el mismo punto desde tu móvil, tablet u ordenador.
+                </li>
+                <li style="background: rgba(0,0,0,0.2); padding: 1.5rem; border-radius: 1rem; border: 1px solid var(--border-color);">
+                    <span style="font-size: 1.2rem; margin-bottom: 0.8rem; display: block; color: #4ade80;">🔐 <strong>Privacidad y Tratamiento de Datos</strong></span>
+                    <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.6rem;">Conforme al modelo de <em>Plantilla Estándar Open Source</em>, garantizamos la máxima transparencia y minimización de datos:</p>
+                    <ul style="list-style-type: disc; padding-left: 1.2rem; font-size: 0.9rem; color: var(--text-primary); display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1.2rem;">
+                        <li><strong>Responsable:</strong> Imanol Ekaitz (Ekaitzel) - Contacto: <a href="mailto:imanoleka@gmail.com" style="color: var(--accent);">imanoleka@gmail.com</a></li>
+                        <li><strong>Datos Recopilados:</strong> Únicamente el correo electrónico facilitado para el acceso y métricas de estudio estrictamente disociadas (hashes de preguntas). No se utilizan cookies de rastreo ni se recopilan direcciones IP.</li>
+                        <li><strong>Finalidad y Seguridad:</strong> Garantizar la continuidad de tus sesiones de estudio. Los datos se almacenan de forma totalmente cifrada bajo la infraestructura segura de Supabase.</li>
+                    </ul>
+                    <button onclick="requestUserAccountDeletion()" class="premium-btn secondary" style="background: #ef4444; color: white; border: none; padding: 0.6rem 1rem; font-size: 0.85rem; border-radius: 0.5rem; display: inline-flex; align-items: center; gap: 0.4rem;">
+                        🗑️ Eliminar mi Cuenta y Datos Almacenados
+                    </button>
+                </li>
             </ul>
         </div>
     </main>
@@ -690,6 +712,54 @@
         </div>
     </div>
 
+    <!-- MODAL DE AUTENTICACIÓN PREMIUM (GLASSMORPHISM) -->
+    <div id="authModal" class="modal-overlay hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 1000; display: flex; justify-content: center; align-items: center;">
+        <div class="glass-panel auth-panel" style="max-width: 420px; width: 90%; padding: 2.5rem; text-align: center; position: relative; animation: fadeInScale 0.3s ease-out;">
+            <button onclick="closeAuthModal()" style="position: absolute; top: 1rem; right: 1.2rem; background: transparent; border: none; color: var(--text-secondary); font-size: 1.2rem; cursor: pointer;">✕</button>
+            <h2 style="font-family: var(--font-heading); font-size: 1.8rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.5rem;">Cuenta en la Nube</h2>
+            <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 1.5rem;">Sincroniza tus estadísticas y favoritos en tiempo real</p>
+
+            <!-- Botón de Google OAuth -->
+            <button onclick="window.appStorage.loginWithGoogle()" class="google-auth-btn" style="width: 100%; padding: 0.8rem; background: white; color: #1f2937; border: none; border-radius: 0.75rem; font-weight: 600; font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 0.8rem; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-bottom: 1.2rem; transition: transform 0.2s;">
+                <svg width="20" height="20" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.5-.1.85-.29 1.5-1.12.75-2.55 1.2-4.31 1.2-3.32 0-6.17-2.22-7.18-5.22H2.63v4.35C4.36 19.89 7.95 22 12 22c3.29 0 6.05-1.09 8.07-2.96 2.11-1.95 2.11-4.78 3.675-6.77z"/>
+                    <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.01c-1.1.74-2.5 1.18-4.05 1.18-3.32 0-6.17-2.22-7.18-5.22H2.63v4.35C4.36 21.89 7.95 24 12 24z"/>
+                    <path fill="#FBBC05" d="M4.82 14.04c-.26-.77-.4-1.6-.4-2.46s.14-1.69.4-2.46V4.77H2.63C1.51 6.99 1 9.46 1 12s.51 5.01 1.63 7.23l2.19-1.69z"/>
+                    <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.95 0 4.36 2.11 2.63 5.65l2.19 1.69c1.01-3 3.86-5.22 7.18-5.22z"/>
+                </svg>
+                Continuar con Google
+            </button>
+
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.2rem;">
+                <div style="flex-grow: 1; height: 1px; background: var(--border-color);"></div>
+                <span style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase;">o con email</span>
+                <div style="flex-grow: 1; height: 1px; background: var(--border-color);"></div>
+            </div>
+
+            <!-- Pestañas Conmutables -->
+            <div style="display: flex; gap: 0.5rem; margin-bottom: 1.2rem; background: var(--surface-input); padding: 0.3rem; border-radius: 0.75rem;">
+                <button id="tabLoginBtn" onclick="switchAuthTab('login')" style="flex-grow: 1; padding: 0.5rem; border: none; background: var(--accent); color: white; border-radius: 0.5rem; font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: background 0.2s;">Iniciar Sesión</button>
+                <button id="tabRegisterBtn" onclick="switchAuthTab('register')" style="flex-grow: 1; padding: 0.5rem; border: none; background: transparent; color: var(--text-secondary); border-radius: 0.5rem; font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: color 0.2s;">Registrarse</button>
+            </div>
+
+            <!-- Formulario Email/Password -->
+            <div id="authFormFieldsContainer" style="display: flex; flex-direction: column; gap: 0.8rem; text-align: left;">
+                <input type="email" id="authEmailInput" placeholder="Correo electrónico" style="width: 100%; padding: 0.8rem; border-radius: 0.5rem; border: 1px solid var(--border-color); background: var(--surface-input); color: var(--text-primary); font-size: 0.95rem;">
+                <input type="password" id="authPasswordInput" placeholder="Contraseña (mín. 6 caracteres)" style="width: 100%; padding: 0.8rem; border-radius: 0.5rem; border: 1px solid var(--border-color); background: var(--surface-input); color: var(--text-primary); font-size: 0.95rem;">
+                <p id="authErrorMsg" class="hidden" style="color: #ef4444; font-size: 0.85rem; margin: 0; text-align: center;"></p>
+                <button id="authSubmitBtn" onclick="submitAuthForm()" class="premium-btn primary" style="width: 100%; padding: 0.8rem; font-size: 1rem; margin-top: 0.5rem;">Entrar</button>
+            </div>
+
+            <!-- Panel logueado minimalista -->
+            <div id="authLoggedPanel" class="hidden" style="margin-top: 1rem;">
+                <div style="display: inline-flex; align-items: center; justify-content: center; width: 48px; height: 48px; border-radius: 50%; background: rgba(34, 197, 94, 0.15); color: #22c55e; font-size: 1.5rem; margin-bottom: 0.5rem;">✓</div>
+                <p style="color: #22c55e; font-weight: 600; font-size: 1.05rem; margin-bottom: 0.2rem;">Cuenta Sincronizada</p>
+                <p id="authLoggedUserEmail" style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1.2rem;"></p>
+                <button onclick="window.appStorage.logout()" class="premium-btn secondary" style="width: 100%; padding: 0.6rem; font-size: 0.9rem; background: #ef4444; color: white; border: none;">Cerrar Sesión</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
@@ -699,6 +769,10 @@
             });
         }
     </script>
+    <!-- SDK de Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Capa de Almacenamiento y Sincronización -->
+    <script src="./scripts/storage.js"></script>
     <script src="main.js"></script>
 </body>
 

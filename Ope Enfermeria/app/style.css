@@ -1313,3 +1313,50 @@ body.light-mode .achievement-card.locked {
         padding: 0.75rem 1rem;
     }
 }
+
+/* ===== MODAL DE AUTENTICACIÓN PREMIUM (FASE 4) ===== */
+.modal-overlay {
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+.modal-overlay.hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.auth-panel {
+    background: rgba(24, 24, 27, 0.85) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6) !important;
+}
+
+body.light-mode .auth-panel {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15) !important;
+}
+
+.google-auth-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.92);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Animación y color del botón superior cuando está sincronizado */
+#cloudAuthTriggerBtn.synced {
+    border-color: rgba(34, 197, 94, 0.4) !important;
+    background: rgba(34, 197, 94, 0.08) !important;
+}
+#cloudAuthTriggerBtn.synced:hover {
+    background: rgba(34, 197, 94, 0.15) !important;
+    transform: scale(1.05);
+}
