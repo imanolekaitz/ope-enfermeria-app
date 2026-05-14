@@ -1204,6 +1204,44 @@ body.light-mode .achievement-card.locked {
     border-color: rgba(0,0,0,0.07);
 }
 
+/* ===== GAMIFICACIÓN (FASE 2) ===== */
+.quest-item {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    padding: 0.8rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s;
+}
+.quest-item.completed {
+    background: rgba(74, 222, 128, 0.1);
+    border-color: rgba(74, 222, 128, 0.4);
+}
+.quest-reward-btn {
+    background: linear-gradient(135deg, #a855f7, #6366f1);
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(99,102,241,0.3);
+    transition: transform 0.2s;
+}
+.quest-reward-btn:hover {
+    transform: translateY(-2px);
+}
+.quest-reward-btn:disabled {
+    background: var(--surface-subtle);
+    color: var(--text-secondary);
+    box-shadow: none;
+    cursor: not-allowed;
+    transform: none;
+}
+
 /* Mobile Optimizations */
 
 /* ===== RESPONSIVIDAD (MEDIA QUERIES) ===== */

@@ -308,6 +308,7 @@ async function autoLoadQuestions() {
         checkSavedSession();
         updateStreakUI();
         updateAchievementsBadge();
+        initGamification();
         // Consolidar estado remoto asíncronamente desde la nube
         if (window.appStorage) {
             window.appStorage.pullAndConsolidateCloudState();
@@ -700,6 +701,7 @@ function handleAnswerSelected(selectedBtn, selectedLetter, correctLetter) {
 
         // Comprobar logros relacionados con tests normales
         checkAndUnlockAchievements({ context: 'answer' });
+        checkDailyQuests('answer', { correct: selectedLetter === correctLetter });
 
     } else {
         // En modo examen, solo marcar la opción seleccionada sin corregir aún
@@ -945,6 +947,10 @@ function finishTest() {
         total,
         percentage
     });
+    
+    // Gamificación (Fase 2)
+    gamificationRewardXP(correct, total, testMode);
+    checkGamificationQuests('finish_test', { correct, total, percentage, testMode });
     
     // Confetti for >90%
     if (percentage >= 90) {
@@ -1789,6 +1795,9 @@ function resumeSavedTest() {
 
 // --- LOGICA RACHAS (STREAKS) ---
 function incrementStreak() {
+    // Primero, si ha pasado la medianoche con la app abierta, updateStreakUI consumirá los protectores necesarios
+    updateStreakUI();
+
     const today = new Date().toDateString();
     let streakData = JSON.parse(localStorage.getItem('appOpeStudyStreak') || '{"streak": 0, "lastDate": ""}');
     
@@ -1803,10 +1812,10 @@ function incrementStreak() {
         const diffTime = Math.abs(curr - last);
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
         
-        if (diffDays === 1) {
+        if (diffDays === 1 || streakData.streak === 0) {
             streakData.streak += 1;
         } else {
-            streakData.streak = 1; // Perdió la racha
+            streakData.streak = 1; // Perdió la racha (no tenía protectores)
         }
     } else {
         streakData.streak = 1;
@@ -1831,13 +1840,33 @@ function updateStreakUI() {
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
         
         if (diffDays > 1) {
-            // Perdió la racha ayer o antes
-            streakData.streak = 0;
-            window.appStorage.setItem('appOpeStudyStreak', JSON.stringify(streakData));
+            let freezes = parseInt(localStorage.getItem('appOpe_streak_freezes') || '0', 10);
+            const daysMissed = diffDays - 1;
+            
+            if (freezes >= daysMissed) {
+                // Tienen suficientes protectores
+                freezes -= daysMissed;
+                localStorage.setItem('appOpe_streak_freezes', freezes);
+                
+                // Actualizar lastDate para simular que estudiaron ayer
+                const yesterday = new Date();
+                yesterday.setDate(yesterday.getDate() - 1);
+                streakData.lastDate = yesterday.toDateString();
+                window.appStorage.setItem('appOpeStudyStreak', JSON.stringify(streakData));
+                
+                if (typeof showAchievementToast === 'function') {
+                    showAchievementToast({ icon: '🧊', name: 'Racha Salvada', desc: `Se usaron ${daysMissed} protectores.` });
+                }
+                if (document.getElementById('streakFreezeCount')) document.getElementById('streakFreezeCount').textContent = freezes;
+            } else {
+                // Perdió la racha ayer o antes
+                streakData.streak = 0;
+                window.appStorage.setItem('appOpeStudyStreak', JSON.stringify(streakData));
+            }
         }
     }
     
-    if (streakData.streak > 0) {
+    if (true) {
         streakContainer.classList.remove('hidden');
         streakCountText.textContent = streakData.streak;
     } else {
@@ -2448,3 +2477,208 @@ window.addEventListener('DOMContentLoaded', () => {
         document.addEventListener(evt, resetInactivityTimer, { passive: true });
     });
 });
+
+// ===== GAMIFICACIÓN (FASE 2) =====
+
+function initGamification() {
+    const xp = parseInt(localStorage.getItem('appOpe_XP') || '0', 10);
+    const freezes = parseInt(localStorage.getItem('appOpe_streak_freezes') || '0', 10);
+    
+    // Ranks
+    let rank = "Estudiante";
+    if (xp >= 50000) rank = "Plaza Fija";
+    else if (xp >= 30000) rank = "Supervisor/a";
+    else if (xp >= 15000) rank = "Enfermero/a Adjunto/a";
+    else if (xp >= 5000) rank = "EIR";
+    
+    // UI Update
+    const gamificationPanel = document.getElementById('gamificationPanel');
+    if (gamificationPanel) gamificationPanel.classList.remove('hidden');
+    
+    const userRankText = document.getElementById('userRankText');
+    const userXpText = document.getElementById('userXpText');
+    const xpBarFill = document.getElementById('xpBarFill');
+    const streakFreezeCount = document.getElementById('streakFreezeCount');
+    
+    if (userRankText) userRankText.textContent = rank;
+    if (userXpText) userXpText.textContent = `${xp} XP`;
+    if (streakFreezeCount) streakFreezeCount.textContent = freezes;
+    
+    if (xpBarFill) {
+        // Calculate next level percentage
+        let nextLvlXP = 5000;
+        let prevLvlXP = 0;
+        if (xp >= 50000) { nextLvlXP = 50000; prevLvlXP = 50000; }
+        else if (xp >= 30000) { nextLvlXP = 50000; prevLvlXP = 30000; }
+        else if (xp >= 15000) { nextLvlXP = 30000; prevLvlXP = 15000; }
+        else if (xp >= 5000) { nextLvlXP = 15000; prevLvlXP = 5000; }
+        
+        if (xp >= 50000) {
+            xpBarFill.style.width = '100%';
+        } else {
+            const pct = ((xp - prevLvlXP) / (nextLvlXP - prevLvlXP)) * 100;
+            xpBarFill.style.width = `${pct}%`;
+        }
+    }
+    
+    updateTemarioHealth();
+    checkDailyQuests();
+}
+
+function awardXP(amount) {
+    if (amount <= 0) return;
+    let xp = parseInt(localStorage.getItem('appOpe_XP') || '0', 10);
+    xp += amount;
+    localStorage.setItem('appOpe_XP', xp);
+    
+    if (typeof showAchievementToast === 'function') {
+        showAchievementToast({ icon: '✨', name: `+${amount} XP`, desc: 'Sigue sumando puntos.' });
+    }
+    initGamification(); // Refresh UI
+}
+
+function gamificationRewardXP(correct, total, mode) {
+    let gained = correct * 10;
+    if (mode === 'examen') gained += 500;
+    else if (total >= 50) gained += 250;
+    awardXP(gained);
+}
+
+function updateTemarioHealth() {
+    const failuresMap = JSON.parse(localStorage.getItem('antigravity_failures') || '{}');
+    const totalQuestions = allQuestions.length || 1;
+    let failedCount = Object.keys(failuresMap).filter(k => failuresMap[k] > 0).length;
+    
+    const healthIndicatorText = document.getElementById('healthIndicatorText');
+    const healthBarFill = document.getElementById('healthBarFill');
+    
+    if (!healthIndicatorText || !healthBarFill) return;
+    
+    let healthPct = 100 - ((failedCount / totalQuestions) * 100);
+    if (healthPct < 0) healthPct = 0;
+    
+    healthIndicatorText.textContent = `${Math.round(healthPct)}%`;
+    healthBarFill.style.width = `${healthPct}%`;
+    
+    if (healthPct >= 80) healthBarFill.style.background = '#4ade80';
+    else if (healthPct >= 50) healthBarFill.style.background = '#facc15';
+    else healthBarFill.style.background = '#f87171';
+}
+
+window.buyStreakFreeze = function() {
+    let xp = parseInt(localStorage.getItem('appOpe_XP') || '0', 10);
+    if (xp >= 500) {
+        if(confirm("¿Quieres gastar 500 XP para comprar 1 Protector de Racha?")) {
+            xp -= 500;
+            localStorage.setItem('appOpe_XP', xp);
+            let freezes = parseInt(localStorage.getItem('appOpe_streak_freezes') || '0', 10);
+            localStorage.setItem('appOpe_streak_freezes', freezes + 1);
+            initGamification();
+            showAchievementToast({ icon: '🧊', name: 'Protector Adquirido', desc: 'Tienes un nuevo protector de racha.' });
+        }
+    } else {
+        alert("Necesitas al menos 500 XP para comprar un protector.");
+    }
+};
+
+// Misiones Diarias
+const possibleQuests = [
+    { id: 'q_20_correct', desc: 'Acierta 20 preguntas en total', req: 20, reward: 150 },
+    { id: 'q_test_50', desc: 'Haz un test de 50 pregs.', req: 1, reward: 200 },
+    { id: 'q_test_perfect', desc: 'Acierta el 100% en un test de >10 pregs', req: 1, reward: 300 }
+];
+
+function checkDailyQuests(event = 'init', data = null) {
+    const today = new Date().toDateString();
+    const storedDate = localStorage.getItem('appOpe_daily_quests_date');
+    let quests = JSON.parse(localStorage.getItem('appOpe_daily_quests') || '[]');
+    
+    if (storedDate !== today || quests.length === 0) {
+        // Generar nuevas misiones (shuffle de posibles)
+        const shuffled = [...possibleQuests].sort(() => 0.5 - Math.random());
+        quests = shuffled.slice(0, 3).map(q => ({ ...q, progress: 0, completed: false, claimed: false }));
+        localStorage.setItem('appOpe_daily_quests_date', today);
+        localStorage.setItem('appOpe_daily_quests', JSON.stringify(quests));
+    }
+    
+    // Procesar progreso
+    if (event !== 'init' && data) {
+        let updated = false;
+        quests.forEach(q => {
+            if (q.completed) return;
+            
+            if (q.id === 'q_20_correct' && event === 'answer' && data.correct) {
+                q.progress += 1;
+                updated = true;
+            } else if (q.id === 'q_test_50' && event === 'finish_test' && data.total >= 50) {
+                q.progress = 1;
+                updated = true;
+            } else if (q.id === 'q_test_perfect' && event === 'finish_test' && data.total >= 10 && data.percentage === 100) {
+                q.progress = 1;
+                updated = true;
+            }
+            
+            if (q.progress >= q.req) {
+                q.progress = q.req;
+                q.completed = true;
+                updated = true;
+                if (typeof showAchievementToast === 'function') {
+                    showAchievementToast({ icon: '🎯', name: 'Misión Completada', desc: q.desc });
+                }
+            }
+        });
+        if (updated) localStorage.setItem('appOpe_daily_quests', JSON.stringify(quests));
+    }
+    
+    renderDailyQuests(quests);
+}
+
+// Alias para finishTest
+window.checkGamificationQuests = checkDailyQuests;
+
+function renderDailyQuests(quests) {
+    const container = document.getElementById('dailyQuestsContainer');
+    if (!container) return;
+    
+    container.innerHTML = '';
+    quests.forEach((q, idx) => {
+        const item = document.createElement('div');
+        item.className = `quest-item ${q.completed ? 'completed' : ''}`;
+        
+        let progressText = q.req > 1 ? `(${q.progress}/${q.req})` : '';
+        if (q.completed) progressText = '✅';
+        
+        let actionHTML = '';
+        if (q.completed && !q.claimed) {
+            actionHTML = `<button class="quest-reward-btn" onclick="claimQuestReward(${idx})">Reclamar +${q.reward}XP</button>`;
+        } else if (q.claimed) {
+            actionHTML = `<span style="font-size:0.8rem; color:var(--text-secondary);">Reclamado</span>`;
+        } else {
+            let jsAction = '';
+            if (q.id === 'q_20_correct') jsAction = 'document.getElementById(`testLengthSelect`).value=`25`; document.getElementById(`startTestBtn`).click()';
+            else if (q.id === 'q_test_50') jsAction = 'document.getElementById(`testLengthSelect`).value=`50`; document.getElementById(`startTestBtn`).click()';
+            else if (q.id === 'q_test_perfect') jsAction = 'document.getElementById(`testLengthSelect`).value=`25`; document.getElementById(`startTestBtn`).click()';
+            
+            actionHTML = `<button onclick="${jsAction}" style="background: rgba(99,102,241,0.15); border: 1px solid rgba(99,102,241,0.4); color: #818cf8; border-radius: 0.5rem; padding: 0.3rem 0.6rem; cursor: pointer; font-size: 0.8rem; display:flex; align-items:center; gap:0.2rem; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">▶️ Ir</button>`;
+        }
+        
+        item.innerHTML = `
+            <div style="display:flex; flex-direction:column; gap:0.2rem;">
+                <span style="font-size:0.85rem; color:var(--text-primary); font-weight:600;">${q.desc} <span style="color:var(--text-secondary); font-weight:normal;">${progressText}</span></span>
+                ${!q.completed ? `<div style="background:rgba(0,0,0,0.2); height:4px; border-radius:2px; margin-top:0.2rem;"><div style="background:linear-gradient(90deg, #6366f1, #a855f7); height:100%; border-radius:2px; width:${(q.progress/q.req)*100}%;"></div></div>` : ''}
+            </div>
+            <div>${actionHTML}</div>
+        `;
+        container.appendChild(item);
+    });
+}
+
+window.claimQuestReward = function(idx) {
+    let quests = JSON.parse(localStorage.getItem('appOpe_daily_quests') || '[]');
+    if (quests[idx] && quests[idx].completed && !quests[idx].claimed) {
+        quests[idx].claimed = true;
+        localStorage.setItem('appOpe_daily_quests', JSON.stringify(quests));
+        awardXP(quests[idx].reward);
+        renderDailyQuests(quests);
+    }
+};

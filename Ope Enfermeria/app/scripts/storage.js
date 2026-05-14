@@ -163,11 +163,20 @@ class StorageService {
                     updated_at: new Date().toISOString()
                 }, { onConflict: 'user_id' });
             }
-            else if (key === 'antigravity_history') {
+            else if (key === 'antigravity_history' || key === 'appOpe_XP' || key === 'appOpe_streak_freezes' || key === 'appOpe_daily_quests') {
                 // Propagación ultrarrobusta e independiente de esquemas en user_metadata del token
-                const historyArr = JSON.parse(value || '[]');
+                const historyArr = JSON.parse(localStorage.getItem('antigravity_history') || '[]');
+                const gamification = {
+                    xp: parseInt(localStorage.getItem('appOpe_XP') || '0', 10),
+                    freezes: parseInt(localStorage.getItem('appOpe_streak_freezes') || '0', 10),
+                    quests: JSON.parse(localStorage.getItem('appOpe_daily_quests') || '[]'),
+                    questsDate: localStorage.getItem('appOpe_daily_quests_date') || ''
+                };
                 await this.supabase.auth.updateUser({
-                    data: { antigravity_history: historyArr }
+                    data: { 
+                        antigravity_history: historyArr,
+                        gamification_state: gamification
+                    }
                 });
             }
         } catch (error) {
@@ -281,6 +290,13 @@ class StorageService {
             if (user.user_metadata && user.user_metadata.antigravity_history) {
                 localStorage.setItem('antigravity_history', JSON.stringify(user.user_metadata.antigravity_history));
             }
+            if (user.user_metadata && user.user_metadata.gamification_state) {
+                const g = user.user_metadata.gamification_state;
+                if (g.xp !== undefined) localStorage.setItem('appOpe_XP', g.xp);
+                if (g.freezes !== undefined) localStorage.setItem('appOpe_streak_freezes', g.freezes);
+                if (g.quests) localStorage.setItem('appOpe_daily_quests', JSON.stringify(g.quests));
+                if (g.questsDate) localStorage.setItem('appOpe_daily_quests_date', g.questsDate);
+            }
 
             console.log('✅ Estado consolidado perfectamente en memoria local.');
             // Disparar evento a la UI para repintar si estamos en pantalla activa
@@ -342,7 +358,10 @@ class StorageService {
             'ope_achievements',
             'antigravity_test_counter',
             'appOpeStudyStreak',
-            'antigravity_history'
+            'antigravity_history',
+            'appOpe_XP',
+            'appOpe_streak_freezes',
+            'appOpe_daily_quests'
         ];
         
         let totalItemsMerged = 0;
@@ -414,7 +433,12 @@ class StorageService {
             'antigravity_last_seen_test',
             'ope_achievements',
             'antigravity_test_counter',
-            'ope_streak'
+            'appOpeStudyStreak',
+            'antigravity_history',
+            'appOpe_XP',
+            'appOpe_streak_freezes',
+            'appOpe_daily_quests',
+            'appOpe_daily_quests_date'
         ];
         keysToRemove.forEach(k => localStorage.removeItem(k));
 
