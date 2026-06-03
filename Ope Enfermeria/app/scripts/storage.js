@@ -17,12 +17,25 @@ class StorageService {
         // Cola local persistente para acciones en modo desconectado
         this.syncQueue = JSON.parse(localStorage.getItem('ope_sync_queue') || '[]');
         this.isSyncing = false;
+        this.isPulling = false; // Estado de descarga activa
 
         // Registrar escucha de reconexión para vaciar cola pendiente
         window.addEventListener('online', () => {
             console.log('🌐 Conexión restaurada. Ejecutando sincronización de fondo...');
             this.processSyncQueue();
         });
+
+        // Registrar escucha de cambio de autenticación para sincronizar de inmediato al iniciar sesión (sitios nuevos)
+        if (this.supabase) {
+            this.supabase.auth.onAuthStateChange((event, session) => {
+                console.log(`🔐 Evento de autenticación Supabase: ${event}`);
+                if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+                    this.pullAndConsolidateCloudState().catch(err => {
+                        console.error('Error en sincronización automática al cambiar auth state:', err);
+                    });
+                }
+            });
+        }
     }
 
     /**
@@ -222,17 +235,32 @@ class StorageService {
      * Sobrescribe de forma inteligente la caché local para unificar el progreso.
      */
     async pullAndConsolidateCloudState() {
-        if (!this.supabase) return;
+        if (!this.supabase || this.isPulling) return;
         const { data: { session } } = await this.supabase.auth.getSession();
         const user = session?.user;
         if (!user) return;
 
         console.log('🔄 Descargando e integrando progreso desde Supabase...');
         const userId = user.id;
+        
+        this.isPulling = true;
+        window.dispatchEvent(new CustomEvent('cloudSyncStarting'));
 
         try {
+            // Descargar todos los recursos de la nube en paralelo para optimizar la latencia (Promise.all)
+            const [
+                { data: profile },
+                { data: qData },
+                { data: qStats },
+                { data: achievements }
+            ] = await Promise.all([
+                this.supabase.from('user_profiles').select('*').eq('user_id', userId).maybeSingle(),
+                this.supabase.from('user_question_data').select('*').eq('user_id', userId),
+                this.supabase.from('user_question_stats').select('*').eq('user_id', userId),
+                this.supabase.from('user_achievements').select('*').eq('user_id', userId)
+            ]);
+
             // 1. Cargar datos globales del perfil
-            const { data: profile } = await this.supabase.from('user_profiles').select('*').eq('user_id', userId).single();
             if (profile) {
                 if (profile.total_tests_completed) {
                     localStorage.setItem('antigravity_test_counter', profile.total_tests_completed.toString());
@@ -246,7 +274,6 @@ class StorageService {
             }
 
             // 2. Cargar Favoritos y Notas
-            const { data: qData } = await this.supabase.from('user_question_data').select('*').eq('user_id', userId);
             if (qData) {
                 const favorites = qData.filter(row => row.is_favorite).map(row => row.question_hash);
                 const notesMap = {};
@@ -258,7 +285,6 @@ class StorageService {
             }
 
             // 3. Cargar Estadísticas Individuales de Preguntas
-            const { data: qStats } = await this.supabase.from('user_question_stats').select('*').eq('user_id', userId);
             if (qStats) {
                 const statsMap = {};
                 const failuresMap = {};
@@ -280,7 +306,6 @@ class StorageService {
             }
 
             // 4. Cargar Logros
-            const { data: achievements } = await this.supabase.from('user_achievements').select('*').eq('user_id', userId);
             if (achievements) {
                 const achList = achievements.map(row => row.achievement_id);
                 localStorage.setItem('ope_achievements', JSON.stringify(achList));
@@ -299,10 +324,12 @@ class StorageService {
             }
 
             console.log('✅ Estado consolidado perfectamente en memoria local.');
-            // Disparar evento a la UI para repintar si estamos en pantalla activa
-            window.dispatchEvent(new CustomEvent('cloudStateSynced'));
         } catch (err) {
             console.error('Error durante la descarga consolidada de datos:', err);
+        } finally {
+            this.isPulling = false;
+            // Disparar evento a la UI para repintar si estamos en pantalla activa
+            window.dispatchEvent(new CustomEvent('cloudStateSynced'));
         }
     }
 

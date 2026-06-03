@@ -332,7 +332,9 @@ function updateMaxRangeInfo() {
     if(repoSelect && maxRangeInfo && allQuestions.length > 0) {
         let count = 0;
         if (repoSelect.value === 'ambos') {
-            count = allQuestions.length;
+            const comunCount = allQuestions.filter(q => q.sourceType === 'comun').length;
+            const especCount = allQuestions.filter(q => q.sourceType === 'especifico').length;
+            count = Math.max(comunCount, especCount);
         } else {
             count = allQuestions.filter(q => q.sourceType === repoSelect.value).length;
         }
@@ -365,9 +367,16 @@ function clampRangeInput(inputEl) {
     let v = parseInt(inputEl.value, 10);
     if (isNaN(v) || v < 1) { inputEl.value = ''; return; }
     let repoSelect = document.getElementById('repoSelect');
-    let count = (repoSelect && repoSelect.value !== 'ambos')
-        ? allQuestions.filter(q => q.sourceType === repoSelect.value).length
-        : allQuestions.length;
+    let count = 0;
+    if (repoSelect && repoSelect.value === 'ambos') {
+        const comunCount = allQuestions.filter(q => q.sourceType === 'comun').length;
+        const especCount = allQuestions.filter(q => q.sourceType === 'especifico').length;
+        count = Math.max(comunCount, especCount);
+    } else if (repoSelect) {
+        count = allQuestions.filter(q => q.sourceType === repoSelect.value).length;
+    } else {
+        count = allQuestions.length;
+    }
     if (v > count) inputEl.value = count;
 }
 
@@ -437,14 +446,19 @@ function startTest(mode) {
             filteredQuestions = filteredQuestions.filter(q => q.sourceType === repoSelect.value);
         }
         let minVal = 1;
-        let maxVal = filteredQuestions.length;
+        let maxVal = 999999;
         if (rangeStart && rangeStart.value) {
             minVal = parseInt(rangeStart.value, 10);
         }
         if (rangeEnd && rangeEnd.value) {
             maxVal = parseInt(rangeEnd.value, 10);
         }
-        filteredQuestions = filteredQuestions.slice(minVal - 1, maxVal);
+        if (minVal > maxVal) {
+            const temp = minVal;
+            minVal = maxVal;
+            maxVal = temp;
+        }
+        filteredQuestions = filteredQuestions.filter(q => q.originalIndex >= minVal && q.originalIndex <= maxVal);
     }
     
     if (filteredQuestions.length === 0) {
@@ -468,8 +482,7 @@ function startTest(mode) {
         } else {
              testsUnseen = currentTestCounter - lastSeenTest;
         }
-        
-        let weight = 1 + (failures * 3) + testsUnseen;
+        let weight = Math.max(1, 1 + (failures * 3) + Math.max(0, testsUnseen));
         return { q, weight };
     });
     
@@ -1256,10 +1269,15 @@ function getDailyFlashcards() {
         filteredQuestions = filteredQuestions.filter(q => q.sourceType === repoSelect.value);
     }
     let minVal = 1;
-    let maxVal = filteredQuestions.length;
+    let maxVal = 999999;
     if (rangeStart && rangeStart.value) minVal = parseInt(rangeStart.value, 10);
     if (rangeEnd && rangeEnd.value) maxVal = parseInt(rangeEnd.value, 10);
-    filteredQuestions = filteredQuestions.slice(minVal - 1, maxVal);
+    if (minVal > maxVal) {
+        const temp = minVal;
+        minVal = maxVal;
+        maxVal = temp;
+    }
+    filteredQuestions = filteredQuestions.filter(q => q.originalIndex >= minVal && q.originalIndex <= maxVal);
     
     if (filteredQuestions.length === 0) {
         alert("No hay preguntas disponibles para Flashcards con el filtro actual.");
@@ -2410,6 +2428,14 @@ async function updateHeaderCloudTriggerBadge() {
     
     if (!triggerBtn || !window.appStorage || !window.appStorage.supabase) return;
 
+    if (window.appStorage.isPulling) {
+        triggerBtn.classList.remove('synced');
+        triggerBtn.title = 'Descargando y sincronizando progreso...';
+        if (statusIcon) statusIcon.style.color = '#f59e0b'; // Color ámbar
+        if (statusText) statusText.textContent = 'Sincronizando...';
+        return;
+    }
+
     const { data: { session } } = await window.appStorage.supabase.auth.getSession();
     if (session && session.user) {
         triggerBtn.classList.add('synced');
@@ -2425,6 +2451,9 @@ async function updateHeaderCloudTriggerBadge() {
 }
 
 // Escuchar consolidación global para repintar cabecera en vivo
+window.addEventListener('cloudSyncStarting', () => {
+    updateHeaderCloudTriggerBadge();
+});
 window.addEventListener('cloudStateSynced', () => {
     updateHeaderCloudTriggerBadge();
     refreshAuthModalViewState();
@@ -2655,9 +2684,9 @@ function renderDailyQuests(quests) {
             actionHTML = `<span style="font-size:0.8rem; color:var(--text-secondary);">Reclamado</span>`;
         } else {
             let jsAction = '';
-            if (q.id === 'q_20_correct') jsAction = 'document.getElementById(`testLengthSelect`).value=`25`; document.getElementById(`startTestBtn`).click()';
-            else if (q.id === 'q_test_50') jsAction = 'document.getElementById(`testLengthSelect`).value=`50`; document.getElementById(`startTestBtn`).click()';
-            else if (q.id === 'q_test_perfect') jsAction = 'document.getElementById(`testLengthSelect`).value=`25`; document.getElementById(`startTestBtn`).click()';
+            if (q.id === 'q_20_correct') jsAction = 'setRangeAll(); document.getElementById(`testLengthSelect`).value=`25`; document.getElementById(`startTestBtn`).click()';
+            else if (q.id === 'q_test_50') jsAction = 'setRangeAll(); document.getElementById(`testLengthSelect`).value=`50`; document.getElementById(`startTestBtn`).click()';
+            else if (q.id === 'q_test_perfect') jsAction = 'setRangeAll(); document.getElementById(`testLengthSelect`).value=`25`; document.getElementById(`startTestBtn`).click()';
             
             actionHTML = `<button onclick="${jsAction}" style="background: rgba(99,102,241,0.15); border: 1px solid rgba(99,102,241,0.4); color: #818cf8; border-radius: 0.5rem; padding: 0.3rem 0.6rem; cursor: pointer; font-size: 0.8rem; display:flex; align-items:center; gap:0.2rem; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">▶️ Ir</button>`;
         }
