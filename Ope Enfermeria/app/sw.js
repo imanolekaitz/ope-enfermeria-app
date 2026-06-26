@@ -1,5 +1,4 @@
-// Cambiar CACHE_NAME para forzar una actualización profunda inmediata
-const CACHE_NAME = 'ope-enfermeria-cache-v4';
+const CACHE_NAME = 'ope-enfermeria-cache-v5';
 const urlsToCache = [
     './',
     './index.html',
@@ -10,35 +9,14 @@ const urlsToCache = [
     './data/preguntas_especificas.json'
 ];
 
-// Instalar SW y pre-cachear los recursos esenciales para que funcione sin internet
 self.addEventListener('install', event => {
     event.waitUntil(
         caches.open(CACHE_NAME)
-            .then(cache => {
-                return cache.addAll(urlsToCache);
-            })
+            .then(cache => cache.addAll(urlsToCache))
+            .then(() => self.skipWaiting())
     );
 });
 
-// Interceptar peticiones para servir desde RED primero, fallback a CACHE si no hay internet (Network First)
-self.addEventListener('fetch', event => {
-    event.respondWith(
-        fetch(event.request)
-            .then(networkResponse => {
-                // Guardamos una copia temporal de lo nuevo que llega de internet
-                return caches.open(CACHE_NAME).then(cache => {
-                    cache.put(event.request, networkResponse.clone());
-                    return networkResponse;
-                });
-            })
-            .catch(() => {
-                // Si falla (estamos offline), usamos la memoria caché
-                return caches.match(event.request);
-            })
-    );
-});
-
-// Limpiar caches antiguos cuando se actualiza
 self.addEventListener('activate', event => {
     const cacheWhitelist = [CACHE_NAME];
     event.waitUntil(
@@ -50,6 +28,36 @@ self.addEventListener('activate', event => {
                     }
                 })
             );
+        }).then(() => self.clients.claim())
+    );
+});
+
+// Estrategia: Stale-While-Revalidate
+self.addEventListener('fetch', event => {
+    event.respondWith(
+        caches.match(event.request).then(cachedResponse => {
+            const fetchPromise = fetch(event.request).then(networkResponse => {
+                // Actualizamos la caché en segundo plano
+                if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
+                    const responseToCache = networkResponse.clone();
+                    caches.open(CACHE_NAME).then(cache => {
+                        cache.put(event.request, responseToCache);
+                    });
+                }
+                return networkResponse;
+            }).catch(() => {
+                // Ignore network errors in background update
+            });
+            
+            // Retornamos la respuesta cacheada inmediatamente si existe, si no esperamos a la red
+            return cachedResponse || fetchPromise;
         })
     );
+});
+
+// Escuchar mensajes para forzar actualización
+self.addEventListener('message', event => {
+    if (event.data === 'SKIP_WAITING') {
+        self.skipWaiting();
+    }
 });

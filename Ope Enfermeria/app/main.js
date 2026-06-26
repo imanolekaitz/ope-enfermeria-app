@@ -134,6 +134,20 @@ const errorUserComment = document.getElementById('errorUserComment');
 const sendErrorEmailBtn = document.getElementById('sendErrorEmailBtn');
 
 /** 
+ * ELEMENTOS DE CONFIGURACIÓN Y NOTIFICACIONES
+ */
+const openSettingsBtn = document.getElementById('openSettingsBtn');
+const settingsModal = document.getElementById('settingsModal');
+const closeSettingsBtn = document.getElementById('closeSettingsBtn');
+const notifToggle = document.getElementById('notifToggle');
+const notifTimeContainer = document.getElementById('notifTimeContainer');
+const notifTimeInput = document.getElementById('notifTimeInput');
+const soundToggle = document.getElementById('soundToggle');
+const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+const swUpdateToast = document.getElementById('swUpdateToast');
+const shareResultBtn = document.getElementById('shareResultBtn');
+
+/** 
  * VARIABLES DE ESTADO DE LA APLICACIÓN
  */
 let allQuestions = [];       // Todas las preguntas cargadas desde los JSON
@@ -186,6 +200,8 @@ window.addEventListener('cloudStateSynced', () => {
 startTestBtn.addEventListener('click', () => startTest('normal'));
 startExamBtn.addEventListener('click', () => startTest('examen'));
 if (startQuickBtn) startQuickBtn.addEventListener('click', () => startTest('rapido'));
+const startSrsBtn = document.getElementById('startSrsBtn');
+if (startSrsBtn) startSrsBtn.addEventListener('click', () => startTest('srs'));
 startFavoritesBtn.addEventListener('click', () => startTest('favoritas'));
 startFailedBtn.addEventListener('click', () => startTest('falladas'));
 resumeTestBtn.addEventListener('click', resumeSavedTest);
@@ -195,6 +211,24 @@ prevBtn.addEventListener('click', proceedToPrev);
 exitTestBtn.addEventListener('click', exitTest);
 viewHistoryBtn.addEventListener('click', showHistory);
 howItWorksBtn.addEventListener('click', () => switchScreen(infoScreen));
+
+if (openSettingsBtn) openSettingsBtn.addEventListener('click', openSettings);
+if (closeSettingsBtn) closeSettingsBtn.addEventListener('click', () => settingsModal.classList.add('hidden'));
+if (notifToggle) {
+    notifToggle.addEventListener('change', () => {
+        if (notifToggle.checked) {
+            notifTimeContainer.style.display = 'flex';
+            if ('Notification' in window && Notification.permission !== 'granted') {
+                Notification.requestPermission();
+            }
+        } else {
+            notifTimeContainer.style.display = 'none';
+        }
+    });
+}
+if (saveSettingsBtn) saveSettingsBtn.addEventListener('click', saveSettings);
+if (swUpdateToast) swUpdateToast.addEventListener('click', () => window.location.reload());
+
 historyToStartBtn.addEventListener('click', () => switchScreen(startScreen));
 infoToStartBtn.addEventListener('click', () => switchScreen(startScreen));
 searchToStartBtn.addEventListener('click', () => switchScreen(startScreen));
@@ -219,6 +253,7 @@ statsReportBtn.addEventListener('click', () => openErrorModal(currentActiveQuest
 
 clearHistoryBtn.addEventListener('click', clearHistory);
 tryAgainBtn.addEventListener('click', () => switchScreen(startScreen));
+if (shareResultBtn) shareResultBtn.addEventListener('click', shareResult);
 
 // Listeners Flashcards
 startFlashcardsBtn.addEventListener('click', startFlashcards);
@@ -429,6 +464,53 @@ function setRangeAll() {
     document.getElementById('rangeEnd').value = '';
 }
 
+// --- LOGICA SRS (SM-2) ---
+function updateSRS(questionKey, isCorrect) {
+    let srsData = JSON.parse(localStorage.getItem('appOpeSRS') || '{}');
+    let item = srsData[questionKey] || { interval: 0, easeFactor: 2.5, nextReviewDate: 0 };
+    
+    if (isCorrect) {
+        if (item.interval === 0) {
+            item.interval = 1;
+        } else if (item.interval === 1) {
+            item.interval = 3;
+        } else {
+            item.interval = Math.round(item.interval * item.easeFactor);
+        }
+        item.easeFactor = Math.min(2.5, item.easeFactor + 0.1);
+    } else {
+        item.interval = 1;
+        item.easeFactor = Math.max(1.3, item.easeFactor - 0.2);
+    }
+    
+    item.nextReviewDate = Date.now() + item.interval * 24 * 60 * 60 * 1000;
+    srsData[questionKey] = item;
+    window.appStorage.setItem('appOpeSRS', JSON.stringify(srsData));
+}
+
+function updateSRSBadge() {
+    const srsBadge = document.getElementById('srsBadge');
+    if (!srsBadge) return;
+    
+    const srsData = JSON.parse(localStorage.getItem('appOpeSRS') || '{}');
+    const now = Date.now();
+    let dueCount = 0;
+    
+    for (const key in srsData) {
+        if (srsData[key].nextReviewDate <= now) {
+            dueCount++;
+        }
+    }
+    
+    srsBadge.textContent = dueCount;
+    if (dueCount > 0) {
+        srsBadge.style.display = 'inline-block';
+    } else {
+        srsBadge.style.display = 'none';
+    }
+}
+// --- FIN LOGICA SRS ---
+
 /**
  * Configura e inicia un nuevo test basado en el modo seleccionado.
  * Aplica filtros de repositorio, rangos y un sistema de pesos para favorecer 
@@ -442,7 +524,7 @@ function startTest(mode) {
     // Limpiar timer si existe
     if (examTimerInterval) clearInterval(examTimerInterval);
     if (mode === 'examen') {
-        timeRemaining = 3600; // 60 minutos
+        timeRemaining = 7200; // 120 minutos
         finalTimeRemainingText = '';
         examTimerContainer.classList.remove('hidden');
         updateTimerDisplay();
@@ -476,6 +558,30 @@ function startTest(mode) {
             alert("¡Enhorabuena! No tienes preguntas falladas registradas.");
             return;
         }
+    } else if (mode === 'srs') {
+        const srsData = JSON.parse(localStorage.getItem('appOpeSRS') || '{}');
+        const now = Date.now();
+        
+        let dueQuestions = filteredQuestions.filter(q => {
+            const key = getQuestionKey(q);
+            return srsData[key] && srsData[key].nextReviewDate <= now;
+        });
+        
+        // Inyectar preguntas nuevas si hay menos de 10 pendientes
+        if (dueQuestions.length < 10) {
+            let unseen = filteredQuestions.filter(q => !srsData[getQuestionKey(q)]);
+            unseen.sort(() => Math.random() - 0.5);
+            const needed = 10 - dueQuestions.length;
+            dueQuestions = dueQuestions.concat(unseen.slice(0, needed));
+        }
+        
+        if (dueQuestions.length === 0) {
+            alert("No hay preguntas para repasar. ¡Buen trabajo!");
+            return;
+        }
+        
+        dueQuestions.sort(() => Math.random() - 0.5);
+        filteredQuestions = dueQuestions.slice(0, 50);
     } else if (mode === 'examen') {
         filteredQuestions = [...allQuestions]; // El examen usa todo el repositorio
     } else {
@@ -743,9 +849,13 @@ function handleAnswerSelected(selectedBtn, selectedLetter, correctLetter) {
             if (failuresMap[hash]) {
                 failuresMap[hash] = Math.max(0, failuresMap[hash] - 1);
             }
+            updateSRS(hash, true);
+            playFeedback('correct');
         } else {
             statsMap[hash].wrong++;
             failuresMap[hash] = (failuresMap[hash] || 0) + 1;
+            updateSRS(hash, false);
+            playFeedback('wrong');
         }
         
         window.appStorage.setItem('antigravity_failures', JSON.stringify(failuresMap));
@@ -791,19 +901,24 @@ function manageNavigationButtons() {
             submitExamBtn.textContent = "Entregar Examen";
             submitExamBtn.onclick = submitExamHandler;
         }
+        if (reviewMode) {
+            submitExamBtn.classList.remove('hidden');
+            submitExamBtn.textContent = "Volver a Resultados";
+            submitExamBtn.onclick = finishTest;
+        }
     } else {
         // Última pregunta: mostrar botón de finalizar
         if (testMode === 'examen' && !reviewMode) {
             submitExamBtn.classList.remove('hidden');
             submitExamBtn.textContent = "Entregar Examen";
             submitExamBtn.onclick = submitExamHandler;
-        } else if (testMode === 'normal' && userAnswers[currentQuestionIndex]) {
+        } else if (testMode !== 'examen' && !reviewMode && userAnswers[currentQuestionIndex]) {
             submitExamBtn.classList.remove('hidden');
             submitExamBtn.textContent = "Ver Nota Final";
             submitExamBtn.onclick = finishTest;
         } else if (reviewMode) {
             submitExamBtn.classList.remove('hidden');
-            submitExamBtn.textContent = "Ver Nota Final";
+            submitExamBtn.textContent = "Volver a Resultados";
             submitExamBtn.onclick = finishTest;
         }
     }
@@ -928,6 +1043,8 @@ function finishTest() {
         isResultSaved = true;
     }
     
+    playFeedback('finish');
+    
     // Cálculo detallado de estadísticas y penalizaciones OPE
     let correct = 0, wrong = 0, blank = 0;
     for (let i = 0; i < testQuestions.length; i++) {
@@ -954,6 +1071,68 @@ function finishTest() {
     document.querySelector('.score-max').textContent = `/ ${total}`;
     animateCountUp(scoreEl, correct);
     
+    // Configurar Chart.js Donut
+    const ctxChart = document.getElementById('resultDonutChart').getContext('2d');
+    if (window.resultDonutInstance) {
+        window.resultDonutInstance.destroy();
+    }
+    window.resultDonutInstance = new Chart(ctxChart, {
+        type: 'doughnut',
+        data: {
+            labels: ['Aciertos', 'Errores', 'En blanco'],
+            datasets: [{
+                data: [correct, wrong, blank],
+                backgroundColor: ['#4ade80', '#f87171', '#9ca3af'],
+                borderWidth: 0,
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            cutout: '75%',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return ` ${context.label}: ${context.raw}`;
+                        }
+                    }
+                }
+            },
+            animation: { animateScale: true, animateRotate: true }
+        }
+    });
+
+    // Comparativa histórica
+    const historyDataLocal = JSON.parse(localStorage.getItem('antigravity_history') || '[]');
+    let pastCorrects = 0;
+    let pastTotals = 0;
+    historyDataLocal.forEach(r => { pastCorrects += r.correct; pastTotals += r.total; });
+    
+    const comparisonDiv = document.getElementById('historicalComparison');
+    if (pastTotals > 0 && historyDataLocal.length > 0) {
+        const pastAvg = (pastCorrects / pastTotals) * 100;
+        const diff = percentage - pastAvg;
+        comparisonDiv.style.display = 'block';
+        if (diff > 0.5) {
+            comparisonDiv.style.backgroundColor = 'rgba(74, 222, 128, 0.1)';
+            comparisonDiv.style.color = '#4ade80';
+            comparisonDiv.innerHTML = `📈 +${diff.toFixed(1)}% vs tu media histórica`;
+        } else if (diff < -0.5) {
+            comparisonDiv.style.backgroundColor = 'rgba(248, 113, 113, 0.1)';
+            comparisonDiv.style.color = '#f87171';
+            comparisonDiv.innerHTML = `📉 ${diff.toFixed(1)}% vs tu media histórica`;
+        } else {
+            comparisonDiv.style.backgroundColor = 'rgba(156, 163, 175, 0.1)';
+            comparisonDiv.style.color = '#9ca3af';
+            comparisonDiv.innerHTML = `Mantienes tu media histórica`;
+        }
+    } else {
+        comparisonDiv.style.display = 'none';
+    }
+    
     // Desglose de penalización
     const penaltyDiv = document.getElementById('penaltyBreakdown');
     penaltyDiv.classList.remove('hidden');
@@ -973,11 +1152,47 @@ function finishTest() {
         feedbackMessage.textContent = "Debes seguir estudiando. ¡No te rindas!";
     }
 
+    const examPredictionContainer = document.getElementById('examPredictionContainer');
     if (testMode === 'examen') {
         remainingTimeFeedback.textContent = finalTimeRemainingText;
         remainingTimeFeedback.classList.remove('hidden');
+        
+        if (examPredictionContainer) {
+            examPredictionContainer.classList.remove('hidden');
+            
+            // Calculo nota neta sobre 10
+            let grade10 = (netScore / total) * 10;
+            if (grade10 < 0) grade10 = 0;
+            
+            document.getElementById('examOfficialScore').textContent = grade10.toFixed(2);
+            
+            // Calculo percentil (Media simulada OPE: 55 netos sobre 100, Desviación: 15)
+            // Usamos un factor de corrección si el examen no es de 100.
+            let simulatedMean = total * 0.55; 
+            let stdDev = total * 0.15;
+            let z = (netScore - simulatedMean) / stdDev;
+            
+            // Aproximación rápida a CDF (función logística)
+            let pct = 0;
+            if (z < -3) pct = 0.001;
+            else if (z > 3) pct = 0.999;
+            else {
+                pct = 1 / (1 + Math.exp(-1.702 * z));
+            }
+            let percentile = (pct * 100).toFixed(1);
+            document.getElementById('examPercentile').textContent = `${percentile}%`;
+            
+            let predMsg = "";
+            if (grade10 >= 8.5) predMsg = "Plaza asegurada. Nivel de élite. 🏆";
+            else if (grade10 >= 6.5) predMsg = "Muy buena posición. Entras en la bolsa alta. 🚀";
+            else if (grade10 >= 5.0) predMsg = "Aprobado. Necesitas subir para coger plaza directa. 📚";
+            else predMsg = "Suspenso. Hay que seguir dándole duro a los repasos. 💪";
+            
+            document.getElementById('examPredictionMessage').textContent = predMsg;
+        }
     } else {
         remainingTimeFeedback.classList.add('hidden');
+        if (examPredictionContainer) examPredictionContainer.classList.add('hidden');
     }
     
     // Show retry failed button if there are wrong answers
@@ -1020,6 +1235,10 @@ function switchScreen(screenElement) {
         if(el) el.classList.remove('active');
     });
     screenElement.classList.add('active');
+    
+    if (screenElement === startScreen) {
+        initGamification();
+    }
 }
 
 /**
@@ -1085,9 +1304,11 @@ function saveResult() {
                     if (failuresMap[hash]) {
                         failuresMap[hash] = Math.max(0, failuresMap[hash] - 1);
                     }
+                    updateSRS(hash, true);
                 } else {
                     statsMap[hash].wrong++;
                     failuresMap[hash] = (failuresMap[hash] || 0) + 1;
+                    updateSRS(hash, false);
                 }
             }
         }
@@ -1109,6 +1330,12 @@ function saveResult() {
     
     historyData.push(record);
     window.appStorage.setItem('antigravity_history', JSON.stringify(historyData));
+
+    // Registro de actividad diaria (Heatmap)
+    const today = new Date().toISOString().split('T')[0];
+    let activityLog = JSON.parse(localStorage.getItem('appOpeActivityLog') || '{}');
+    activityLog[today] = (activityLog[today] || 0) + respondidas;
+    window.appStorage.setItem('appOpeActivityLog', JSON.stringify(activityLog));
 }
 
 /**
@@ -2642,6 +2869,40 @@ function initGamification() {
     
     updateTemarioHealth();
     checkDailyQuests();
+    renderActivityHeatmap();
+    updateSRSBadge();
+}
+
+function renderActivityHeatmap() {
+    const heatmapContainer = document.getElementById('heatmapContainer');
+    if (!heatmapContainer) return;
+    heatmapContainer.innerHTML = '';
+    
+    let activityLog = JSON.parse(localStorage.getItem('appOpeActivityLog') || '{}');
+    
+    // Generar últimos 60 días
+    const today = new Date();
+    for (let i = 59; i >= 0; i--) {
+        const d = new Date(today);
+        d.setDate(today.getDate() - i);
+        const dateStr = d.toISOString().split('T')[0];
+        
+        const count = activityLog[dateStr] || 0;
+        
+        const cell = document.createElement('div');
+        cell.style.width = '12px';
+        cell.style.height = '12px';
+        cell.style.borderRadius = '2px';
+        cell.title = `${dateStr}: ${count} preguntas`;
+        
+        if (count === 0) cell.style.background = 'rgba(255,255,255,0.1)';
+        else if (count < 25) cell.style.background = '#0e4429';
+        else if (count < 50) cell.style.background = '#006d32';
+        else if (count < 100) cell.style.background = '#26a641';
+        else cell.style.background = '#39d353';
+        
+        heatmapContainer.appendChild(cell);
+    }
 }
 
 function awardXP(amount) {
@@ -2801,3 +3062,190 @@ window.claimQuestReward = function(idx) {
         renderDailyQuests(quests);
     }
 };
+
+// --- LOGICA DE AJUSTES Y NOTIFICACIONES ---
+function openSettings() {
+    if (!settingsModal) return;
+    settingsModal.classList.remove('hidden');
+    
+    const notifsEnabled = localStorage.getItem('appOpeNotifsEnabled') === 'true';
+    const notifTime = localStorage.getItem('appOpeNotifTime') || '10:00';
+    const soundEnabled = localStorage.getItem('appOpeSoundEnabled') !== 'false'; // Default true
+    
+    if (notifToggle) notifToggle.checked = notifsEnabled;
+    if (notifTimeInput) notifTimeInput.value = notifTime;
+    if (soundToggle) soundToggle.checked = soundEnabled;
+    
+    if (notifTimeContainer) {
+        notifTimeContainer.style.display = notifsEnabled ? 'flex' : 'none';
+    }
+}
+
+function saveSettings() {
+    if (notifToggle) {
+        localStorage.setItem('appOpeNotifsEnabled', notifToggle.checked);
+        if (notifToggle.checked && 'Notification' in window && Notification.permission !== 'granted') {
+            Notification.requestPermission();
+        }
+    }
+    if (notifTimeInput && notifTimeInput.value) {
+        localStorage.setItem('appOpeNotifTime', notifTimeInput.value);
+    }
+    if (soundToggle) {
+        localStorage.setItem('appOpeSoundEnabled', soundToggle.checked);
+    }
+    
+    if (settingsModal) settingsModal.classList.add('hidden');
+    alert('Ajustes guardados correctamente.');
+}
+
+function checkAndSendNotifications() {
+    const notifsEnabled = localStorage.getItem('appOpeNotifsEnabled') === 'true';
+    if (!notifsEnabled || !('Notification' in window) || Notification.permission !== 'granted') return;
+    
+    const notifTime = localStorage.getItem('appOpeNotifTime');
+    if (!notifTime) return;
+    
+    const now = new Date();
+    const currentHour = now.getHours().toString().padStart(2, '0');
+    const currentMinute = now.getMinutes().toString().padStart(2, '0');
+    const currentTimeStr = `${currentHour}:${currentMinute}`;
+    
+    // Solo lanzar notificacion si coincide exactamente en el minuto (y evitar duplicados)
+    const lastNotifDate = localStorage.getItem('appOpeLastNotifDate');
+    const todayStr = now.toDateString();
+    
+    if (currentTimeStr === notifTime && lastNotifDate !== todayStr) {
+        // Verificar si hay preguntas SRS pendientes
+        const srsData = JSON.parse(localStorage.getItem('appOpeSRS') || '{}');
+        const tsNow = Date.now();
+        let dueCount = 0;
+        
+        for (const key in srsData) {
+            if (srsData[key].nextReviewDate <= tsNow) {
+                dueCount++;
+            }
+        }
+        
+        if (dueCount > 0) {
+            new Notification('OPE Enfermería', { 
+                body: `¡No pierdas tu racha! Tienes ${dueCount} repasos pendientes.`,
+                icon: './icon.png'
+            });
+            localStorage.setItem('appOpeLastNotifDate', todayStr);
+        }
+    }
+}
+
+// Iniciar chequeo de notificaciones cada minuto
+setInterval(checkAndSendNotifications, 60000);
+
+// Detectar nueva versión del Service Worker (desde la inicialización)
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+        // Recargar la pagina porque el nuevo SW ha tomado el control
+        window.location.reload();
+    });
+    
+    navigator.serviceWorker.ready.then(registration => {
+        registration.addEventListener('updatefound', () => {
+            const newWorker = registration.installing;
+            newWorker.addEventListener('statechange', () => {
+                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                    // Mostrar toast en lugar de reload brusco
+                    if (swUpdateToast) {
+                        swUpdateToast.classList.remove('hidden');
+                        swUpdateToast.onclick = () => {
+                            newWorker.postMessage('SKIP_WAITING');
+                        };
+                    }
+                }
+            });
+        });
+    });
+}
+
+// --- COMPARTIR Y AUDIO/HAPTICS ---
+function shareResult() {
+    if (!lastTestResults) return;
+    
+    const total = lastTestResults.testQuestions.length;
+    const correct = lastTestResults.correct;
+    const netPercentage = ((lastTestResults.netScore / total) * 100).toFixed(1);
+    
+    let text = `¡Acabo de completar un test en OPE Enfermería!\n✅ Aciertos: ${correct}/${total}\n📊 Nota Neta: ${netPercentage}%\n\n¡Anímate a probarla!`;
+    
+    if (testMode === 'examen') {
+        const grade10 = ((lastTestResults.netScore / total) * 10).toFixed(2);
+        const ptile = document.getElementById('examPercentile').textContent;
+        text = `¡Simulacro OPE Enfermería Completado!\n📝 Nota Oficial: ${grade10}/10\n🏆 Percentil: ${ptile}\n\n¿Puedes superarlo?`;
+    }
+    
+    if (navigator.share) {
+        navigator.share({
+            title: 'Mi resultado OPE',
+            text: text,
+            url: window.location.href
+        }).catch(console.error);
+    } else {
+        // Fallback
+        navigator.clipboard.writeText(text).then(() => {
+            alert("¡Resultado copiado al portapapeles! Puedes pegarlo donde quieras.");
+        });
+    }
+}
+
+let audioCtx = null;
+function playFeedback(type) {
+    if (localStorage.getItem('appOpeSoundEnabled') === 'false') return;
+    
+    // Haptics
+    if ('vibrate' in navigator) {
+        if (type === 'correct') navigator.vibrate(50);
+        else if (type === 'wrong') navigator.vibrate([50, 100, 50]);
+        else if (type === 'finish') navigator.vibrate([100, 50, 100, 50, 200]);
+    }
+    
+    // Web Audio API
+    try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        
+        const now = audioCtx.currentTime;
+        
+        if (type === 'correct') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(600, now);
+            osc.frequency.exponentialRampToValueAtTime(1200, now + 0.1);
+            gain.gain.setValueAtTime(0.1, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+            osc.start(now);
+            osc.stop(now + 0.1);
+        } else if (type === 'wrong') {
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(300, now);
+            osc.frequency.exponentialRampToValueAtTime(150, now + 0.2);
+            gain.gain.setValueAtTime(0.1, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+            osc.start(now);
+            osc.stop(now + 0.2);
+        } else if (type === 'finish') {
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(400, now);
+            osc.frequency.setValueAtTime(600, now + 0.1);
+            osc.frequency.setValueAtTime(800, now + 0.2);
+            gain.gain.setValueAtTime(0.1, now);
+            gain.gain.linearRampToValueAtTime(0.01, now + 0.4);
+            osc.start(now);
+            osc.stop(now + 0.4);
+        }
+    } catch(e) {
+        console.error("Audio playback failed", e);
+    }
+}
+

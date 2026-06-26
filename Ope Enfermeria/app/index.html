@@ -91,6 +91,14 @@
                         <!-- Quests inserted here by JS -->
                     </div>
                 </div>
+
+                <!-- CALENDARIO DE ESTUDIO (HEATMAP) -->
+                <div style="background: rgba(0,0,0,0.15); border-radius: 0.5rem; padding: 0.8rem; margin-top: 1rem;">
+                    <span style="font-size: 0.9rem; font-weight: 600; color: var(--text-primary); display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">📅 Actividad Reciente</span>
+                    <div id="heatmapContainer" style="display: flex; flex-wrap: wrap; gap: 4px; overflow-x: auto; padding-bottom: 0.5rem;">
+                        <!-- Heatmap cells inserted here by JS -->
+                    </div>
+                </div>
             </div>
 
             <div class="upload-zone" id="loadingZone" style="border: none; background: transparent;">
@@ -163,6 +171,11 @@
 
                     <button id="startQuickBtn" class="premium-btn primary"
                         style="width: 100%; margin-bottom: 0.5rem; box-shadow: 0 0 15px rgba(56, 189, 248, 0.4); background: linear-gradient(135deg, #38bdf8, #0284c7);">⚡ Test Rápido (5 pregs)</button>
+                    <button id="startSrsBtn" class="premium-btn primary"
+                        style="width: 100%; margin-bottom: 0.5rem; box-shadow: 0 0 15px rgba(236, 72, 153, 0.4); background: linear-gradient(135deg, #ec4899, #be185d); position: relative;">
+                        🧠 Repaso Inteligente
+                        <span id="srsBadge" style="position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); background: white; color: #be185d; font-size: 0.8rem; font-weight: bold; padding: 0.1rem 0.5rem; border-radius: 1rem; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">0</span>
+                    </button>
                     <div style="display: flex; gap: 0.5rem; width: 100%;">
                         <button id="startFavoritesBtn" class="premium-btn secondary"
                             style="flex-grow: 1; border-color: #facc15; color: #facc15;">⭐ Test Favoritas</button>
@@ -188,6 +201,7 @@
                     </button>
                     <button id="howItWorksBtn" class="premium-btn secondary" style="width: 100%;">❓ ¿Cómo funciona la
                         app?</button>
+                    <button id="openSettingsBtn" class="premium-btn secondary" style="width: 100%;">⚙️ Ajustes y Notificaciones</button>
                 </div>
             </div>
         </div>
@@ -277,11 +291,31 @@
         <div class="glass-panel text-center">
             <h1 class="gradient-text">¡Test Completado!</h1>
 
-            <div class="score-display">
-                <div class="score-circle">
-                    <span id="finalScoreText" class="score-number">0</span>
-                    <span class="score-max">/ 40</span>
+            <div class="score-display" style="position: relative; width: 220px; height: 220px; margin: 0 auto 1.5rem auto;">
+                <canvas id="resultDonutChart"></canvas>
+                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none;">
+                    <span id="finalScoreText" style="font-size: 3rem; font-weight: 900; background: var(--gradient-primary); -webkit-background-clip: text; color: transparent; line-height: 1;">0</span>
+                    <span class="score-max" style="font-size: 1.2rem; color: var(--text-secondary); margin-top: -5px;">/ 40</span>
                 </div>
+            </div>
+            
+            <div id="historicalComparison" style="margin-bottom: 1.5rem; font-weight: 600; padding: 0.8rem; border-radius: 0.5rem; display: none; text-align: center; font-size: 1.1rem;">
+            </div>
+
+            <!-- CONTENEDOR PREDICCIÓN SIMULACRO -->
+            <div id="examPredictionContainer" class="hidden" style="margin-bottom: 1.5rem; background: linear-gradient(135deg, rgba(245,158,11,0.1), rgba(217,119,6,0.2)); border: 1px solid rgba(245,158,11,0.4); padding: 1.2rem; border-radius: 1rem; text-align: center;">
+                <h3 style="color: #f59e0b; margin-bottom: 0.8rem; font-size: 1.1rem; display: flex; justify-content: center; align-items: center; gap: 0.5rem;">⭐ Estimación Oficial OPE</h3>
+                <div style="display: flex; justify-content: space-around; margin-bottom: 1rem;">
+                    <div>
+                        <div style="font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase;">Nota Neta</div>
+                        <div id="examOfficialScore" style="font-size: 2rem; font-weight: 900; color: var(--text-primary);">0.00</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase;">Percentil</div>
+                        <div id="examPercentile" style="font-size: 2rem; font-weight: 900; color: #f59e0b;">0%</div>
+                    </div>
+                </div>
+                <div id="examPredictionMessage" style="font-size: 0.95rem; color: var(--text-primary); font-weight: 600; background: rgba(0,0,0,0.2); padding: 0.5rem; border-radius: 0.5rem;"></div>
             </div>
 
             <div id="penaltyBreakdown" class="penalty-breakdown hidden">
@@ -303,7 +337,8 @@
                 <button id="reviewAnswersBtn" class="premium-btn secondary">📋 Revisar Respuestas</button>
                 <button id="retryFailedBtn" class="premium-btn secondary hidden"
                     style="border-color:#f87171;color:#f87171;">🔁 Repetir Falladas</button>
-                <button id="tryAgainBtn" class="premium-btn primary">Realizar otro test</button>
+                <button id="shareResultBtn" class="premium-btn primary" style="background: linear-gradient(135deg, #10b981, #059669); border: none;">📲 Compartir</button>
+                <button id="tryAgainBtn" class="premium-btn primary">🏠 Volver al Menú Principal</button>
             </div>
 
             <div id="resultReviewSection" class="hidden">
@@ -525,85 +560,161 @@
     <main id="infoScreen" class="screen">
         <header class="test-header" style="margin-bottom: 2rem;">
             <div style="display: flex; justify-content: space-between; align-items: center;">
-                <h2 class="gradient-text" style="font-size: 2rem; margin: 0;">Cómo funciona el simulador</h2>
-                <button id="infoToStartBtn" class="premium-btn secondary"
-                    style="padding: 0.5rem 1rem; font-size: 0.9rem;">✕ Volver</button>
+                <h2 class="gradient-text" style="font-size: 2rem; margin: 0;">¿Cómo funciona la app?</h2>
+                <button id="infoToStartBtn" class="premium-btn secondary" style="padding: 0.5rem 1rem; font-size: 0.9rem;">✕ Volver</button>
             </div>
         </header>
 
-        <div class="glass-panel"
-            style="padding: 2rem; text-align: left; color: var(--text-primary); font-size: 1.05rem; line-height: 1.6;">
-            <ul
-                style="list-style-type: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 1.5rem;">
-                <li>
-                    <span style="font-size: 1.3rem; margin-bottom: 0.5rem; display: block;">📝 <strong>Dos modos de
-                            estudio</strong></span>
-                    Puedes elegir el <strong>Test Normal</strong> (de 25, 50 o 100 preguntas) para estudiar de forma
-                    dinámica con confirmación inmediata de si has acertado o fallado, o el <strong>Modo Examen</strong>
-                    (100 preguntas temporizadas a 1 hora) para ponerte a prueba a ciegas hasta el final.
+        <div class="glass-panel" style="padding: 2rem; text-align: left; color: var(--text-primary); font-size: 1rem; line-height: 1.7;">
+
+            <!-- SECCIÓN: MODOS DE ESTUDIO -->
+            <p style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700; margin-bottom: 1rem;">📚 MODOS DE ESTUDIO</p>
+            <div style="display: grid; gap: 1rem; margin-bottom: 2rem;">
+
+                <div style="background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.3); padding: 1rem; border-radius: 0.8rem;">
+                    <span style="font-size: 1.1rem; font-weight: 700;">📝 Test Normal</span>
+                    <p style="margin: 0.4rem 0 0 0; color: var(--text-secondary); font-size: 0.95rem;">Elige entre 10, 25, 50, 100 preguntas o todas. Cada respuesta se corrige de inmediato: verde si aciertas, rojo con la respuesta correcta si fallas. Ideal para aprender sin presión.</p>
+                </div>
+
+                <div style="background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.3); padding: 1rem; border-radius: 0.8rem;">
+                    <span style="font-size: 1.1rem; font-weight: 700;">⏱️ Simulacro Oficial OPE</span>
+                    <p style="margin: 0.4rem 0 0 0; color: var(--text-secondary); font-size: 0.95rem;">100 preguntas, 120 minutos, sin feedback hasta el final. Aplica la penalización oficial (-1/3 por error). Al entregar verás tu <strong>Nota sobre 10</strong> y un <strong>Percentil estadístico</strong> que te indica en qué posición quedarías frente al resto de aspirantes.</p>
+                </div>
+
+                <div style="background: rgba(168,85,247,0.1); border: 1px solid rgba(168,85,247,0.3); padding: 1rem; border-radius: 0.8rem;">
+                    <span style="font-size: 1.1rem; font-weight: 700;">🧠 Repaso Inteligente (SRS)</span>
+                    <p style="margin: 0.4rem 0 0 0; color: var(--text-secondary); font-size: 0.95rem;">La app aplica el algoritmo de <strong>Repetición Espaciada</strong> (similar a Anki). Las preguntas que fallas vuelven más pronto; las que dominas, más tarde. El badge <span style="background: #6366f1; color: white; padding: 0 6px; border-radius: 99px; font-size: 0.8rem;">N</span> en el menú te indica cuántas preguntas tienes pendientes hoy.</p>
+                </div>
+
+                <div style="background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); padding: 1rem; border-radius: 0.8rem;">
+                    <span style="font-size: 1.1rem; font-weight: 700;">⭐ Test de Favoritas &nbsp;|&nbsp; ❌ Test de Falladas</span>
+                    <p style="margin: 0.4rem 0 0 0; color: var(--text-secondary); font-size: 0.95rem;">Marca cualquier pregunta con ⭐ para crear tu propio banco personal. El test de Falladas se genera automáticamente con todas las preguntas que tienes errores acumulados.</p>
+                </div>
+
+                <div style="background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); padding: 1rem; border-radius: 0.8rem;">
+                    <span style="font-size: 1.1rem; font-weight: 700;">🎴 Flashcards</span>
+                    <p style="margin: 0.4rem 0 0 0; color: var(--text-secondary); font-size: 0.95rem;">Estudia con tarjetas de memorización de doble cara (toca para girar). Una forma visual y rápida de repasar conceptos clave.</p>
+                </div>
+
+            </div>
+
+            <hr style="border-color: var(--border-color); margin-bottom: 2rem;">
+
+            <!-- SECCIÓN: HERRAMIENTAS -->
+            <p style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700; margin-bottom: 1rem;">🛠️ HERRAMIENTAS</p>
+            <ul style="list-style-type: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 1.2rem; margin-bottom: 2rem;">
+
+                <li style="display:flex; gap: 1rem; align-items: flex-start;">
+                    <span style="font-size: 1.5rem; flex-shrink:0;">🔍</span>
+                    <div><strong>Buscador</strong><br><span style="color: var(--text-secondary); font-size: 0.95rem;">Busca cualquier concepto por texto libre o por número de pregunta. Toca cualquier resultado para ver tus estadísticas individuales sobre esa pregunta (vistas, aciertos, fallos).</span></div>
                 </li>
-                <li>
-                    <span style="font-size: 1.3rem; margin-bottom: 0.5rem; display: block;">⭐ <strong>Favoritas,
-                            Falladas y Buscador</strong></span>
-                    Puedes marcar cualquier pregunta con la ⭐ para añadirla a tus favoritas. Luego, desde el menú
-                    principal, podrás generar un <strong>Test de Favoritas</strong> o un <strong>Test de
-                        Falladas</strong>. Además, dispones de un <strong>Buscador</strong> para consultar rápidamente
-                    cualquier concepto por texto o por número de pregunta.
+
+                <li style="display:flex; gap: 1rem; align-items: flex-start;">
+                    <span style="font-size: 1.5rem; flex-shrink:0;">⏸️</span>
+                    <div><strong>Pausar y Continuar</strong><br><span style="color: var(--text-secondary); font-size: 0.95rem;">¿Te tienes que ir? Pulsa Pausar y la sesión se guarda al segundo. La próxima vez que entres, el botón "Continuar" te devuelve exactamente a la pregunta donde lo dejaste.</span></div>
                 </li>
-                <li>
-                    <span style="font-size: 1.3rem; margin-bottom: 0.5rem; display: block;">🎴 <strong>Flashcards y
-                            Rachas</strong></span>
-                    Inicia tu día con 10 flashcards diferentes cada jornada. Para mantener la constancia, el sistema
-                    cuenta tu <strong>Racha de Estudio</strong> diaria (🔥). ¡Intenta no perder tu racha!
+
+                <li style="display:flex; gap: 1rem; align-items: flex-start;">
+                    <span style="font-size: 1.5rem; flex-shrink:0;">📝</span>
+                    <div><strong>Notas Mnemotécnicas</strong><br><span style="color: var(--text-secondary); font-size: 0.95rem;">Pulsa el botón 📝 en cualquier pregunta para anotar una regla o explicación propia. Aparecerá siempre que esa pregunta vuelva a salir.</span></div>
                 </li>
-                <li>
-                    <span style="font-size: 1.3rem; margin-bottom: 0.5rem; display: block;">⏸️ <strong>Pausar Test y Mis
-                            Notas</strong></span>
-                    Si tienes que irte en mitad de un test, pulsa el botón <strong>⏸️ Pausar</strong>. Podrás retomarlo
-                    exactamente donde lo dejaste la próxima vez que entres. También puedes usar el botón 📝 en cualquier
-                    pregunta para añadir una <strong>Regla Mnemotécnica o Nota</strong> que te aparecerá cada vez que
-                    esa pregunta vuelva a salir.
+
+                <li style="display:flex; gap: 1rem; align-items: flex-start;">
+                    <span style="font-size: 1.5rem; flex-shrink:0;">📊</span>
+                    <div><strong>Histórico y Estadísticas</strong><br><span style="color: var(--text-secondary); font-size: 0.95rem;">Consulta todos tus tests anteriores con gráficos de evolución, tu Mapa de Calor de actividad (estilo GitHub) y métricas globales como tu nota media y preguntas únicas vistas.</span></div>
                 </li>
-                <li>
-                    <span style="font-size: 1.3rem; margin-bottom: 0.5rem; display: block;">🎯 <strong>Insistencia
-                            inteligente</strong></span>
-                    El algoritmo detecta qué respuestas fallas más a menudo y les otorga más peso. Conforme más utilices
-                    la app, más insistirá en tus puntos flacos garantizando que abarcarás el 100% de las preguntas.
+
+                <li style="display:flex; gap: 1rem; align-items: flex-start;">
+                    <span style="font-size: 1.5rem; flex-shrink:0;">⌨️</span>
+                    <div><strong>Atajos de Teclado</strong><br><span style="color: var(--text-secondary); font-size: 0.95rem;">Responde con <kbd style="background:rgba(255,255,255,0.1);padding:2px 6px;border-radius:4px;">A</kbd> <kbd style="background:rgba(255,255,255,0.1);padding:2px 6px;border-radius:4px;">B</kbd> <kbd style="background:rgba(255,255,255,0.1);padding:2px 6px;border-radius:4px;">C</kbd> <kbd style="background:rgba(255,255,255,0.1);padding:2px 6px;border-radius:4px;">D</kbd>. Navega con <kbd style="background:rgba(255,255,255,0.1);padding:2px 6px;border-radius:4px;">←</kbd> <kbd style="background:rgba(255,255,255,0.1);padding:2px 6px;border-radius:4px;">→</kbd>. Solo en modo escritorio.</span></div>
                 </li>
-                <li>
-                    <span style="font-size: 1.3rem; margin-bottom: 0.5rem; display: block;">📊 <strong>Histórico y
-                            Estadísticas</strong></span>
-                    Consulta tu evolución global desde "Ver Histórico". Además, al pulsar sobre cualquier pregunta
-                    (desde el buscador), podrás ver en detalle cuántas veces la has visto, acertado y fallado.
+
+                <li style="display:flex; gap: 1rem; align-items: flex-start;">
+                    <span style="font-size: 1.5rem; flex-shrink:0;">📲</span>
+                    <div><strong>Compartir Resultado</strong><br><span style="color: var(--text-secondary); font-size: 0.95rem;">Al terminar cualquier test o simulacro, pulsa el botón verde "Compartir" para enviar tu nota por WhatsApp, Telegram u otras apps. En PC, el texto se copia al portapapeles.</span></div>
                 </li>
-                <li>
-                    <span style="font-size: 1.3rem; margin-bottom: 0.5rem; display: block;">⚠️ <strong>Reportar
-                            Errores</strong></span>
-                    Si encuentras una pregunta con una respuesta incorrecta o que deba ser anulada, usa el botón
-                    <strong>⚠️ Reportar Error</strong> para enviar un aviso por email con tu sugerencia de
-                    corrección.
+
+                <li style="display:flex; gap: 1rem; align-items: flex-start;">
+                    <span style="font-size: 1.5rem; flex-shrink:0;">⚠️</span>
+                    <div><strong>Reportar Errores en Preguntas</strong><br><span style="color: var(--text-secondary); font-size: 0.95rem;">Si detectas una pregunta con respuesta incorrecta o que deba anularse, pulsa "⚠️ Reportar Error" para enviar un aviso por email con tu sugerencia.</span></div>
                 </li>
-                <li>
-                    <span style="font-size: 1.3rem; margin-bottom: 0.5rem; display: block;">🏆 <strong>Gamificación, Rangos y Misiones</strong></span>
-                    Para hacer tu preparación más entretenida, ganarás <strong>Puntos de Experiencia (XP)</strong> al completar tests y exámenes. Dependiendo de tu XP irás subiendo de <strong>Rango</strong> (Estudiante, EIR, Adjunto, Supervisor, Plaza Fija). Además, dispones de un indicador de <strong>Salud del Temario</strong> que mide qué tan al día llevas tus repasos, <strong>Misiones Diarias</strong> para ganar XP extra, y <strong>Protectores de Racha</strong> que puedes comprar con XP para salvar tu constancia si un día no puedes estudiar.
-                </li>
-                <li style="border-top: 1px solid var(--border-color); padding-top: 1.5rem; margin-top: 0.5rem;">
-                    <span style="font-size: 1.3rem; margin-bottom: 0.5rem; display: block; color: var(--accent);">☁️ <strong>Sincronización Multidispositivo</strong></span>
-                    Al hacer clic en el botón superior <strong>☁️ Sincronizar</strong>, puedes crear una cuenta o iniciar sesión mediante <strong>Google</strong> o Email/Contraseña. Esto te permite guardar tu historial, rachas, notas y favoritas de forma permanente en la nube para continuar estudiando exactamente en el mismo punto desde tu móvil, tablet u ordenador.
-                </li>
-                <li style="background: rgba(0,0,0,0.2); padding: 1.5rem; border-radius: 1rem; border: 1px solid var(--border-color);">
-                    <span style="font-size: 1.2rem; margin-bottom: 0.8rem; display: block; color: #4ade80;">🔐 <strong>Privacidad y Tratamiento de Datos</strong></span>
-                    <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.6rem;">Conforme al modelo de <em>Plantilla Estándar Open Source</em>, garantizamos la máxima transparencia y minimización de datos:</p>
-                    <ul style="list-style-type: disc; padding-left: 1.2rem; font-size: 0.9rem; color: var(--text-primary); display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1.2rem;">
-                        <li><strong>Responsable:</strong> Imanol Ekaitz (Ekaitzel) - Contacto: <a href="mailto:imanoleka@gmail.com" style="color: var(--accent);">imanoleka@gmail.com</a></li>
-                        <li><strong>Datos Recopilados:</strong> Únicamente el correo electrónico facilitado para el acceso y métricas de estudio estrictamente disociadas (hashes de preguntas). No se utilizan cookies de rastreo ni se recopilan direcciones IP.</li>
-                        <li><strong>Finalidad y Seguridad:</strong> Garantizar la continuidad de tus sesiones de estudio. Los datos se almacenan de forma totalmente cifrada bajo la infraestructura segura de Supabase.</li>
-                    </ul>
-                    <button onclick="requestUserAccountDeletion()" class="premium-btn secondary" style="background: #ef4444; color: white; border: none; padding: 0.6rem 1rem; font-size: 0.85rem; border-radius: 0.5rem; display: inline-flex; align-items: center; gap: 0.4rem;">
-                        🗑️ Eliminar mi Cuenta y Datos Almacenados
-                    </button>
-                </li>
+
             </ul>
+
+            <hr style="border-color: var(--border-color); margin-bottom: 2rem;">
+
+            <!-- SECCIÓN: GAMIFICACIÓN -->
+            <p style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700; margin-bottom: 1rem;">🏆 GAMIFICACIÓN Y PROGRESO</p>
+            <ul style="list-style-type: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 1.2rem; margin-bottom: 2rem;">
+
+                <li style="display:flex; gap: 1rem; align-items: flex-start;">
+                    <span style="font-size: 1.5rem; flex-shrink:0;">⚡</span>
+                    <div><strong>XP y Rangos</strong><br><span style="color: var(--text-secondary); font-size: 0.95rem;">Ganas XP por cada test, acierto y racha. Con el XP acumulado asciendes de rango: <em>Estudiante → EIR → Auxiliar → Graduado → Especialista → Supervisor → Jefe de Servicio → Adjunto → Subdirector → Director → Rector → Plaza Fija</em>.</span></div>
+                </li>
+
+                <li style="display:flex; gap: 1rem; align-items: flex-start;">
+                    <span style="font-size: 1.5rem; flex-shrink:0;">🔥</span>
+                    <div><strong>Racha Diaria y Protectores</strong><br><span style="color: var(--text-secondary); font-size: 0.95rem;">Estudia un día para iniciar tu racha. Puedes comprar <strong>Protectores de Racha</strong> con XP: si un día no estudias, el protector se consume automáticamente y tu racha se salva.</span></div>
+                </li>
+
+                <li style="display:flex; gap: 1rem; align-items: flex-start;">
+                    <span style="font-size: 1.5rem; flex-shrink:0;">📅</span>
+                    <div><strong>Misiones Diarias</strong><br><span style="color: var(--text-secondary); font-size: 0.95rem;">Cada día se generan 3 misiones nuevas (ej: "Responde 20 preguntas", "Consigue 5 aciertos seguidos"). Complétalas para ganar XP extra. Se renuevan a medianoche.</span></div>
+                </li>
+
+                <li style="display:flex; gap: 1rem; align-items: flex-start;">
+                    <span style="font-size: 1.5rem; flex-shrink:0;">🎖️</span>
+                    <div><strong>Logros</strong><br><span style="color: var(--text-secondary); font-size: 0.95rem;">Desbloquea medallas especiales por hitos de estudio: primera racha, primer simulacro aprobado, preguntas únicas vistas, y mucho más. Puedes verlos todos en el panel de Logros del menú principal.</span></div>
+                </li>
+
+                <li style="display:flex; gap: 1rem; align-items: flex-start;">
+                    <span style="font-size: 1.5rem; flex-shrink:0;">❤️</span>
+                    <div><strong>Salud del Temario</strong><br><span style="color: var(--text-secondary); font-size: 0.95rem;">Un indicador (0–100%) que mide qué tan al día llevas tus repasos SRS. Baja si tienes muchas preguntas pendientes acumuladas, y sube cuando las repasas. ¡Mantenla al máximo!</span></div>
+                </li>
+
+            </ul>
+
+            <hr style="border-color: var(--border-color); margin-bottom: 2rem;">
+
+            <!-- SECCIÓN: NOTIFICACIONES Y OFFLINE -->
+            <p style="color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700; margin-bottom: 1rem;">⚙️ AJUSTES Y CONECTIVIDAD</p>
+            <ul style="list-style-type: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 1.2rem; margin-bottom: 2rem;">
+
+                <li style="display:flex; gap: 1rem; align-items: flex-start;">
+                    <span style="font-size: 1.5rem; flex-shrink:0;">🔔</span>
+                    <div><strong>Recordatorios de Estudio</strong><br><span style="color: var(--text-secondary); font-size: 0.95rem;">Desde ⚙️ Ajustes puedes activar notificaciones diarias. Elige la hora y, si tienes repasos SRS pendientes, recibirás una alerta nativa del sistema operativo. Requiere tener la app abierta en segundo plano.</span></div>
+                </li>
+
+                <li style="display:flex; gap: 1rem; align-items: flex-start;">
+                    <span style="font-size: 1.5rem; flex-shrink:0;">🔊</span>
+                    <div><strong>Sonidos y Vibración</strong><br><span style="color: var(--text-secondary); font-size: 0.95rem;">La app emite sonidos sutiles al acertar (tono agudo) y al fallar (tono grave), y vibra en móvil. Puedes desactivarlo en cualquier momento desde ⚙️ Ajustes → "Efectos Hápticos y Audio".</span></div>
+                </li>
+
+                <li style="display:flex; gap: 1rem; align-items: flex-start;">
+                    <span style="font-size: 1.5rem; flex-shrink:0;">📶</span>
+                    <div><strong>Funciona Sin Conexión</strong><br><span style="color: var(--text-secondary); font-size: 0.95rem;">La app se instala como PWA y carga de forma instantánea aunque no tengas internet. Si hay una nueva versión disponible, un aviso verde en la parte inferior te invitará a actualizarla.</span></div>
+                </li>
+
+                <li style="display:flex; gap: 1rem; align-items: flex-start;">
+                    <span style="font-size: 1.5rem; flex-shrink:0;">☁️</span>
+                    <div><strong>Sincronización Multidispositivo</strong><br><span style="color: var(--text-secondary); font-size: 0.95rem;">Pulsa ☁️ Sincronizar para crear una cuenta o iniciar sesión con Google. Tu historial, rachas, favoritas, notas y XP se guardan en la nube: estudia en el móvil y continúa en el PC sin perder nada.</span></div>
+                </li>
+
+            </ul>
+
+            <!-- PRIVACIDAD -->
+            <div style="background: rgba(0,0,0,0.25); padding: 1.5rem; border-radius: 1rem; border: 1px solid var(--border-color);">
+                <span style="font-size: 1.1rem; display: block; margin-bottom: 0.8rem; color: #4ade80;">🔐 <strong>Privacidad y Datos</strong></span>
+                <ul style="list-style-type: disc; padding-left: 1.2rem; font-size: 0.9rem; color: var(--text-secondary); display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1.2rem;">
+                    <li><strong style="color: var(--text-primary);">Responsable:</strong> Imanol Ekaitz — <a href="mailto:imanoleka@gmail.com" style="color: var(--accent);">imanoleka@gmail.com</a></li>
+                    <li><strong style="color: var(--text-primary);">Datos Recopilados:</strong> Solo el email para el acceso y hashes de preguntas (nunca texto plano). Sin cookies de rastreo ni IPs.</li>
+                    <li><strong style="color: var(--text-primary);">Finalidad:</strong> Continuidad de sesiones de estudio. Almacenados de forma cifrada en Supabase.</li>
+                </ul>
+                <button onclick="requestUserAccountDeletion()" class="premium-btn secondary" style="background: #ef4444; color: white; border: none; padding: 0.6rem 1rem; font-size: 0.85rem; border-radius: 0.5rem; display: inline-flex; align-items: center; gap: 0.4rem;">
+                    🗑️ Eliminar mi Cuenta y Datos
+                </button>
+            </div>
+
         </div>
     </main>
 
@@ -825,11 +936,53 @@
             });
         }
     </script>
+    <!-- TOAST ACTUALIZACIÓN SW -->
+    <div id="swUpdateToast" class="hidden" style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #22c55e; color: white; padding: 1rem 1.5rem; border-radius: 1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 9999; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 0.5rem; animation: slideUp 0.3s ease-out;">
+        <span>🔄 ¡Nueva versión disponible! Haz clic para actualizar.</span>
+    </div>
+
+    <!-- MODAL DE AJUSTES -->
+    <div id="settingsModal" class="modal-overlay hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 1000; display: flex; justify-content: center; align-items: center;">
+        <div class="glass-panel" style="max-width: 400px; width: 90%; padding: 2rem; position: relative;">
+            <button id="closeSettingsBtn" style="position: absolute; top: 1rem; right: 1.2rem; background: transparent; border: none; color: var(--text-secondary); font-size: 1.2rem; cursor: pointer;">✕</button>
+            <h2 style="font-size: 1.5rem; margin-bottom: 1.5rem; color: var(--text-primary); font-family: var(--font-heading);">⚙️ Ajustes</h2>
+            
+            <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 0.8rem; margin-bottom: 1rem;">
+                <h3 style="font-size: 1rem; margin-bottom: 0.5rem;">Notificaciones Locales</h3>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">Recibe un recordatorio diario si tienes repasos pendientes. Requiere mantener la app abierta en 2º plano.</p>
+                
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+                    <span style="font-size: 0.95rem; font-weight: 600;">Activar Notificaciones</span>
+                    <label class="switch">
+                        <input type="checkbox" id="notifToggle">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                
+                <div id="notifTimeContainer" style="display: none; align-items: center; justify-content: space-between;">
+                    <span style="font-size: 0.95rem;">Hora de aviso:</span>
+                    <input type="time" id="notifTimeInput" style="background: var(--surface-input); color: white; border: 1px solid var(--border-color); padding: 0.5rem; border-radius: 0.5rem; font-family: var(--font-body);">
+                </div>
+            </div>
+
+            <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 0.8rem; margin-bottom: 1rem;">
+                <h3 style="font-size: 1rem; margin-bottom: 0.5rem;">Sonidos y Vibración</h3>
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <span style="font-size: 0.95rem; font-weight: 600;">Efectos Hápticos y Audio</span>
+                    <label class="switch">
+                        <input type="checkbox" id="soundToggle" checked>
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
+            <button id="saveSettingsBtn" class="premium-btn primary" style="width: 100%;">Guardar Ajustes</button>
+        </div>
+    </div>
+
     <!-- SDK de Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- Capa de Almacenamiento y Sincronización -->
     <script src="./scripts/storage.js"></script>
     <script src="main.js"></script>
 </body>
-
 </html>
