@@ -1,5 +1,5 @@
 // Cambiar CACHE_NAME para forzar una actualización profunda inmediata
-const CACHE_NAME = 'ope-enfermeria-cache-v3';
+const CACHE_NAME = 'ope-enfermeria-cache-v4';
 const urlsToCache = [
     './',
     './index.html',
