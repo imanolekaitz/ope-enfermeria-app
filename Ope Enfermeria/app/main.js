@@ -74,6 +74,7 @@ const fileCountText = document.getElementById('fileCount');
 const totalAvailableText = document.getElementById('totalAvailable');
 const startTestBtn = document.getElementById('startTestBtn');
 const startExamBtn = document.getElementById('startExamBtn');
+const startQuickBtn = document.getElementById('startQuickBtn');
 const viewHistoryBtn = document.getElementById('viewHistoryBtn');
 const howItWorksBtn = document.getElementById('howItWorksBtn');
 const historyToStartBtn = document.getElementById('historyToStartBtn');
@@ -184,6 +185,7 @@ window.addEventListener('cloudStateSynced', () => {
 });
 startTestBtn.addEventListener('click', () => startTest('normal'));
 startExamBtn.addEventListener('click', () => startTest('examen'));
+if (startQuickBtn) startQuickBtn.addEventListener('click', () => startTest('rapido'));
 startFavoritesBtn.addEventListener('click', () => startTest('favoritas'));
 startFailedBtn.addEventListener('click', () => startTest('falladas'));
 resumeTestBtn.addEventListener('click', resumeSavedTest);
@@ -243,6 +245,42 @@ document.getElementById('openAchievementsBtn').addEventListener('click', openAch
 document.getElementById('closeAchievementsBtn').addEventListener('click', closeAchievementsModal);
 document.getElementById('achievementsModal').addEventListener('click', (e) => {
     if (e.target === document.getElementById('achievementsModal')) closeAchievementsModal();
+});
+
+// Atajos de Teclado
+document.addEventListener('keydown', (e) => {
+    // Evitar atajos si se está escribiendo
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+    if (testScreen.classList.contains('active')) {
+        if (e.key === 'ArrowRight') {
+            if (!nextBtn.classList.contains('hidden')) proceedToNext();
+        } else if (e.key === 'ArrowLeft') {
+            if (!prevBtn.classList.contains('hidden')) proceedToPrev();
+        } else if (['a', 'A', '1'].includes(e.key)) {
+            const btns = optionsContainer.querySelectorAll('.option-btn');
+            if (btns[0] && !btns[0].disabled) btns[0].click();
+        } else if (['b', 'B', '2'].includes(e.key)) {
+            const btns = optionsContainer.querySelectorAll('.option-btn');
+            if (btns[1] && !btns[1].disabled) btns[1].click();
+        } else if (['c', 'C', '3'].includes(e.key)) {
+            const btns = optionsContainer.querySelectorAll('.option-btn');
+            if (btns[2] && !btns[2].disabled) btns[2].click();
+        } else if (['d', 'D', '4'].includes(e.key)) {
+            const btns = optionsContainer.querySelectorAll('.option-btn');
+            if (btns[3] && !btns[3].disabled) btns[3].click();
+        }
+    } else if (flashcardScreen.classList.contains('active')) {
+        if (e.key === ' ') {
+            e.preventDefault();
+            flashcardElement.classList.toggle('is-flipped');
+        } else if (e.key === 'ArrowRight') {
+            if (!fcNextBtn.classList.contains('hidden')) proceedToNextFlashcard();
+            else if (!fcFinishBtn.classList.contains('hidden')) finishFlashcards();
+        } else if (e.key === 'ArrowLeft') {
+            if (!fcPrevBtn.classList.contains('hidden')) proceedToPrevFlashcard();
+        }
+    }
 });
 
 /**
@@ -499,6 +537,8 @@ function startTest(mode) {
                 maxQuestions = parseInt(selectEl.value, 10);
             }
         }
+    } else if (mode === 'rapido') {
+        maxQuestions = 5;
     }
     
     const limit = Math.min(maxQuestions, pool.length);
@@ -2207,13 +2247,36 @@ function retryFailedQuestions() {
  * DEFINICIÓN DEL SISTEMA DE LOGROS
  */
 const ACHIEVEMENTS = [
-    { id: 'primer_test', icon: '\ud83e\udd49', name: 'Primer Test', desc: 'Completa tu primer test o examen.', check: () => JSON.parse(localStorage.getItem('antigravity_history') || '[]').length >= 1 },
-    { id: 'decena', icon: '\ud83d\udcd6', name: 'Estudiante Constante', desc: 'Completa 10 tests o ex\u00e1menes.', check: () => JSON.parse(localStorage.getItem('antigravity_history') || '[]').length >= 10 },
-    { id: 'francotirador', icon: '\ud83c\udfaf', name: 'Francotirador', desc: 'Consigue un 100% en un test de 50+ preguntas.', check: (ctx) => (ctx && ctx.context === 'finish' && ctx.percentage === 100 && ctx.total >= 50) || JSON.parse(localStorage.getItem('antigravity_history') || '[]').some(r => r.total >= 50 && r.correct === r.total && r.answered === r.total) },
-    { id: 'perfeccionista', icon: '\ud83d\udc8e', name: 'Perfeccionista', desc: 'Responde 10 preguntas seguidas correctamente en un test.', check: () => !!localStorage.getItem('appOpeAch_streak10') },
-    { id: 'racha_7', icon: '\ud83d\udd25', name: 'Racha de 7', desc: '7 d\u00edas seguidos estudiando.', check: (ctx) => (ctx && ctx.context === 'streak' && ctx.streak >= 7) || JSON.parse(localStorage.getItem('appOpeStudyStreak') || '{"streak":0}').streak >= 7 },
-    { id: 'enciclopedia', icon: '\ud83d\udcda', name: 'Enciclopedia', desc: 'Has visto al menos 500 preguntas distintas.', check: () => Object.keys(JSON.parse(localStorage.getItem('appOpeQuestionStats') || '{}')).length >= 500 },
-    { id: 'coleccionista', icon: '\u2b50', name: 'Coleccionista', desc: 'Marca 50 preguntas como favoritas.', check: () => JSON.parse(localStorage.getItem('appOpeFavorites') || '[]').length >= 50 }
+    // Tests Completados
+    { id: 'primer_test', icon: '🥉', name: 'Primer Test', desc: 'Completa tu primer test o examen.', check: () => JSON.parse(localStorage.getItem('antigravity_history') || '[]').length >= 1 },
+    { id: 'decena', icon: '📖', name: 'Estudiante Constante', desc: 'Completa 10 tests o exámenes.', check: () => JSON.parse(localStorage.getItem('antigravity_history') || '[]').length >= 10 },
+    { id: 'centena', icon: '💯', name: 'Centurión', desc: 'Completa 100 tests o exámenes.', check: () => JSON.parse(localStorage.getItem('antigravity_history') || '[]').length >= 100 },
+    { id: 'milenio', icon: '🏛️', name: 'Leyenda Viva', desc: 'Completa 1000 tests o exámenes.', check: () => JSON.parse(localStorage.getItem('antigravity_history') || '[]').length >= 1000 },
+    
+    // Rendimiento y Precisión
+    { id: 'francotirador', icon: '🎯', name: 'Francotirador', desc: 'Consigue un 100% en un test de 50+ pregs.', check: (ctx) => (ctx && ctx.context === 'finish' && ctx.percentage === 100 && ctx.total >= 50) || JSON.parse(localStorage.getItem('antigravity_history') || '[]').some(r => r.total >= 50 && r.correct === r.total && r.answered === r.total) },
+    { id: 'perfeccionista', icon: '💎', name: 'Perfeccionista', desc: '10 preguntas seguidas correctas en un test.', check: () => !!localStorage.getItem('appOpeAch_streak10') },
+    { id: 'dios_test', icon: '⚡', name: 'Modo Dios', desc: '50 preguntas seguidas correctas en un test.', check: () => !!localStorage.getItem('appOpeAch_streak50') },
+    { id: 'maraton', icon: '🏃', name: 'Maratón OPE', desc: 'Completa un Modo Examen (100 pregs).', check: (ctx) => ctx && ctx.context === 'finish' && ctx.total >= 100 && ctx.mode === 'examen' },
+    
+    // Rachas
+    { id: 'racha_3', icon: '🔥', name: 'Calentando', desc: '3 días seguidos estudiando.', check: (ctx) => (ctx && ctx.context === 'streak' && ctx.streak >= 3) || JSON.parse(localStorage.getItem('appOpeStudyStreak') || '{"streak":0}').streak >= 3 },
+    { id: 'racha_7', icon: '📅', name: 'Semana Perfecta', desc: '7 días seguidos estudiando.', check: (ctx) => (ctx && ctx.context === 'streak' && ctx.streak >= 7) || JSON.parse(localStorage.getItem('appOpeStudyStreak') || '{"streak":0}').streak >= 7 },
+    { id: 'racha_30', icon: '🗓️', name: 'Mes Imparable', desc: '30 días seguidos estudiando.', check: (ctx) => (ctx && ctx.context === 'streak' && ctx.streak >= 30) || JSON.parse(localStorage.getItem('appOpeStudyStreak') || '{"streak":0}').streak >= 30 },
+    { id: 'racha_100', icon: '👑', name: 'Opositor Legendario', desc: '100 días seguidos estudiando.', check: (ctx) => (ctx && ctx.context === 'streak' && ctx.streak >= 100) || JSON.parse(localStorage.getItem('appOpeStudyStreak') || '{"streak":0}').streak >= 100 },
+    
+    // Temario
+    { id: 'explorador', icon: '🧭', name: 'Explorador', desc: 'Vistas 100 preguntas distintas.', check: () => Object.keys(JSON.parse(localStorage.getItem('appOpeQuestionStats') || '{}')).length >= 100 },
+    { id: 'enciclopedia', icon: '📚', name: 'Enciclopedia', desc: 'Vistas 500 preguntas distintas.', check: () => Object.keys(JSON.parse(localStorage.getItem('appOpeQuestionStats') || '{}')).length >= 500 },
+    { id: 'omnisciente', icon: '👁️', name: 'Omnisciente', desc: 'Vistas todas las preguntas del repositorio.', check: () => allQuestions.length > 0 && Object.keys(JSON.parse(localStorage.getItem('appOpeQuestionStats') || '{}')).length >= allQuestions.length },
+    
+    // Específicos
+    { id: 'coleccionista', icon: '⭐', name: 'Coleccionista', desc: 'Marca 50 preguntas como favoritas.', check: () => JSON.parse(localStorage.getItem('appOpeFavorites') || '[]').length >= 50 },
+    { id: 'estratega', icon: '📝', name: 'Estratega', desc: 'Guarda 20 notas o reglas mnemotécnicas.', check: () => Object.keys(JSON.parse(localStorage.getItem('appOpeNotes') || '{}')).length >= 20 },
+    { id: 'madrugador', icon: '🌅', name: 'Madrugador', desc: 'Completa un test entre 5:00 y 8:00 AM.', check: (ctx) => { if (ctx && ctx.context === 'finish') { const h = new Date().getHours(); return h >= 5 && h < 8; } return false; } },
+    { id: 'noctambulo', icon: '🦉', name: 'Noctámbulo', desc: 'Completa un test entre 0:00 y 4:00 AM.', check: (ctx) => { if (ctx && ctx.context === 'finish') { const h = new Date().getHours(); return h >= 0 && h < 4; } return false; } },
+    { id: 'flashcards', icon: '🎴', name: 'Memoria Visual', desc: 'Completa tu primera sesión de flashcards.', check: (ctx) => ctx && ctx.context === 'flashcards_done' },
+    { id: 'redencion', icon: '🔁', name: 'Redención', desc: 'Aprueba un Test de Falladas.', check: (ctx) => ctx && ctx.context === 'finish' && ctx.mode === 'falladas' && ctx.percentage >= 50 }
 ];
 
 function loadUnlockedAchievements() { return JSON.parse(localStorage.getItem('appOpeAchievements') || '{}'); }
@@ -2234,6 +2297,7 @@ function checkAndUnlockAchievements(ctx = {}) {
             else streak = 0;
         }
         if (streak >= 10) window.appStorage.setItem('appOpeAch_streak10', '1');
+        if (streak >= 50) window.appStorage.setItem('appOpeAch_streak50', '1');
     }
 
     const unlocked = loadUnlockedAchievements();
@@ -2509,16 +2573,47 @@ window.addEventListener('DOMContentLoaded', () => {
 
 // ===== GAMIFICACIÓN (FASE 2) =====
 
+const RANKS = [
+    { xp: 0, name: 'Aspirante' },
+    { xp: 1000, name: 'Estudiante de 1º' },
+    { xp: 2000, name: 'Estudiante de 2º' },
+    { xp: 3500, name: 'Estudiante de 3º' },
+    { xp: 5000, name: 'Estudiante de 4º' },
+    { xp: 7500, name: 'Egresado Reciente' },
+    { xp: 10000, name: 'Opositor Novato' },
+    { xp: 15000, name: 'Opositor Motivado' },
+    { xp: 20000, name: 'Enfermero/a Suplente' },
+    { xp: 25000, name: 'Enfermero/a Adjunto/a' },
+    { xp: 30000, name: 'Opositor Veterano' },
+    { xp: 40000, name: 'Experto en Exámenes' },
+    { xp: 50000, name: 'EIR 1º Año' },
+    { xp: 60000, name: 'EIR 2º Año' },
+    { xp: 75000, name: 'Especialista' },
+    { xp: 90000, name: 'Supervisor/a' },
+    { xp: 110000, name: 'Coordinador/a' },
+    { xp: 130000, name: 'Jefe/a de Bloque' },
+    { xp: 150000, name: 'Director/a de Enfermería' },
+    { xp: 200000, name: 'Plaza Fija (OPE)' },
+    { xp: 300000, name: 'Tribunal OPE' },
+    { xp: 500000, name: 'Ministro/a de Sanidad' }
+];
+
 function initGamification() {
     const xp = parseInt(localStorage.getItem('appOpe_XP') || '0', 10);
     const freezes = parseInt(localStorage.getItem('appOpe_streak_freezes') || '0', 10);
     
     // Ranks
-    let rank = "Estudiante";
-    if (xp >= 50000) rank = "Plaza Fija";
-    else if (xp >= 30000) rank = "Supervisor/a";
-    else if (xp >= 15000) rank = "Enfermero/a Adjunto/a";
-    else if (xp >= 5000) rank = "EIR";
+    let rankObj = RANKS[0];
+    let nextRankObj = RANKS[1] || RANKS[0];
+    for (let i = 0; i < RANKS.length; i++) {
+        if (xp >= RANKS[i].xp) {
+            rankObj = RANKS[i];
+            nextRankObj = RANKS[i+1] || RANKS[i];
+        } else {
+            break;
+        }
+    }
+    let rank = rankObj.name;
     
     // UI Update
     const gamificationPanel = document.getElementById('gamificationPanel');
@@ -2534,15 +2629,10 @@ function initGamification() {
     if (streakFreezeCount) streakFreezeCount.textContent = freezes;
     
     if (xpBarFill) {
-        // Calculate next level percentage
-        let nextLvlXP = 5000;
-        let prevLvlXP = 0;
-        if (xp >= 50000) { nextLvlXP = 50000; prevLvlXP = 50000; }
-        else if (xp >= 30000) { nextLvlXP = 50000; prevLvlXP = 30000; }
-        else if (xp >= 15000) { nextLvlXP = 30000; prevLvlXP = 15000; }
-        else if (xp >= 5000) { nextLvlXP = 15000; prevLvlXP = 5000; }
+        let prevLvlXP = rankObj.xp;
+        let nextLvlXP = nextRankObj.xp;
         
-        if (xp >= 50000) {
+        if (prevLvlXP === nextLvlXP) {
             xpBarFill.style.width = '100%';
         } else {
             const pct = ((xp - prevLvlXP) / (nextLvlXP - prevLvlXP)) * 100;
